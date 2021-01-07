@@ -7,10 +7,10 @@ function Ping(props) {
   const [answer, setAnswer] = useState("");
   useEffect(() => {
     props.incrementStep();
-    // eslint-disable-next-line
   }, []);
 
   const submitAnswer = () => {
+    console.log("run");
     let status;
     fetch("/ping", {
       method: "POST",
@@ -36,8 +36,8 @@ function Ping(props) {
   return (
     <div>
       <Typography>
-        Step 3: Add your first name to server/.env, refresh and test the result
-        below
+        Step 3: Add your first name to server/.env, restart the server and test
+        the result below
       </Typography>
       <Typography>{result}</Typography>
 

@@ -1,7 +1,8 @@
-# Express Starter
+# flask-starter
 
-This starter repo will be used for building applications using React, Material-UI, React-Router, Node, & Express.js.
+## Starting the server:
 
-## Getting started
 
-The project is broken down into a client and server folder.
+1. Open a terminal and go to the server folder. Make sure you have **pipenv** installed (`pip install pipenv`)
+2. Install the dependencies with `pipenv install`. This also createa a virtual environment, if there isn't one already
+3. Activate the virtual environment and start the app with `pipenv run flask run`
