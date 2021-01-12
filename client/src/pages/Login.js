@@ -3,8 +3,8 @@ import { withStyles } from "@material-ui/core/styles"
 import React from "react";
 
 const warningMsg = {
-    emptyFieldError: (fieldName) => `${fieldName} cannot be empty`,
-    passwordError: () => "password must contain at least 6 characters"
+    emptyFieldError: "Required",
+    passwordError: "Password must contain at least 6 characters"
 }
 
 const styles = theme => ({
@@ -40,7 +40,7 @@ class Login extends React.Component {
         this.setState({
             username: event.target.value,
             usernameError: empty, 
-            usernameWarning: empty ? warningMsg.emptyFieldError("username") : ""
+            usernameWarning: empty ? warningMsg.emptyFieldError: ""
         })
     }
 
@@ -51,7 +51,7 @@ class Login extends React.Component {
         this.setState({
             password: event.target.value,
             passwordError: lengthCheck || empty, 
-            passwordWarning: empty ? warningMsg.emptyFieldError("password") : (lengthCheck ? warningMsg.passwordError() : "")
+            passwordWarning: empty ? warningMsg.emptyFieldError : (lengthCheck ? warningMsg.passwordError : "")
         })
     }
 
