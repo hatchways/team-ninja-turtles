@@ -4,7 +4,6 @@ import { Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { Route, Link } from "react-router-dom";
 
-import NavBar from '../components/Navbar'
 import Ping from "./Ping";
 
 const landinPageStyle = theme => ({
@@ -43,7 +42,6 @@ class LandingPage extends Component {
     const { classes } = this.props;
     return (
       <div className={classes.landingContainer}>
-        <NavBar />
         <Typography>{this.state.welcomeMessage}</Typography>
         {this.state.step >= 1 && (
           <React.Fragment>
