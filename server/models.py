@@ -27,7 +27,7 @@ class Contest(db.Model):
     deadline_date = db.Column(db.DateTime)
     created_time = db.Column(db.DateTime, default=func.utcnow())
     update_time = db.Column(db.DateTime, onupdate=func.utcnow()) # store updated time of row
-    contest_creater = db.Column(db.Integer, ForeignKey('contest_user.id'))
+    contest_creater = db.Column(db.Integer, ForeignKey('user.id'))
 
     def __init__(self, id, title, description, prize_contest, deadline_date, created_time, update_time, contest_creater):
         self.id = id
@@ -58,8 +58,3 @@ class Submission(db.Model):
         self.image_link = image_link
         self.created_time = created_time
         self.update_time = update_time
-
-
-
-
-
