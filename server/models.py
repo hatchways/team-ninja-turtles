@@ -1,23 +1,6 @@
-from app import app
-from flask_sqlalchemy import SQLAlchemy
+from app import db
 from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey
-from flask_migrate import Migrate
-
-
-POSTGRES = {
-    'user': 'postgres',
-    'pw': 'Hema@101',
-    'db': 'user_info',
-    'host': 'localhost',
-    'port': '5433',
-}
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
-%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 
 class contest_user(db.Model):
     __tablename__ = 'contest_user'
@@ -25,13 +8,21 @@ class contest_user(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String())
     password = db.Column(db.String())
-    createdTime = db.Column(db.DateTime, default=func.current_timestamp())
+    createdTime = db.Column(db.DateTime, default=func.utcnow())
 
     def __init__(self, id, email, password, createdTime):
         self.id = id
         self.email = email
         self.password = password
         self.createdTime = createdTime
+
+class submission_user(db.Model):
+    __tablename__ = 'submission_user'
+
+    id = db.Column(db.Integer, primary_key=True)
+    sub_email = db.Column(db.String())
+    sub_password = db.Column(db.String())
+    createdTime = db.Column(db.DateTime, default=func.utcnow())
 
 class contest_table(db.Model):
     __tablename__ = 'contest'
@@ -55,6 +46,25 @@ class contest_table(db.Model):
         self.updateTime = updateTime
         self.contestCreater = contestCreater
 
+class submission_table(db.Model):
+    __tablename__ = 'submission'
+
+    id = db.Column(db.Integer, primary_key=True)
+    contest_id = db.Column(db.Integer, ForeignKey('contest.id'))
+    submiter_id = db.Column(db.Integer, ForeignKey('submission_user.id'))
+    active = db.Column(db.Boolean, default=False, nullable=False)
+    image_link = db.Column(db.String())
+    createdTime = db.Column(db.DateTime, default=func.utcnow())
+    updateTime = db.Column(db.DateTime, onupdate=func.utcnow()) # updated time of row
+
+    def __init__(self, id, contest_id, submiter_id, active, image_link, createdTime, updateTime):
+        self.id = id
+        self.contest_id = contest_id
+        self.submiter_id = submiter_id
+        self.active = active
+        self.image_link = image_link
+        self.createdTime = createdTime
+        self.updateTime = updateTime
 
 
 
