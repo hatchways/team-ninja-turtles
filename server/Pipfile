@@ -7,6 +7,8 @@ verify_ssl = true
 
 [packages]
 flask = "*"
+boto3 = "*"
+awscli = "*"
 
 [requires]
 python_version = "3.7"
