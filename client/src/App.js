@@ -12,7 +12,6 @@ import "./App.css"
 function App() {
   return (
     <MuiThemeProvider theme={theme}>
-
       <Router>
         <NavBar />
         <Switch>
