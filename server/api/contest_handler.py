@@ -5,7 +5,7 @@ from datetime import date
 contest_handler = Blueprint('contest_new_handler', __name__)
 
 
-@contest_handler.route('/create_new_contest', methods=['POST'])
+@contest_handler.route('/contest', methods=['POST'])
 def create_contest():
     if request.method == 'POST':
 
@@ -25,32 +25,34 @@ def create_contest():
 
 @contest_handler.route('/contests', methods=['GET'])
 def get_all_contests():
-    all_contests = contest_table.query.all()
-    return jsonify(all_contests)
+    try:
+        all_contests = contest_table.query.all()
+        if len(all_contests) == 0:
+            raise Exception
+    except Exception:
+        return jsonify("No contests listed")
+    else:
+        return jsonify(all_contests)
 
-@contest_handler.route('/contest/<contest_id>')
+@contest_handler.route('/contest/<contest_id>', methods=['PUT', 'GET'])
 def get_contest(contest_id):
-    contest = contest_table.query.get(contest_id)
-    return jsonify(contest)  
-
-@contest_handler.route('/update_contest/<contest_id>', methods=['PUT'])
-def update_contest(contest_id):
-    if request.method == 'PUT':
+    try:
         contest = contest_table.query.get(contest_id)
+        if contest == None:
+            raise Exception
+    except Exception:
+        return jsonify("Contest does not exist")
 
-        title = request.form['title']
-        description = request.form['description']
-        prize_contest = request.form['amount']
-        deadline_date = request.form['deadline_date']
-        update_time = date.today()
+    if request.method == 'GET':
+        return jsonify(contest)
 
-        contest.title = title
-        contest.description = description
-        contest.prize_contest = prize_contest
-        contest.deadline_date = deadline_date
-        contest.update_time = update_time
+    if request.method == 'PUT':
+        contest.title = request.form['title']
+        contest.description = request.form['description']
+        contest.prize_contest = request.form['amount']
+        contest.deadline_date = request.form['deadline_date']
+        contest.update_time = date.today()
 
         db.session.commit()
 
         return jsonify({'successMessage': 'Contest Updated!'})
-        
