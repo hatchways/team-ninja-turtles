@@ -1,8 +1,8 @@
 from flask import Flask
 import os
 from api.ping_handler import ping_handler
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate,MigrateCommand
+from flask_migrate import Migrate, MigrateCommand
+from api import db, bcrypt
 from api.home_handler import home_handler
 from api.user_handler import user_handler
 
@@ -16,13 +16,12 @@ POSTGRES = {
     'port': os.environ.get('DB_PORT')
 }
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
-%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-db = SQLAlchemy(app)
+db.init_app(app)
 migrate = Migrate(app, db)
 
-import models
+bcrypt.init_app(app)
 
 app.register_blueprint(user_handler)
 app.register_blueprint(home_handler)

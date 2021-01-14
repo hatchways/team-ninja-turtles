@@ -1,21 +1,18 @@
-from app import db
+from api import db
+
 from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey
+
 
 class User(db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String())
-    email = db.Column(db.String())
-    password = db.Column(db.String())
-    created_time = db.Column(db.DateTime, default=func.utcnow())
+    username = db.Column(db.String(), unique=True, nullable=False)
+    email = db.Column(db.String(), unique=True, nullable=False)
+    password = db.Column(db.String(), nullable=False)
+    created_time = db.Column(db.DateTime, default=func.timezone('UTC', func.current_timestamp()))
 
-    def __init__(self, id, email, password, created_time):
-        self.id = id
-        self.email = email
-        self.password = password
-        self.created_time = created_time
 
 class Contest(db.Model):
     __tablename__ = 'contest'
@@ -38,6 +35,7 @@ class Contest(db.Model):
         self.created_time = created_time
         self.update_time = update_time
         self.contest_creater = contest_creater
+
 
 class Submission(db.Model):
     __tablename__ = 'submission'
