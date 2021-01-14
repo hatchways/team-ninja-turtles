@@ -13,6 +13,7 @@ class User(db.Model):
     password = db.Column(db.String(), nullable=False)
     created_time = db.Column(db.DateTime, default=func.timezone('UTC', func.current_timestamp()))
 
+
 class Contest(db.Model):
     __tablename__ = 'contest'
 
@@ -25,8 +26,7 @@ class Contest(db.Model):
     update_time = db.Column(db.DateTime, onupdate=func.utcnow()) # store updated time of row
     contest_creater = db.Column(db.Integer, ForeignKey('user.id'))
 
-    def __init__(self, id, title, description, prize_contest, deadline_date, update_time, contest_creater):
-        self.id = id
+    def __init__(self, title, description, prize_contest, deadline_date, update_time, contest_creater):
         self.title = title
         self.description = description
         self.prize_contest = prize_contest
@@ -46,8 +46,7 @@ class Submission(db.Model):
     created_time = db.Column(db.DateTime, default=func.utcnow())
     update_time = db.Column(db.DateTime, onupdate=func.utcnow()) # updated time of row
 
-    def __init__(self, id, contest_id, submiter_id, active, image_link, update_time):
-        self.id = id
+    def __init__(self, contest_id, submiter_id, active, image_link, update_time):
         self.contest_id = contest_id
         self.submiter_id = submiter_id
         self.active = active
