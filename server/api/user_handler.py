@@ -15,8 +15,6 @@ def register():
     if username is None or password is None or email is None:
         return jsonify({"Error": "required input missing"}), 400
 
-    print("HERE1")
-
     # check input errors
     if len(password) < 6:
         return jsonify({"Error": "Password must have at least 6 characters."}), 400
@@ -26,8 +24,6 @@ def register():
 
     if User.query.filter_by(username=username).first() is not None:
         return jsonify({"error": "username exist"}), 400
-
-    print("HERE")
 
     user = User(username=username, email=email, password=bcrypt.generate_password_hash(password).decode('utf-8'))
     db.session.add(user)
