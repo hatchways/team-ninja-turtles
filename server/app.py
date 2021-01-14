@@ -26,6 +26,7 @@ POSTGRES = {
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['JWT_SECRET'] = 'jW$9Xa|HKPwXeY$'
 
 db.init_app(app)
 
