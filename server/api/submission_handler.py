@@ -1,6 +1,6 @@
 from flask import jsonify, Blueprint, request
 from api import db
-from api.models import Contest,Submission
+from api.models import Contest,Submission,User
 from datetime import date
 submission_handler = Blueprint('submission_new_handler', __name__)
 
@@ -8,7 +8,7 @@ submission_handler = Blueprint('submission_new_handler', __name__)
 @submission_handler.route('/contestImage/submission/<contest_id>/<user_id>', methods=['POST'])
 def create_submission(contest_id, user_id):
     contest = Contest.query.get(contest_id)
-    submission_user = Submission.query.get(user_id)
+    submission_user = User.query.get(user_id)
 
     if request.method == 'POST':
         data = request.form
