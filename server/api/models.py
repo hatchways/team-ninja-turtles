@@ -13,6 +13,7 @@ class User(db.Model):
     password = db.Column(db.String(), nullable=False)
     created_time = db.Column(db.DateTime, default=func.timezone('UTC', func.current_timestamp()))
 
+
 class Contest(db.Model):
     __tablename__ = 'contest'
 
