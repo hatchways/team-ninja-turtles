@@ -38,7 +38,7 @@ const Login = () => {
 
     // Used to detect if a field blurred without input
     const blurred = (event, field, setFieldError, setFieldWarning) => {
-        if (field.length == 0) {
+        if (field.length === 0) {
             setFieldError(true)
             setFieldWarning(warningMsg.emptyFieldError)
         }
@@ -46,7 +46,7 @@ const Login = () => {
 
     const onUsernameChange = (event) => {
         const newValue = event.target.value
-        const empty = newValue.length == 0
+        const empty = newValue.length === 0
         setUsername(newValue)
         setUsernameError(empty)
         setUsernameWarning(empty ? warningMsg.emptyFieldError : "")
@@ -55,7 +55,7 @@ const Login = () => {
     const onPasswordChange = (event) => {
         const newValue = event.target.value
         const lengthCheck = newValue.length < 6
-        const empty = newValue.length == 0 
+        const empty = newValue.length === 0 
         console.log(newValue)
         setPassword(newValue)
         setPasswordError(lengthCheck || empty)

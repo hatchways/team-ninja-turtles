@@ -44,7 +44,7 @@ const Signup = () => {
 
     // Used to detect if a field blurred without input
     const blurred = (event, field, setFieldError, setFieldWarning) => {
-        if (field.length == 0) {
+        if (field.length === 0) {
             setFieldError(true)
             setFieldWarning(warningMsg.emptyFieldError)
         }
@@ -52,7 +52,7 @@ const Signup = () => {
 
     const onUsernameChange = (event) => {
         const newValue = event.target.value
-        const empty = newValue.length == 0
+        const empty = newValue.length === 0
         setUsername(newValue)
         setUsernameError(empty)
         setUsernameWarning(empty ? warningMsg.emptyFieldError : "")
@@ -61,7 +61,7 @@ const Signup = () => {
     const onPasswordChange = (event) => {
         const newValue = event.target.value
         const lengthCheck = newValue.length < 6
-        const empty = newValue.length == 0 
+        const empty = newValue.length === 0 
         setPassword(newValue)
         setPasswordError(lengthCheck || empty)
         setPasswordWarning(empty ? warningMsg.emptyFieldError : (lengthCheck ? warningMsg.passwordError : ""))
@@ -71,7 +71,7 @@ const Signup = () => {
         const newValue = event.target.value
         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         const properEmail = !re.test(newValue) // regex matching
-        const empty = newValue.length == 0
+        const empty = newValue.length === 0
         
         setEmail(newValue)
         setEmailError(empty || properEmail)
@@ -81,8 +81,8 @@ const Signup = () => {
     const onConfirmPWChange = (event) => {
         const newValue = event.target.value
         const lengthCheck = newValue.length < 6
-        const empty = newValue.length == 0 
-        const unmatch = newValue != password
+        const empty = newValue.length === 0 
+        const unmatch = newValue !== password
     
         setConfirmPW(newValue)
         setConfirmPWError(lengthCheck || empty || unmatch)
