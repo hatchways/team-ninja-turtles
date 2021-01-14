@@ -8,6 +8,7 @@ contest_handler = Blueprint('contest_new_handler', __name__)
 
 @contest_handler.route('/contest', methods=['POST'])
 def create_contest():
+    # Create new contests
     if request.method == 'POST':
 
         title = request.form['title']
@@ -27,18 +28,21 @@ def create_contest():
 
 @contest_handler.route('/contests', methods=['GET'])
 def get_all_contests():
+    # Do any contests exist?
     try:
         all_contests = Contest.query.all()
         if len(all_contests) == 0:
             raise Exception
     except Exception:
         return jsonify("No contests listed")
+    # Return all contests
     else:
         return jsonify(all_contests)
 
 
 @contest_handler.route('/contest/<contest_id>', methods=['PUT', 'GET'])
 def get_contest(contest_id):
+    # Does contest exist?
     try:
         contest = Contest.query.get(contest_id)
         if contest == None:
@@ -46,9 +50,11 @@ def get_contest(contest_id):
     except Exception:
         return jsonify("Contest does not exist")
 
+    # Return contest contents
     if request.method == 'GET':
         return jsonify(contest)
 
+    # Update contest contents
     if request.method == 'PUT':
         contest.title = request.form['title']
         contest.description = request.form['description']

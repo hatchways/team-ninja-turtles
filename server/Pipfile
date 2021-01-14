@@ -9,6 +9,8 @@ verify_ssl = true
 flask = "*"
 boto3 = "*"
 awscli = "*"
+flask-sqlalchemy = "*"
+flask-bcrypt = "*"
 
 [requires]
 python_version = "3.7"
