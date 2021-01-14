@@ -3,7 +3,7 @@ from flask import jsonify, Blueprint, request
 from api import db
 from api.models import Contest
 from datetime import date
-contest_handler = Blueprint('contest_new_handler', __name__)
+contest_handler = Blueprint('contest_handler', __name__)
 
 
 @contest_handler.route('/contest', methods=['POST'])
@@ -65,3 +65,18 @@ def get_contest(contest_id):
         db.session.commit()
 
         return jsonify({'successMessage': 'Contest Updated!'})
+
+
+@contest_handler.route('/contests/owned/<user_id>', methods=['GET'])
+def get_owned_contests(user_id):
+    # Do any contests exist for this user?
+    try:
+        all_owned_contests = Contest.query.filter_by(contest_creater=user_id)
+        if len(all_owned_contests) == 0:
+            raise Exception
+    except Exception:
+        return jsonify("No contests listed")
+
+    # Return all contests owned by user
+    else:
+        return jsonify(all_owned_contests)
