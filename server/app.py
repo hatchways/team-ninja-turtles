@@ -1,4 +1,4 @@
-from flask import Flask, Response
+from flask import Flask
 from api.ping_handler import ping_handler
 from api import db, bcrypt
 from api.home_handler import home_handler
