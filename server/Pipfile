@@ -10,6 +10,9 @@ flask = "*"
 boto3 = "*"
 awscli = "*"
 pyjwt = "*"
+flask-sqlalchemy = "*"
+flask-bcrypt = "*"
+
 
 [requires]
 python_version = "3.7"
