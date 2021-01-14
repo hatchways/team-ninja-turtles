@@ -19,11 +19,8 @@ def register():
     if len(password) < 6:
         return jsonify({"Error": "Password must have at least 6 characters."}), 400
 
-    if User.query.filter_by(email=email).first() is not None:
-        return jsonify({"error": "email exist"}), 400
-
-    if User.query.filter_by(username=username).first() is not None:
-        return jsonify({"error": "username exist"}), 400
+    if User.query.filter_by(email=email, username=username).first() is not None:
+        return jsonify({"error": "email or username already exist"}), 400
 
     user = User(username=username, email=email, password=bcrypt.generate_password_hash(password).decode('utf-8'))
     db.session.add(user)
