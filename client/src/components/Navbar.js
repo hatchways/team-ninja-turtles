@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import Toolbar from '@material-ui/core/Toolbar'
-import { Link } from "react-router-dom"
+import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -25,17 +25,17 @@ export default function Navbar() {
     const classes = useStyles()
 
     return (
-        <AppBar position="static" className={classes.root}>
+        <AppBar position='static' className={classes.root}>
             <Toolbar>
-                <Typography variant="h6" className={classes.branchName}>
+                <Typography variant='h6' className={classes.branchName}>
                     Tattoo Art
                 </Typography>
                 <div className={classes.navItems}>
-                    <Button color="inherit">Discover</Button>
-                    <Button color="inherit">Messages</Button>
-                    <Button color="inherit">Notifications</Button>
-                    <Button component={Link} to={'/create-contest'} color="inherit">Create Contest</Button>
-                    <Button color="inherit">Account</Button>
+                    <Button color='inherit'>Discover</Button>
+                    <Button color='inherit'>Messages</Button>
+                    <Button color='inherit'>Notifications</Button>
+                    <Button component={Link} to={'/create-contest'} color='inherit'>Create Contest</Button>
+                    <Button color='inherit'>Account</Button>
                 </div>
             </Toolbar>
         </AppBar>

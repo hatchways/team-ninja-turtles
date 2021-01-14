@@ -23,7 +23,7 @@ export default function CreateContest() {
     const classes = useStyles()
 
     return (
-        <Grid container justify="center" className={classes.pageContainer}>
+        <Grid container justify='center' className={classes.pageContainer}>
             <Grid item xs={12} className={classes.pageTitle}>
                 Create New Contest
             </Grid>

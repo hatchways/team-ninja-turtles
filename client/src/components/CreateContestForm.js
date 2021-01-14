@@ -33,31 +33,31 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'right'
     },
     tattooImages: {
-        marginTop: "1.5rem",
-        border: "1px solid #efebe9",
-        maxHeight: "500px",
-        overflow: "scroll"
+        marginTop: '1.5rem',
+        border: '1px solid #efebe9',
+        maxHeight: '500px',
+        overflow: 'scroll'
     },
     gridList: {
-        padding: "2rem"
+        padding: '2rem'
     },
     buttonWrapper: {
-        display: "flex",
-        justifyContent: "center"
+        display: 'flex',
+        justifyContent: 'center'
     },
     submitButton: {
-        backgroundColor: "rgba(0, 0, 0, 0.87)",
-        color: "white",
-        borderRadius: "0",
-        padding: "1rem",
-        margin: "5rem",
+        backgroundColor: 'rgba(0, 0, 0, 0.87)',
+        color: 'white',
+        borderRadius: '0',
+        padding: '1rem',
+        margin: '5rem',
     },
     borderedDiv: {
-        width: "100%",
-        height: "100%",
-        border: "1px solid #efebe9",
-        display: "flex",
-        alignItems: "center",
+        width: '100%',
+        height: '100%',
+        border: '1px solid #efebe9',
+        display: 'flex',
+        alignItems: 'center',
     }
 }))
 
@@ -76,7 +76,7 @@ export default function CreateContestForm() {
     const onAmountChange = e => {
         if (e.target.value < 0) {
             setAmountError(true)
-            setAmountHelperText("Invalid input")
+            setAmountHelperText('Invalid input')
         } else {
             setAmount(e.target.value)
             setAmountError(false)
@@ -91,19 +91,19 @@ export default function CreateContestForm() {
 
     return (
         <form className={classes.formContainer}>
-            <Grid container direction="row">
+            <Grid container direction='row'>
                 <Grid item xs={12}>
                     <Typography className={classes.label}>What do you need designed?</Typography>
                 </Grid>
                 <Grid item xs={12}>
                     <TextField 
-                        id="title"
+                        id='title'
                         className={classes.inputMargin}
                         value={title}
                         onChange={e => setTitle(e.target.value)}
-                        label="Write a descriptive contest title"
+                        label='Write a descriptive contest title'
                         fullWidth
-                        variant="outlined"
+                        variant='outlined'
                     />
                 </Grid>
                 <Grid item xs={12}>
@@ -111,15 +111,15 @@ export default function CreateContestForm() {
                 </Grid>
                 <Grid item xs={12}>
                     <TextField 
-                        id="description"
+                        id='description'
                         value={description}
                         onChange={e => setDescription(e.target.value)}
                         className={classes.inputMargin}
-                        label="Details about what type of tattoo you want"
+                        label='Details about what type of tattoo you want'
                         fullWidth
                         multiline
                         rows={8}
-                        variant="outlined"
+                        variant='outlined'
                     />
                 </Grid>
                 <Grid item xs={4}>
@@ -130,29 +130,28 @@ export default function CreateContestForm() {
                 </Grid>
                 <Grid item xs={4}>
                     <TextField 
-                        id="amount"
+                        id='amount'
                         value={amount}
                         error={amountError}
                         helperText={amountHelperText}
                         onChange={onAmountChange}
                         className={classes.inputMargin}
-                        type="number"
+                        type='number'
                         InputProps={{
-                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                            // endAdornment: <InputAdornment position="end">.00</InputAdornment>,
-                            style: {textAlign: 'right'},
+                            startAdornment: <InputAdornment position='start'>$</InputAdornment>,
+                            style: { textAlign: 'right' },
                         }}
-                        variant="outlined"
+                        variant='outlined'
                     />
                 </Grid>
                 <Grid item xs={3}>
                     <div className={classes.borderedDiv}>
                         <TextField
-                            id="deadlineDate"
-                            defaultValue="2021-01-12"
-                            inputProps={{ style: { padding: "1rem" } }}
+                            id='deadlineDate'
+                            defaultValue='2021-01-12'
+                            inputProps={{ style: { padding: '1rem' } }}
                             InputProps={{ disableUnderline: true }}
-                            type="date"
+                            type='date'
                             fullWidth
                         />
                     </div>
@@ -160,11 +159,11 @@ export default function CreateContestForm() {
                 <Grid item xs={3}>
                     <div className={classes.borderedDiv}>
                         <TextField
-                            id="deadlineTime"
-                            type="time"
-                            inputProps={{ style: { padding: "1rem" } }}
-                            InputProps={{disableUnderline: true}}
-                            defaultValue="13:00"
+                            id='deadlineTime'
+                            type='time'
+                            inputProps={{ style: { padding: '1rem' } }}
+                            InputProps={{ disableUnderline: true }}
+                            defaultValue='13:00'
                             fullWidth
                         />
                     </div>
@@ -172,17 +171,17 @@ export default function CreateContestForm() {
                 <Grid item xs={2}>
                     <div className={classes.borderedDiv}>
                         <Select
-                            id="timezoneSelect"
+                            id='timezoneSelect'
                             value={timeZone}
                             fullWidth
                             disableUnderline
-                            style={{ padding: "1rem" }}
+                            style={{ padding: '1rem' }}
                             onChange={e => setTimeZone(e.target.value)}
                         >
-                            <MenuItem value="EST">EST</MenuItem>
-                            <MenuItem value="PDT">PDT</MenuItem>
-                            <MenuItem value="ICT">ICT</MenuItem>
-                            <MenuItem value="WET">WET</MenuItem>
+                            <MenuItem value='EST'>EST</MenuItem>
+                            <MenuItem value='PDT'>PDT</MenuItem>
+                            <MenuItem value='ICT'>ICT</MenuItem>
+                            <MenuItem value='WET'>WET</MenuItem>
                         </Select>
                     </div>
                 </Grid>
@@ -195,7 +194,7 @@ export default function CreateContestForm() {
                         <GridList cellHeight={160} className={classes.gridList} cols={4}>
                             {imageNames.map((image, index) => (
                                 <GridListTile key={index} cols={1}>
-                                    <img src={process.env.PUBLIC_URL + "/images/" + image} alt={image} />
+                                    <img src={process.env.PUBLIC_URL + '/images/' + image} alt={image} />
                                 </GridListTile>
                             ))}
                         </GridList>
