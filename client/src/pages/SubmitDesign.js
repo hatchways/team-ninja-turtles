@@ -5,7 +5,7 @@ import { Paper, Typography, Button, Box } from '@material-ui/core'
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
         width: '100vw',
-        height: '90vh',
+        height: 'calc(100vh - 100px)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
