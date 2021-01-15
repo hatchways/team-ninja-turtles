@@ -1,5 +1,3 @@
-import { theme } from "./themes/theme"
-
 const hostname = "http://localhost:5000"
 
 const makeRequest = async (subdom, callMethod, header, data, onSucess, onError, ) => {
