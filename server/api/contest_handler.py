@@ -95,7 +95,6 @@ def get_submitted_to_contests(user_id):
     # Do any submissions exist for this user?
     try:
         all_user_submissions = Submission.query.all()
-        # return str(all_user_submissions[0].__dict__)
         if not bool(all_user_submissions):
             raise Exception
     except Exception:
