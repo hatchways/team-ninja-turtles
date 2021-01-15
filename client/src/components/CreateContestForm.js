@@ -87,7 +87,7 @@ export default function CreateContestForm() {
     // temporary hardcode image names
     const imageNames = ['tattoo-1.png', 'tattoo-2.png', 'tattoo-3.png', 'tattoo-4.png', 'tattoo-5.png', 
     'tattoo-6.png', 'tattoo-7.png', 'tattoo-8.png', 'tattoo-9.png', 'tattoo-10.png', 
-    'tattoo-11.png', 'tattoo-12.png']
+    'tattoo-11.png', 'tattoo-12.png', 'tattoo-13.png', 'tattoo-14.png']
 
     return (
         <form className={classes.formContainer}>
@@ -190,7 +190,7 @@ export default function CreateContestForm() {
                     <Typography>Let's start by helping your desingers understand which styles you prefer.</Typography>
                 </Grid>
                 <Grid item xs={12}>
-                    <Box className={classes.tattoosImages}>
+                    <Box className={classes.tattooImages}>
                         <GridList cellHeight={160} className={classes.gridList} cols={4}>
                             {imageNames.map((image, index) => (
                                 <GridListTile key={index} cols={1}>
