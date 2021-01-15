@@ -91,11 +91,17 @@ const Signup = () => {
     
     const submit = () => {
         if (!passwordError && !usernameError) {
-            // TODO : submit to the sever   
+            register(username, password, email, (data) => {
+                const token = data['auth_token']
+                Cookies.set('auth_token', token)
+            }, (response) => {
+                if (response.status == 400) {
+                    console.log(response.json['message'])
+                } else {
+                    console.log("unexpcted error")
+                }
+            })   
         }
-    
-        console.log(username)
-        console.log(password)
     }
 
     return (
