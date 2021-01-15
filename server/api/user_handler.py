@@ -1,10 +1,10 @@
 from flask import jsonify, Blueprint, request
 from api import db, bcrypt
 from api.models import User
+from api.middleware import require_auth
 import jwt
 from datetime import datetime, timedelta
 import app
-from functools import wraps
 
 
 user_handler = Blueprint("user_handler", __name__)
@@ -58,29 +58,6 @@ def login():
     token = jwt.encode({"user": username, "exp": datetime.utcnow() + timedelta(minutes=exp)}, \
                        app.app.config['JWT_SECRET'])
     return jsonify({"auth_token": token}), 201
-
-
-def require_auth(route):
-    @wraps(route)
-    def auth(*arg, **kwargs):
-        request_data = request.json
-
-        if request_data is None:
-            return jsonify({"error": "auth_token missing"}), 401
-
-        token = request_data.get("auth_token")
-
-        if token is None:
-            return jsonify({"error": "auth_token missing"}), 401
-
-        try:
-            jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
-        except:
-            return jsonify({'message': 'invalid Token'}), 401
-
-        return route(*arg, **kwargs)
-
-    return auth
 
 
 @user_handler.route('/api/test_protected', methods=['POST', 'GET'])
