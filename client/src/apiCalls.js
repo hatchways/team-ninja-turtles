@@ -11,7 +11,8 @@ const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) 
     fetch(hostname+subdom, {
         method: callMethod,
         headers: header,
-        body: data
+        body: data,
+        credentials: 'include'
     }).
     then(response => {
         if (response.ok) {

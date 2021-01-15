@@ -68,8 +68,6 @@ const Login = () => {
     const submit = () => {
         if (!passwordError && !usernameError) {
             login(username, password, (data) => {
-                const token = data['auth_token']
-                Cookies.set('auth_token', token)
                 console.log("SUCCESS")
             },  (error) => {
                 // onError

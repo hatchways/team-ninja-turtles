@@ -40,7 +40,10 @@ def register():
     token = jwt.encode({"user": username, "exp": datetime.utcnow() + timedelta(minutes=exp)}, \
                        app.app.config['JWT_SECRET'])
 
-    return jsonify({"auth_token": token}), 201
+    response = jsonify({"message": "success"})
+    response.status_code = 201
+    response.set_cookie('auth_token', value=token)
+    return response
 
 
 @user_handler.route('/api/login', methods=['POST'])
@@ -67,7 +70,11 @@ def login():
 
     token = jwt.encode({"user": username, "exp": datetime.utcnow() + timedelta(minutes=exp)}, \
                        app.app.config['JWT_SECRET'])
-    return jsonify({"auth_token": token}), 201
+
+    response = jsonify({"message": "success"})
+    response.status_code = 201
+    response.set_cookie('auth_token', value=token)
+    return response
 
 
 @user_handler.route('/api/test_protected', methods=['POST', 'GET'])
