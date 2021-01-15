@@ -14,11 +14,10 @@ def create_submission(contest_id, user_id):
     except Exception:
         return jsonify({'notFound': 'Contest not found'})
 
-    submission_user = User.query.filter_by(id=user_id)
 
     if request.method == 'POST':
         data = request.form
-        new_submission = Submission(contest_id=contest.id, submiter_id=request.json['user_id'], active=data.get('status'),
+        new_submission = Submission(contest_id=contest.id, submiter_id=data.get['user_id'], active=data.get('status'),
                                     image_link=data.get('link'), update_time=date.today())
         db.session.add(new_submission)
         db.session.commit()
