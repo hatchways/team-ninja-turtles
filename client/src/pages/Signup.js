@@ -94,8 +94,6 @@ const Signup = () => {
         if (!passwordError && !usernameError) {
             register(username, password, email, (data) => {
                 // onSucess
-                const token = data['auth_token']
-                Cookies.set('auth_token', token)
                 console.log("SUCCESS")
             }, (error) => {
                 // onError

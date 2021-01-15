@@ -2,7 +2,6 @@ import { Button, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
 import React, { useState } from "react";
 import RequestError, { login } from "../apiCalls";
-import Cookies from "js-cookie"
 
 const warningMsg = {
     emptyFieldError: "Required",
