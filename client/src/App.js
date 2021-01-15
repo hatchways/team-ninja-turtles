@@ -7,6 +7,7 @@ import NavBar from './components/Navbar'
 
 import SignupPage from './pages/Signup'
 import LoginPage from './pages/Login'
+import ProfilePage from './pages/Profile'
 import LandingPage from './pages/Landing'
 import CreateContestPage from './pages/CreateContest'
 import SubmitDesignPage from './pages/SubmitDesign' 
@@ -21,6 +22,7 @@ function App() {
         <Switch>
           <Route path='/signup' component={SignupPage}></Route>
           <Route path='/login' component={LoginPage}></Route>
+          <Route path='/profile' component={ProfilePage}></Route>
           <Route path='/create-contest' component={CreateContestPage}></Route>
           <Route path='/submit-design' component={SubmitDesignPage}></Route>
           <Route path='/' component={LandingPage} />
