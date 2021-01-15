@@ -1,8 +1,14 @@
 from flask import jsonify, Blueprint, request
 from api import db, bcrypt
 from api.models import User
+from api.middleware import require_auth
+import jwt
+from datetime import datetime, timedelta
+import app
+
 
 user_handler = Blueprint("user_handler", __name__)
+exp = 20  # in minutes
 
 
 @user_handler.route('/api/register', methods=['POST'])
@@ -26,9 +32,10 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    # TODO: grant user a JWT
+    token = jwt.encode({"user": username, "exp": datetime.utcnow() + timedelta(minutes=exp)}, \
+                       app.app.config['JWT_SECRET'])
 
-    return jsonify({}), 201
+    return jsonify({"auth_token": token}), 201
 
 
 @user_handler.route('/api/login', methods=['POST'])
@@ -48,6 +55,12 @@ def login():
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify({"Error": "incorrect password"}), 400
 
-    # TODO: register an auth token and return to the user
+    token = jwt.encode({"user": username, "exp": datetime.utcnow() + timedelta(minutes=exp)}, \
+                       app.app.config['JWT_SECRET'])
+    return jsonify({"auth_token": token}), 201
 
-    return jsonify({}), 201
+
+@user_handler.route('/api/test_protected', methods=['POST', 'GET'])
+@require_auth
+def protected():
+    return jsonify({"message": "hello"}), 200

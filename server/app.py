@@ -26,6 +26,7 @@ POSTGRES = {
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['JWT_SECRET'] = os.environ.get('JWT_SECRET') if os.environ.get('JWT_SECRET') else "bad_secret_key"
 
 db.init_app(app)
 
