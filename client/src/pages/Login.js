@@ -1,6 +1,7 @@
 import { Button, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { login } from "../apiCalls";
 
 const warningMsg = {
     emptyFieldError: "Required",
@@ -47,6 +48,7 @@ const Login = () => {
     const onUsernameChange = (event) => {
         const newValue = event.target.value
         const empty = newValue.length == 0
+        
         setUsername(newValue)
         setUsernameError(empty)
         setUsernameWarning(empty ? warningMsg.emptyFieldError : "")
@@ -56,7 +58,7 @@ const Login = () => {
         const newValue = event.target.value
         const lengthCheck = newValue.length < 6
         const empty = newValue.length == 0 
-        console.log(newValue)
+
         setPassword(newValue)
         setPasswordError(lengthCheck || empty)
         setPasswordWarning(empty ? warningMsg.emptyFieldError : (lengthCheck ? warningMsg.passwordError : ""))
@@ -64,11 +66,18 @@ const Login = () => {
     
     const submit = () => {
         if (!passwordError && !usernameError) {
-            // TODO : submit to the sever   
+            login(username, password, (data) => {
+                // onSucess
+                console.log(data)
+            }, (response) => {
+                // onError
+                if (response.status == 400) {
+                    
+                } else {
+
+                }
+            })   
         }
-    
-        console.log(username)
-        console.log(password)
     }
 
     return (
