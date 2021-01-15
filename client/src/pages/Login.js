@@ -2,6 +2,7 @@ import { Button, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
 import React, { useEffect, useState } from "react";
 import { login } from "../apiCalls";
+import Cookies from "js-cookie"
 
 const warningMsg = {
     emptyFieldError: "Required",
@@ -67,14 +68,13 @@ const Login = () => {
     const submit = () => {
         if (!passwordError && !usernameError) {
             login(username, password, (data) => {
-                // onSucess
-                console.log(data)
+                const token = data['auth_token']
+                Cookies.set('auth_token', token)
             }, (response) => {
-                // onError
                 if (response.status == 400) {
-                    
+                    console.log(response.json['message'])
                 } else {
-
+                    console.log("unexpcted error")
                 }
             })   
         }

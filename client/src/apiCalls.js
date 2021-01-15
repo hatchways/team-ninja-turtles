@@ -15,7 +15,7 @@ export const login = async (username, password, onSuccess, onError) => {
     })
     .then(response => {
         if (response.ok) {
-            return response.data
+            return response.json()
         } else {
             throw response
         }
