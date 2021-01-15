@@ -1,7 +1,7 @@
 import { Button, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
-import React, { useEffect, useState } from "react";
-import { login } from "../apiCalls";
+import React, { useState } from "react";
+import RequestError, { login } from "../apiCalls";
 import Cookies from "js-cookie"
 
 const warningMsg = {
@@ -70,11 +70,13 @@ const Login = () => {
             login(username, password, (data) => {
                 const token = data['auth_token']
                 Cookies.set('auth_token', token)
-            }, (response) => {
-                if (response.status == 400) {
-                    console.log(response.json['message'])
+                console.log("SUCCESS")
+            },  (error) => {
+                // onError
+                if (error instanceof RequestError && error.response.status == 400) {
+                    console.log(error.response.json())
                 } else {
-                    console.log("unexpcted error")
+                    console.log("unexpected error")
                 }
             })   
         }

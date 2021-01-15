@@ -1,6 +1,13 @@
 const hostname = "http://localhost:5000"
 
-const makeRequest = async (subdom, callMethod, header, data, onSucess, onError, ) => {
+class RequestError extends Error {
+    constructor(response) {
+        super()
+        this.response = response
+    }
+}
+
+const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) => {
     fetch(hostname+subdom, {
         method: callMethod,
         headers: header,
@@ -10,11 +17,11 @@ const makeRequest = async (subdom, callMethod, header, data, onSucess, onError, 
         if (response.ok) {
             return response.json()
         } else {
-            throw response
+            throw RequestError(response)
         }
     })
-    .then(data => onSucess) 
-    .catch(response => onError(response))
+    .then(data => onSucess(data)) 
+    .catch(error => onError(error))
 }
 
 export const login = async (username, password, onSuccess, onError) => {
@@ -22,11 +29,7 @@ export const login = async (username, password, onSuccess, onError) => {
         'username' : username,
         'password' : password
     }
-    makeRequest("/api/login", {
-        method: "POST", 
-        headers: {"Content-Type": "application/json"}, 
-        body:JSON.stringify(data)
-    }, onSuccess, onError)
+    makeRequest("/api/login", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
 }
 
 export const register = async (username, password, email, onSuccess, onError) => {
@@ -36,9 +39,7 @@ export const register = async (username, password, email, onSuccess, onError) =>
         'password' : password
     }
     
-    makeRequest("/api/register", {
-        method: "POST", 
-        headers: {"Content-Type": "application/json"}, 
-        body:JSON.stringify(data)
-    }, onSuccess, onError)
+    makeRequest("/api/register", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
 }
+
+export default RequestError;
