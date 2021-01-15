@@ -13,9 +13,14 @@ exp = 20  # in minutes
 
 @user_handler.route('/api/register', methods=['POST'])
 def register():
-    username = request.form.get("username")
-    password = request.form.get("password")
-    email = request.form.get("email")
+    request_json = request.get_json()
+
+    if request_json is None:
+        return jsonify({"Error": "required input missing"}), 400
+
+    username = request_json.get("username")
+    password = request_json.get("password")
+    email = request_json.get("email")
 
     # input missing
     if username is None or password is None or email is None:
@@ -40,8 +45,13 @@ def register():
 
 @user_handler.route('/api/login', methods=['POST'])
 def login():
-    username = request.form["username"]
-    password = request.form["password"]
+    request_json = request.get_json()
+
+    if request_json is None:
+        return jsonify({"Error": "required input missing"}), 400
+
+    username = request_json.get("username")
+    password = request_json.get("password")
 
     # input missing
     if username is None or password is None:

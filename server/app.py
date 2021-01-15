@@ -16,6 +16,15 @@ s3 = boto3.client(
 
 app = Flask(__name__)
 
+# Handle COR preflight
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', '*')
+    response.headers.add('Access-Control-Allow-Methods', '*')
+    return response
+
+
 POSTGRES = {
     'user': os.environ.get('DB_USER'),
     'pw': os.environ.get('DB_PASS'),
