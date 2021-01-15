@@ -11,6 +11,7 @@ boto3 = "*"
 awscli = "*"
 flask-sqlalchemy = "*"
 flask-bcrypt = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.7"
