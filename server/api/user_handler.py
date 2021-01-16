@@ -42,7 +42,7 @@ def register():
 
     response = jsonify({"message": "success"})
     response.status_code = 201
-    response.set_cookie('auth_token', value=token)
+    response.set_cookie('auth_token', value=token, httponly=True)
     return response
 
 
@@ -73,7 +73,7 @@ def login():
 
     response = jsonify({"message": "success"})
     response.status_code = 201
-    response.set_cookie('auth_token', value=token)
+    response.set_cookie('auth_token', value=token, httponly=True)
     return response
 
 
