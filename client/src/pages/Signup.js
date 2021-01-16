@@ -1,6 +1,7 @@
 import { Button, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
 import React, { useState } from "react";
+import RequestError, {register} from "../apiCalls"
 
 const warningMsg = {
     emptyFieldError: "Required",
@@ -91,11 +92,18 @@ const Signup = () => {
     
     const submit = () => {
         if (!passwordError && !usernameError) {
-            // TODO : submit to the sever   
+            register(username, password, email, (data) => {
+                // onSucess
+                console.log("SUCCESS")
+            }, (error) => {
+                // onError
+                if (error instanceof RequestError && error.response.status == 400) {
+                    console.log(error.response.json())
+                } else {
+                    console.log("unexpected error")
+                }
+            })   
         }
-    
-        console.log(username)
-        console.log(password)
     }
 
     return (
