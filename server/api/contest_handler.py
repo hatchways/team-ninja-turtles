@@ -10,15 +10,23 @@ contest_handler = Blueprint('contest_handler', __name__)
 def create_contest():
     # Create new contests
     if request.method == 'POST':
+        request_json = request.get_json()
 
-        title = request.json['title']
-        description = request.json['description']
-        prize_contest = request.json['amount']
-        deadline_date = request.json['deadline_date']
+        title = request_json.get("title")
+        description = request_json.get("description")
+        prize_contest = request_json.get("prize_contest")
+        deadline_date = request_json.get("deadline_date")
         update_time = date.today()
-        contest_creator = request.json['contestCreator']
+        contest_creator = request_json.get('contest_creator')
         
-        new_contest = Contest(title, description, prize_contest, deadline_date, created_time, update_time, contest_creator)
+        new_contest = Contest(
+                                title=title, 
+                                description=description, 
+                                prize_contest=prize_contest, 
+                                deadline_date=deadline_date, 
+                                update_time=update_time, 
+                                contest_creater=contest_creator
+                            )
         db.session.add(new_contest)
         db.session.commit()
 
