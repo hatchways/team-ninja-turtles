@@ -12,6 +12,7 @@ awscli = "*"
 pyjwt = "*"
 flask-sqlalchemy = "*"
 flask-bcrypt = "*"
+psycopg2 = "*"
 
 
 [requires]
