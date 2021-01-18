@@ -13,6 +13,8 @@ import {
     GridListTile
 } from '@material-ui/core'
 
+import RequestError, { createContest } from '../apiCalls'
+
 const useStyles = makeStyles((theme) => ({
     formContainer: {
         width: '70%',
@@ -66,8 +68,8 @@ export default function CreateContestForm() {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [amount, setAmount] = useState(0)
-    const [date, setDate] = useState(new Date())
-    const [time, setTime] = useState(new Date())
+    const [date, setDate] = useState(new Date().toISOString().substr(0,10))
+    const [time, setTime] = useState(new Date().toTimeString().substr(0,5))
     const [timeZone, setTimeZone] = useState('PDT')
     const [images, setImages] = useState('')
     const [amountError, setAmountError] = useState(false)
@@ -82,6 +84,25 @@ export default function CreateContestForm() {
             setAmountError(false)
             setAmountHelperText('')
         }
+    }
+
+    const onSubmit = () => {
+        const deadline = new Date(date.replace(/-/g, '\/'))
+        const hours = time.substr(0,2)
+        const minutes = time.substr(3, 5)
+        deadline.setHours(hours)
+        deadline.setMinutes(minutes)
+        const contestCreator = 1
+
+        createContest(title, description, amount, deadline, contestCreator, data => {
+            console.log('contest has been successfully created!')
+        }, error => {
+            if (error instanceof RequestError && error.response.status === 400) {
+                console.log(error.response.json())
+            } else {
+                console.log("unexpected error")
+            }
+        })
     }
 
     // temporary hardcode image names
@@ -148,10 +169,11 @@ export default function CreateContestForm() {
                     <div className={classes.borderedDiv}>
                         <TextField
                             id='deadlineDate'
-                            defaultValue='2021-01-12'
                             inputProps={{ style: { padding: '1rem' } }}
                             InputProps={{ disableUnderline: true }}
                             type='date'
+                            value={date}
+                            onChange={e => setDate(e.target.value)}
                             fullWidth
                         />
                     </div>
@@ -163,7 +185,8 @@ export default function CreateContestForm() {
                             type='time'
                             inputProps={{ style: { padding: '1rem' } }}
                             InputProps={{ disableUnderline: true }}
-                            defaultValue='13:00'
+                            value={time}
+                            onChange={e => setTime(e.target.value)}
                             fullWidth
                         />
                     </div>
@@ -202,7 +225,7 @@ export default function CreateContestForm() {
                 </Grid>
                 <Grid item xs={12}>
                     <Box className={classes.buttonWrapper}>
-                        <Button className={classes.submitButton}>Create Contest</Button>
+                        <Button className={classes.submitButton} onClick={onSubmit}>Create Contest</Button>
                     </Box>
                 </Grid>
             </Grid>
