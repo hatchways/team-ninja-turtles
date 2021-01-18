@@ -74,10 +74,10 @@ const tempData = [
 
 export default function Profile() {
     const classes = useStyles()
-    const [value, setValue] = useState(0)
+    const [activeTab, setActiveTab] = useState(0)
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue)
+    const handleTabChange = (event, newActiveTab) => {
+        setActiveTab(newActiveTab)
     }
 
     const inprogressContests = tempData.map((contest, index) => (
@@ -115,18 +115,18 @@ export default function Profile() {
             </div>
             <Paper className={classes.contestSection}>
                 <Tabs
-                    value={value}
-                    onChange={handleChange}
+                    value={activeTab}
+                    onChange={handleTabChange}
                     variant='fullWidth'
                     TabIndicatorProps={{ style: { background:'black' }}}
                 >
                     <Tab label='IN PROGRESS' />
                     <Tab label='COMPLETED' />
                 </Tabs>
-                <TabPanel value={value} index={0}>
+                <TabPanel value={activeTab} index={0}>
                     {inprogressContests}
                 </TabPanel>
-                <TabPanel value={value} index={1}>
+                <TabPanel value={activeTab} index={1}>
                     {completedContests}
                 </TabPanel>
             </Paper>
