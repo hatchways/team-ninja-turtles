@@ -1,9 +1,9 @@
 import json
 from flask import jsonify, Blueprint, request
 from api import db
-from api.models import Contest
+from api.models import Contest, Submission
 from datetime import date
-contest_handler = Blueprint('contest_new_handler', __name__)
+contest_handler = Blueprint('contest_handler', __name__)
 
 
 @contest_handler.route('/contest', methods=['POST'])
@@ -11,11 +11,10 @@ def create_contest():
     # Create new contests
     if request.method == 'POST':
 
-        title = request.form['title']
-        description = request.form['description']
-        prize_contest = request.form['amount']
-        deadline_date = request.form['deadline_date']
-        created_time = date.today()
+        title = request.json['title']
+        description = request.json['description']
+        prize_contest = request.json['amount']
+        deadline_date = request.json['deadline_date']
         update_time = date.today()
         contest_creator = request.json['contestCreator']
         
@@ -31,14 +30,18 @@ def get_all_contests():
     # Do any contests exist?
     try:
         all_contests = Contest.query.all()
-        if len(all_contests) == 0:
+        if not bool(all_contests):
             raise Exception
     except Exception:
         return jsonify("No contests listed")
     # Return all contests
     else:
-        return jsonify(all_contests)
-
+        dictionary = {}
+        counter = 0
+        for contest in all_contests:
+            dictionary["contest_{contest_number}".format(contest_number = counter)] = contest.__dict__
+            counter += 1
+        return json.dumps(dictionary, default=str)
 
 @contest_handler.route('/contest/<contest_id>', methods=['PUT', 'GET'])
 def get_contest(contest_id):
@@ -52,16 +55,57 @@ def get_contest(contest_id):
 
     # Return contest contents
     if request.method == 'GET':
-        return jsonify(contest)
+        return json.dumps(contest.__dict__, default=str)
 
     # Update contest contents
     if request.method == 'PUT':
-        contest.title = request.form['title']
-        contest.description = request.form['description']
-        contest.prize_contest = request.form['amount']
-        contest.deadline_date = request.form['deadline_date']
+        contest.title = request.json['title']
+        contest.description = request.json['description']
+        contest.prize_contest = request.json['amount']
+        contest.deadline_date = request.json['deadline_date']
         contest.update_time = date.today()
 
         db.session.commit()
 
         return jsonify({'successMessage': 'Contest Updated!'})
+
+
+@contest_handler.route('/contests/owned/<user_id>', methods=['GET'])
+def get_owned_contests(user_id):
+    # Do any contests exist for this user?
+    try:
+        all_owned_contests = Contest.query.filter_by(contest_creater = user_id).all()
+        if not bool(all_owned_contests):
+            raise Exception
+    except Exception:
+        return jsonify("No contests listed")
+
+    # Return all contests owned by user
+    else:
+        dictionary = {}
+        counter = 0
+        for contest in all_owned_contests:
+            dictionary["contest_{contest_number}".format(contest_number = counter)] = contest.__dict__
+            counter += 1
+        return json.dumps(dictionary, default=str)
+
+
+@contest_handler.route('/contests/submitted/to/<user_id>', methods=['GET'])
+def get_submitted_to_contests(user_id):
+    # Do any submissions exist for this user?
+    try:
+        all_user_submissions = Submission.query.all()
+        if not bool(all_user_submissions):
+            raise Exception
+    except Exception:
+        return jsonify("No submissions listed")
+    
+    # Return all contests owned by user
+    else:
+        dictionary = {}
+        counter = 0
+        for submission in all_user_submissions:
+            contest = Contest.query.filter_by(id=submission.contest_id).first()
+            dictionary["contest_{contest_number}".format(contest_number = counter)] = contest.__dict__
+            counter += 1
+        return json.dumps(dictionary, default=str)
