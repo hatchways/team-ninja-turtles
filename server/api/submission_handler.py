@@ -1,7 +1,7 @@
 from flask import jsonify, Blueprint, request
 from api import db
 from .models import Contest, Submission, User
-from app import s3
+import app
 from config import S3_BUCKET
 from datetime import date
 submission_handler = Blueprint('submission_new_handler', __name__)
@@ -10,7 +10,7 @@ submission_handler = Blueprint('submission_new_handler', __name__)
 @submission_handler.route('/contestImage/submission/<contest_id>', methods=['POST'])
 def create_submission(contest_id):
     try:
-        s3.upload_file(request.files["file"], S3_BUCKET, request.form["file_name"])
+        app.s3.upload_file(request.files["file"], S3_BUCKET, request.form["file_name"])
     except Exception as e:
         return jsonify({'error': e})
     

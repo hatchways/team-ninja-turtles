@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_migrate import Migrate
 from api.ping_handler import ping_handler
 from api import db, bcrypt
 from api.home_handler import home_handler
@@ -50,3 +51,5 @@ app.register_blueprint(ping_handler)
 app.register_blueprint(contest_handler)
 app.register_blueprint(submission_handler)
 app.register_blueprint(payment_handler)
+
+migrate = Migrate(app, db)
