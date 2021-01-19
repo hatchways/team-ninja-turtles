@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
         marginRight: '0.4rem'
     },
     backButtonText: {
-        textDecoration: 'underLine'
+        textDecoration: 'underline'
     },
     contestInfo: {
         margin: '2rem auto'
