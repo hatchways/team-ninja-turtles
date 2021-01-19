@@ -2,6 +2,7 @@ from api import db
 
 from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey
+from datetime import datetime
 
 
 class User(db.Model):
@@ -11,7 +12,7 @@ class User(db.Model):
     username = db.Column(db.String(), unique=True, nullable=False)
     email = db.Column(db.String(), unique=True, nullable=False)
     password = db.Column(db.String(), nullable=False)
-    created_time = db.Column(db.DateTime, default=func.timezone('UTC', func.current_timestamp()))
+    created_time = db.Column(db.DateTime, default=datetime.utcnow())
 
 
 class Contest(db.Model):
@@ -22,8 +23,8 @@ class Contest(db.Model):
     description = db.Column(db.String())
     prize_contest = db.Column(db.Integer())
     deadline_date = db.Column(db.DateTime)
-    created_time = db.Column(db.DateTime, default=func.utcnow())
-    update_time = db.Column(db.DateTime, onupdate=func.utcnow()) # store updated time of row
+    created_time = db.Column(db.DateTime, default=datetime.utcnow())
+    update_time = db.Column(db.DateTime, onupdate=datetime.utcnow()) # store updated time of row
     contest_creater = db.Column(db.Integer, ForeignKey('user.id'))
 
     def __init__(self, title, description, prize_contest, deadline_date, update_time, contest_creater):

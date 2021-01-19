@@ -2,7 +2,7 @@ import json
 from flask import jsonify, Blueprint, request
 from api import db
 from api.models import Contest, Submission
-from datetime import date
+from datetime import date, datetime
 contest_handler = Blueprint('contest_handler', __name__)
 
 
@@ -10,19 +10,26 @@ contest_handler = Blueprint('contest_handler', __name__)
 def create_contest():
     # Create new contests
     if request.method == 'POST':
+        request_json = request.get_json()
 
-        title = request.json['title']
-        description = request.json['description']
-        prize_contest = request.json['amount']
-        deadline_date = request.json['deadline_date']
-        update_time = date.today()
-        contest_creator = request.json['contestCreator']
+        title = request_json.get("title")
+        description = request_json.get("description")
+        prize_contest = request_json.get("prize_contest")
+        deadline_date = datetime.strptime(request_json.get("deadline_date"), "%Y-%m-%dT%H:%M:%S.%fZ")
+        update_time = datetime.utcnow()
+        contest_creator = request_json.get('contest_creator')
         
-        new_contest = Contest(title, description, prize_contest, deadline_date, created_time, update_time, contest_creator)
+        new_contest = Contest(
+                                title=title, 
+                                description=description, 
+                                prize_contest=prize_contest, 
+                                deadline_date=deadline_date, 
+                                update_time=update_time, 
+                                contest_creater=contest_creator
+                            )
         db.session.add(new_contest)
         db.session.commit()
-
-        return jsonify({'successMessage': 'Contest Created!'})
+        return jsonify({'successMessage': request_json.get("deadline_date")})
 
 
 @contest_handler.route('/contests', methods=['GET'])

@@ -92,6 +92,27 @@ export default function SubmitDesign() {
         </div>
     ))
 
+   const handleUpload = () => {
+
+        const data = new FormData();
+        data.append('file', acceptedFiles[0]);
+        data.append('file_name', acceptedFiles[0].name)
+        data.append('user_id','2')
+        data.append('status','True')
+
+        fetch('http://127.0.0.1:5000/contestImage/submission/1', {
+            method: 'POST',
+            body: data
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+             console.error('Error:', error);
+        });
+}
+
     return (
         <div className={classes.pageContainer}>
             <div {...getRootProps({ className: 'dropzone' })}>
@@ -113,7 +134,7 @@ export default function SubmitDesign() {
                 </aside>
             </div>
             <Box className={classes.buttonWrapper}>
-                <Button className={classes.submitButton}>Submit</Button>
+                <Button className={classes.submitButton} onClick={handleUpload}>Submit</Button>
             </Box>
         </div>
     )

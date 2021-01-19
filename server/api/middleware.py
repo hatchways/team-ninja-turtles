@@ -7,12 +7,10 @@ import app
 def require_auth(route):
     @wraps(route)
     def auth(*arg, **kwargs):
-        request_data = request.json
+        token = request.cookies.get("auth_token")
 
-        if request_data is None:
+        if token is None:
             return jsonify({"error": "auth_token missing"}), 401
-
-        token = request_data.get("auth_token")
 
         if token is None:
             return jsonify({"error": "auth_token missing"}), 401
