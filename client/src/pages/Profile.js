@@ -48,59 +48,59 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const tempData = [
-    {
-        image: 'tattoo-1.png',
-        noSketches: '24',
-        title: 'Lion tattoo concept in minimal style',
-        description: 'Looking for cool simplicity ideas of lion',
-        prizeAmount: '150'
-    },
-    {
-        image: 'tattoo-3.png',
-        noSketches: '24',
-        title: 'Cat tattoo concept in minimal style',
-        description: 'Looking for cool simplicity ideas of lion',
-        prizeAmount: '200'
-    },
-    {
-        image: 'tattoo-7.png',
-        noSketches: '24',
-        title: 'Lion tattoo concept in minimal style',
-        description: 'Looking for cool simplicity ideas of lion',
-        prizeAmount: '90'
-    },
-]
+const user_id = 1
+const hostname = "http://localhost:5000"
 
 export default function Profile() {
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
+    const [inProgressContestCards, getInProgressContestCards] = useState([])
+    const [completedContestCards, getCompletedContestCards] = useState([])
 
     const handleTabChange = (event, newActiveTab) => {
         setActiveTab(newActiveTab)
     }
+    useEffect(() => {
+        const xhr = new XMLHttpRequest()
+        xhr.open('GET', hostname + '/contests/owned/' + user_id)
 
-    const inprogressContests = tempData.map((contest, index) => (
-        <ContestCard 
-            key={index}
-            image={contest.image} 
-            noSketches={contest.noSketches} 
-            title={contest.title}
-            description={contest.description}
-            prizeAmount={contest.prizeAmount}
-        />
-    ))
-
-    const completedContests = tempData.map((contest, index) => (
-        <ContestCard 
-            key={index}
-            image={contest.image} 
-            noSketches={contest.noSketches} 
-            title={contest.title}
-            description={contest.description}
-            prizeAmount={contest.prizeAmount}
-        />
-    )).reverse()
+        xhr.onload = () => {
+            const inProgressContestCards = []
+            const completedContestCards = []
+            const contests = new Map(Object.entries(JSON.parse(xhr.response)))
+            for(var i = 0; i < contests.size; i++) {
+                const contest_name = 'contest_' + i
+                const contest = new Map(Object.entries(contests.get(contest_name)))
+                const deadline_date = Date.parse(contest.get('deadline_date'))
+                if(deadline_date > Date.now()) {
+                    inProgressContestCards.push(
+                        <ContestCard 
+                            key={i}
+                            image='tattoo-3.png'
+                            noSketches='24' 
+                            title={contest.get('title')}
+                            description={contest.get('description')}
+                            prizeAmount={contest.get('prize_contest')}
+                        />
+                    )
+                } else {
+                    completedContestCards.push(
+                        <ContestCard 
+                            key={i}
+                            image='tattoo-2.png'
+                            noSketches='24' 
+                            title={contest.get('title')}
+                            description={contest.get('description')}
+                            prizeAmount={contest.get('prize_contest')}
+                        />
+                    )
+                }
+            }
+            getInProgressContestCards(inProgressContestCards)
+            getCompletedContestCards(completedContestCards)
+        }
+        xhr.send()
+    }, [])
 
     return (
         <div className={classes.pageContainer}>
@@ -115,6 +115,7 @@ export default function Profile() {
             </div>
             <Paper className={classes.contestSection}>
                 <Tabs
+                    id="tabs"
                     value={activeTab}
                     onChange={handleTabChange}
                     variant='fullWidth'
@@ -123,11 +124,11 @@ export default function Profile() {
                     <Tab label='IN PROGRESS' />
                     <Tab label='COMPLETED' />
                 </Tabs>
-                <TabPanel value={activeTab} index={0}>
-                    {inprogressContests}
+                <TabPanel id = {"in_progress_tab"} value={activeTab} index={0}>
+                    {inProgressContestCards}
                 </TabPanel>
-                <TabPanel value={activeTab} index={1}>
-                    {completedContests}
+                <TabPanel id = {"completed_tab"} value={activeTab} index={1}>
+                    {completedContestCards}
                 </TabPanel>
             </Paper>
         </div>
