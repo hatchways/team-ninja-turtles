@@ -1,10 +1,11 @@
 from flask import Flask
 from api.ping_handler import ping_handler
-from api import db, bcrypt
+from api import db, bcrypt, socketio
 from api.home_handler import home_handler
 from api.contest_handler import contest_handler
 from api.user_handler import user_handler
 from api.submission_handler import submission_handler
+from api.socketio_handler import socketio_handler
 from config import S3_BUCKET, S3_KEY, S3_SECRET, S3_REGION
 import os
 import boto3
@@ -44,8 +45,11 @@ db.init_app(app)
 
 bcrypt.init_app(app)
 
+socketio.init_app(app, cors_allowed_origins="*")
+
 app.register_blueprint(user_handler)
 app.register_blueprint(home_handler)
 app.register_blueprint(ping_handler)
 app.register_blueprint(contest_handler)
 app.register_blueprint(submission_handler)
+app.register_blueprint(socketio_handler)
