@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import {CardElement, useElements, useStripe} from '@stripe/react-stripe-js';
-import RequestError, { getStripeID } from '../apiCalls';
+import { makeStyles } from "@material-ui/core/styles";
+import { CardNumberElement, CardExpiryElement, CardCvcElement, useElements, useStripe} from '@stripe/react-stripe-js';
+import { getStripeID } from '../apiCalls';
 
 const CARD_ELEMENT_OPTIONS = {
+  showIcon: true,
   style: {
     base: {
       color: "#32325d",
@@ -20,11 +22,32 @@ const CARD_ELEMENT_OPTIONS = {
   },
 };
 
+const useStyles = makeStyles(theme => ({
+  root: {
+      alignItems: "center",
+  },
+  container: {
+      width:300,
+      marginTop: theme.spacing(2),
+  },
+  centered: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+  },
+  button: {
+    marginTop: theme.spacing(5)
+  }
+}));
+
+
 function CreditCardForm() {
-    const [error, setError] = useState(null);
+    const [numberError, setNumberError] = useState(null);
+    const [expiryError, setExpiryError] = useState(null);
+    const [cvcError, setCVCError] = useState(null);
     const stripe = useStripe();
     const element = useElements();
-
+    const classes = useStyles();
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -37,10 +60,10 @@ function CreditCardForm() {
             async (data) => {
                 intentSecret = data["intent_id"]
                 if (intentSecret != null) {
-                    console.log("reached")
+                    // adding card via confirmCard Setup
                     const result = await stripe.confirmCardSetup(intentSecret, {
                         payment_method: {
-                            card: element.getElement(CardElement)
+                            card: element.getElement(CardNumberElement)
                         }
                     })
         
@@ -57,36 +80,68 @@ function CreditCardForm() {
         )
     }
 
-    const onChange = (event) => {
+    const onChangeNumber = (event) => {
         if (event.error) {
-          setError(event.error.message);
+            setNumberError(event.error.message);
         } else {
-          setError(null);
+            setNumberError(null);
+        } 
+    }
+
+    const onChangeExpiry = (event) => {
+        if (event.error) {
+            setExpiryError(event.error.message);
+        } else {
+            setExpiryError(null);
+        } 
+    }
+
+    const onChangeCVC = (event) => {
+        if (event.error) {
+            setCVCError(event.error.message);
+        } else {
+            setCVCError(null);
         } 
     }
 
     return (
-        <form onSubmit={onSubmit}>
-            <div className="form-row">
-                <label htmlFor="card-element">
-                    Enter Your Card Details
-                </label>
-
-                < CardElement
-                    id="card-element"
+      <form onSubmit={onSubmit} className={classes.root}>
+          <div className={classes.container}>
+              <label>
+                Card number
+                <CardNumberElement
+                    onChange={onChangeNumber}
                     options={CARD_ELEMENT_OPTIONS}
-                    onChange={onChange}
                 />
+              </label>
+          </div>
+          
+          <div className={classes.container}>
+              <label>
+                  Expiration date
+                  <CardExpiryElement
+                      onChange={onChangeExpiry}
+                      options={CARD_ELEMENT_OPTIONS}
+                    />
+              </label>
+          </div>
 
-                <div className="card-errors" role="alert">{error}</div>
-            </div>
+          <div className={classes.container}>
+              <label>
+                  CVC
+                  <CardCvcElement
+                      onChange={onChangeCVC}
+                      options={CARD_ELEMENT_OPTIONS}
+                    />
+              </label>
+          </div>
 
-            <div>
-                <button type="submit">Add Card</button>
-            </div>
-            
-        </form>
-    );
+          <div className={classes.centered}>
+              <button className={classes.button}>Add Card</button>
+          </div>
+          
+    </form>
+    )
 };
 
 export default CreditCardForm;
