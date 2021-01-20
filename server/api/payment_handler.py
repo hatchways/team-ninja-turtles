@@ -7,7 +7,6 @@ import app
 from api.middleware import require_auth
 
 payment_handler = Blueprint("payment_handler", __name__)
-stripe.api_key = os.environ.get("STRIPE_SECRET")
 
 
 # Mock data
