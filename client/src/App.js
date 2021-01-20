@@ -27,7 +27,7 @@ function App() {
           <Route path='/create-contest' component={CreateContestPage}></Route>
           <Route path='/submit-design' component={SubmitDesignPage}></Route>
           <Route path='/' component={LandingPage} />
-          <Route path="/add_card" component={PaymentInfo} />
+          <Route path="/add-card" component={PaymentInfo}></Route>
         </Switch>
       </Router>
     </MuiThemeProvider>
