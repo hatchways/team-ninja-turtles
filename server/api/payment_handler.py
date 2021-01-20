@@ -7,7 +7,7 @@ import app
 from api.middleware import require_auth
 
 payment_handler = Blueprint("payment_handler", __name__)
-stripe.api_key="sk_test_51IB2YjBC6Uxj9HYv7iZBoYA6ijfWk2Y9dVJsxYfrfv0v1SGEcoct35vVVEBiPNYeqRxUDxikGcYSlqOT2PRThQfz00io3SSVC2"
+stripe.api_key=app.app.config["STRIPE_SK"]
 
 
 # Mock data

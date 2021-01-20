@@ -41,6 +41,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['JWT_SECRET'] = os.environ.get('JWT_SECRET') if os.environ.get('JWT_SECRET') else "bad_secret_key"
 app.config['DOM_NAME'] = "http://localhost:3000"
+app.config['STRIPE_SK'] = os.environ.get("STRIPE_SECRET")
 
 db.init_app(app)
 bcrypt.init_app(app)
