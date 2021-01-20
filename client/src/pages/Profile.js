@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Button, Typography, Tabs, Tab, Paper } from '@material-ui/core'
 import TabPanel from '../components/TabPanel'
 import ContestCard from '../components/ContestCard'
+import RequestError, { getOwnedContests } from '../apiCalls'
 
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
@@ -49,59 +50,69 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const user_id = 1
-const hostname = "http://localhost:5000"
 
 export default function Profile() {
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
+    const [contests, setContests] = useState([])    
     const [inProgressContestCards, getInProgressContestCards] = useState([])
     const [completedContestCards, getCompletedContestCards] = useState([])
 
     const handleTabChange = (event, newActiveTab) => {
         setActiveTab(newActiveTab)
     }
-    useEffect(() => {
-        const xhr = new XMLHttpRequest()
-        xhr.open('GET', hostname + '/contests/owned/' + user_id)
-
-        xhr.onload = () => {
+    const getData = () => {
+        setContests(getOwnedContests(user_id, (data) => {
+            setContests(data) // Sets contests equal to return from get request
+        }, (error) => {
+            // onError
+            if (error instanceof RequestError && error.response.status === 400) {
+                console.log(error.response.json())
+            } else {
+                console.log("unexpected error")
+            }
+        }))
+    }
+    useEffect(() => { // Only runs once when first rendering
+        getData() 
+    }, [])
+    useEffect(() => { // Once get request returns a response, set contest cards
+        try {
+            console.log(contests)
             const inProgressContestCards = []
             const completedContestCards = []
-            const contests = new Map(Object.entries(JSON.parse(xhr.response)))
-            for(var i = 0; i < contests.size; i++) {
+            const contests_map = new Map(Object.entries(contests))
+            for (var i = 0; i < contests_map.size; i++) {
                 const contest_name = 'contest_' + i
-                const contest = new Map(Object.entries(contests.get(contest_name)))
+                const contest = new Map(Object.entries(contests_map.get(contest_name)))
                 const deadline_date = Date.parse(contest.get('deadline_date'))
-                if(deadline_date > Date.now()) {
-                    inProgressContestCards.push(
-                        <ContestCard 
-                            key={i}
-                            image='tattoo-3.png'
-                            noSketches='24' 
-                            title={contest.get('title')}
-                            description={contest.get('description')}
-                            prizeAmount={contest.get('prize_contest')}
-                        />
-                    )
+                if (deadline_date > Date.now()) {
+                    pushContestCard(inProgressContestCards, contest, i)
                 } else {
-                    completedContestCards.push(
-                        <ContestCard 
-                            key={i}
-                            image='tattoo-2.png'
-                            noSketches='24' 
-                            title={contest.get('title')}
-                            description={contest.get('description')}
-                            prizeAmount={contest.get('prize_contest')}
-                        />
-                    )
+                    pushContestCard(completedContestCards, contest, i)
                 }
             }
             getInProgressContestCards(inProgressContestCards)
             getCompletedContestCards(completedContestCards)
+        } catch (error) {
+            if (error instanceof TypeError) {
+                // TODO: display "no ongoing contests"
+            }
+            console.log(error)
         }
-        xhr.send()
-    }, [])
-
+    }, [contests])
+    const pushContestCard = (cardList, contest, i) => {
+        cardList.push(
+            <ContestCard 
+                key={i}
+                image='tattoo-2.png'
+                noSketches='24' 
+                title={contest.get('title')}
+                description={contest.get('description')}
+                prizeAmount={contest.get('prize_contest')}
+            />
+        )
+    }
     return (
         <div className={classes.pageContainer}>
             <div className={classes.profileSection}>
