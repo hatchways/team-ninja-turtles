@@ -169,7 +169,7 @@ const Signup = () => {
             </div>
 
             <div className={classes.container}>
-                <Button onClick={submit} variant="outlined" className={classes.button}>Login</Button>
+                <Button onClick={submit} variant="outlined" className={classes.button}>Sign Up</Button>
             </div>
         </form>
     );
