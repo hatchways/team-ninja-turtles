@@ -7,7 +7,7 @@ import app
 from api.middleware import require_auth
 
 payment_handler = Blueprint("payment_handler", __name__)
-stripe.api_key=app.app.config["STRIPE_SK"]
+stripe.api_key = os.environ.get("STRIPE_SECRET")
 
 
 # Mock data
@@ -22,7 +22,8 @@ def get_stripe_intent():
         username = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])['user']
     except:
         return jsonify({'message': 'invalid Token'}), 401
-    
+
+    stripe.api_key = app.app.config['STRIPE_SECRET']
     user = User.query.filter_by(username=username).first()
 
     if user.stripe_id is None:
