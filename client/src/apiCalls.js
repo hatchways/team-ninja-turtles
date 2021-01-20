@@ -7,14 +7,31 @@ class RequestError extends Error {
     }
 }
 
+const get = async(subdom, onSucess, onError) => {
+    fetch(hostname+subdom, {
+        method: "GET",
+        credentials: 'include'
+    })
+    .then(response => {
+        if (response.ok) {
+            const json = response.json()
+            return json
+        } else {
+            throw RequestError(response);
+        }
+    })
+    .then(data => onSucess(data)) 
+    .catch(error => onError(error))
+}
+
 const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) => {
     fetch(hostname+subdom, {
         method: callMethod,
         headers: header,
         body: data,
         credentials: 'include'
-    }).
-    then(response => {
+    })
+    .then(response => {
         if (response.ok) {
             return response.json()
         } else {
@@ -53,6 +70,11 @@ export const createContest = async (title, description, prize_contest, deadline_
     }
 
     makeRequest("/contest", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
+}
+
+export const getStripeID = async (onSuccess, onError) => {
+    get("/api/get_stripe_intent", onSuccess, onError)
+    return true
 }
 
 export default RequestError;

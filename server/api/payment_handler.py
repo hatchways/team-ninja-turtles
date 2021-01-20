@@ -18,8 +18,11 @@ def get_price_val(data):
 @payment_handler.route("/api/get_stripe_intent", methods=["GET"])
 def get_stripe_intent():
     token = request.cookies.get("auth_token")
-    username = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])['user']
-
+    try:
+        username = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])['user']
+    except:
+        return jsonify({'message': 'invalid Token'}), 401
+    
     user = User.query.filter_by(username=username).first()
 
     if user.stripe_id is None:
