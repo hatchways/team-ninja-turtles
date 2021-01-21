@@ -81,7 +81,7 @@ export default function Profile() {
             console.log(contests)
             const inProgressContestCards = []
             const completedContestCards = []
-            const contests_map = new Map(Object.entries(contests))
+            const contestsMap = new Map(Object.entries(contests))
             for (var i = 0; i < contests_map.size; i++) {
                 const contest_name = 'contest_' + i
                 const contest = new Map(Object.entries(contests_map.get(contest_name)))
