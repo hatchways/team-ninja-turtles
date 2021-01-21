@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const user_id = 1
+const userId = 1
 
 export default function Profile() {
     const classes = useStyles()
