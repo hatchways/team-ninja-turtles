@@ -42,6 +42,22 @@ const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) 
     .catch(error => onError(error))
 }
 
+const makeGETRequest = async (subdom, header, onSucess, onError) => {
+    fetch(hostname+subdom, {
+        headers: header,
+        credentials: 'include'
+    }).
+    then(response => {
+        if (response.ok) {
+            return response.json()
+        } else {
+            throw RequestError(response)
+        }
+    })
+    .then(data => onSucess(data))
+    .catch(error => onError(error))
+}
+
 export const login = async (username, password, onSuccess, onError) => {
     const data = {
         'username' : username,
@@ -75,6 +91,10 @@ export const createContest = async (title, description, prize_contest, deadline_
 export const getStripeID = async (onSuccess, onError) => {
     get("/api/get_stripe_intent", onSuccess, onError)
     return true
+}
+
+export const getOwnedContests = async (userId, onSuccess, onError) => {
+    makeGETRequest(`/contests/owned/${userId}`, {"Content-Type": "application/json"}, onSuccess, onError)
 }
 
 export default RequestError;
