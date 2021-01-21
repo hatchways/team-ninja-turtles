@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Button, Typography, Tabs, Tab, Paper } from '@material-ui/core'
 import TabPanel from '../components/TabPanel'
 import ContestCard from '../components/ContestCard'
+import RequestError, { getOwnedContests } from '../apiCalls'
 
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
@@ -48,60 +49,67 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const tempData = [
-    {
-        image: 'tattoo-1.png',
-        noSketches: '24',
-        title: 'Lion tattoo concept in minimal style',
-        description: 'Looking for cool simplicity ideas of lion',
-        prizeAmount: '150'
-    },
-    {
-        image: 'tattoo-3.png',
-        noSketches: '24',
-        title: 'Cat tattoo concept in minimal style',
-        description: 'Looking for cool simplicity ideas of lion',
-        prizeAmount: '200'
-    },
-    {
-        image: 'tattoo-7.png',
-        noSketches: '24',
-        title: 'Lion tattoo concept in minimal style',
-        description: 'Looking for cool simplicity ideas of lion',
-        prizeAmount: '90'
-    },
-]
+const user_id = 1
 
 export default function Profile() {
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
+    const [contests, setContests] = useState([])    
+    const [inProgressContestCards, getInProgressContestCards] = useState([])
+    const [completedContestCards, getCompletedContestCards] = useState([])
 
     const handleTabChange = (event, newActiveTab) => {
         setActiveTab(newActiveTab)
     }
-
-    const inprogressContests = tempData.map((contest, index) => (
-        <ContestCard 
-            key={index}
-            image={contest.image} 
-            noSketches={contest.noSketches} 
-            title={contest.title}
-            description={contest.description}
-            prizeAmount={contest.prizeAmount}
-        />
-    ))
-
-    const completedContests = tempData.map((contest, index) => (
-        <ContestCard 
-            key={index}
-            image={contest.image} 
-            noSketches={contest.noSketches} 
-            title={contest.title}
-            description={contest.description}
-            prizeAmount={contest.prizeAmount}
-        />
-    )).reverse()
-
+    useEffect(() => { // Only runs once when first rendering
+        setContests(getOwnedContests(userId, (data) => {
+            setContests(data) // Sets contests equal to return from get request
+        }, (error) => {
+            // onError
+            if (error instanceof RequestError && error.response.status === 400) {
+                console.log(error.response.json())
+            } else {
+                console.log("unexpected error")
+            }
+        }))
+    }, [])
+    useEffect(() => { // Once get request returns a response, set contest cards
+        try {
+            console.log(contests)
+            const inProgressContestCards = []
+            const completedContestCards = []
+            const contestsMap = new Map(Object.entries(contests))
+            for (var i = 0; i < contestsMap.size; i++) {
+                const contestName = 'contest_' + i
+                const contest = new Map(Object.entries(contestsMap.get(contestName)))
+                const deadlineDate = Date.parse(contest.get('deadline_date'))
+                if (deadlineDate > Date.now()) {
+                    pushContestCard(inProgressContestCards, contest, i)
+                } else {
+                    pushContestCard(completedContestCards, contest, i)
+                }
+            }
+            getInProgressContestCards(inProgressContestCards)
+            getCompletedContestCards(completedContestCards)
+        } catch (error) {
+            if (error instanceof TypeError) {
+                // TODO: display "no ongoing contests"
+            }
+            console.log(error)
+        }
+    }, [contests])
+    const pushContestCard = (cardList, contest, i) => {
+        cardList.push(
+            <ContestCard 
+                key={i}
+                image='tattoo-2.png'
+                noSketches='24' 
+                title={contest.get('title')}
+                description={contest.get('description')}
+                prizeAmount={contest.get('prize_contest')}
+            />
+        )
+    }
     return (
         <div className={classes.pageContainer}>
             <div className={classes.profileSection}>
@@ -115,6 +123,7 @@ export default function Profile() {
             </div>
             <Paper className={classes.contestSection}>
                 <Tabs
+                    id="tabs"
                     value={activeTab}
                     onChange={handleTabChange}
                     variant='fullWidth'
@@ -123,11 +132,11 @@ export default function Profile() {
                     <Tab label='IN PROGRESS' />
                     <Tab label='COMPLETED' />
                 </Tabs>
-                <TabPanel value={activeTab} index={0}>
-                    {inprogressContests}
+                <TabPanel id = {"in_progress_tab"} value={activeTab} index={0}>
+                    {inProgressContestCards}
                 </TabPanel>
-                <TabPanel value={activeTab} index={1}>
-                    {completedContests}
+                <TabPanel id = {"completed_tab"} value={activeTab} index={1}>
+                    {completedContestCards}
                 </TabPanel>
             </Paper>
         </div>
