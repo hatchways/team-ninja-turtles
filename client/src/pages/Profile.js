@@ -61,7 +61,7 @@ export default function Profile() {
     const handleTabChange = (event, newActiveTab) => {
         setActiveTab(newActiveTab)
     }
-    const getData = () => {
+    useEffect(() => { // Only runs once when first rendering
         setContests(getOwnedContests(userId, (data) => {
             setContests(data) // Sets contests equal to return from get request
         }, (error) => {
@@ -72,9 +72,6 @@ export default function Profile() {
                 console.log("unexpected error")
             }
         }))
-    }
-    useEffect(() => { // Only runs once when first rendering
-        getData() 
     }, [])
     useEffect(() => { // Once get request returns a response, set contest cards
         try {
@@ -82,11 +79,11 @@ export default function Profile() {
             const inProgressContestCards = []
             const completedContestCards = []
             const contestsMap = new Map(Object.entries(contests))
-            for (var i = 0; i < contests_map.size; i++) {
-                const contest_name = 'contest_' + i
-                const contest = new Map(Object.entries(contests_map.get(contest_name)))
-                const deadline_date = Date.parse(contest.get('deadline_date'))
-                if (deadline_date > Date.now()) {
+            for (var i = 0; i < contestsMap.size; i++) {
+                const contestName = 'contest_' + i
+                const contest = new Map(Object.entries(contestsMap.get(contestName)))
+                const deadlineDate = Date.parse(contest.get('deadline_date'))
+                if (deadlineDate > Date.now()) {
                     pushContestCard(inProgressContestCards, contest, i)
                 } else {
                     pushContestCard(completedContestCards, contest, i)
