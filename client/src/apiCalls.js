@@ -25,6 +25,23 @@ const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) 
     .catch(error => onError(error))
 }
 
+const makeGetRequest = async (subdom, header, onSucess, onError) => {
+    fetch(hostname+subdom, {
+        method: 'GET',
+        headers: header,
+        credentials: 'include'
+    }).
+    then(response => {
+        if (response.ok) {
+            return response.json()
+        } else {
+            throw RequestError(response)
+        }
+    })
+    .then(data => onSucess(data)) 
+    .catch(error => onError(error))
+}
+
 export const login = async (username, password, onSuccess, onError) => {
     const data = {
         'username' : username,
@@ -53,6 +70,10 @@ export const createContest = async (title, description, prize_contest, deadline_
     }
 
     makeRequest("/contest", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
+}
+
+export const getContestDetails = async (contestId, onSuccess, onError) => {
+    makeGetRequest(`/contest/${contestId}`, {"Content-Type": "application/json"}, onSuccess, onError)
 }
 
 export default RequestError;
