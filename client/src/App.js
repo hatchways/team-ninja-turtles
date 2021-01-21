@@ -8,6 +8,7 @@ import Login from './pages/Login'
 import ProfilePage from './pages/Profile'
 import LandingPage from './pages/Landing'
 import CreateContestPage from './pages/CreateContest'
+import SocketPage from './pages/SocketioConnection'
 import SubmitDesignPage from './pages/SubmitDesign' 
 import PaymentInfo from "./pages/PaymentInfo"
 import ContestDetails from './pages/ContestDetails'
@@ -26,6 +27,7 @@ function App() {
           <Route path='/contest-details' component={ContestDetails}></Route>
           <Route path='/create-contest' component={CreateContestPage}></Route>
           <Route path='/submit-design' component={SubmitDesignPage}></Route>
+          <Route path='/message' component={SocketPage}></Route>
           <Route path='/' component={LandingPage} />
           <Route path="/add-card" component={PaymentInfo}></Route>
         </Switch>
