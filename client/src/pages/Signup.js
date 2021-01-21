@@ -41,7 +41,7 @@ const Signup = () => {
     const [passwordWarning, setPasswordWarning] = useState("");
     const [passwordError, setPasswordError] = useState(false);
     const [confirmPWWarning, setConfirmPWWarning] = useState("");
-    const [confirmPWError, setConfirmPWError] = useState("");
+    const [confirmPWError, setConfirmPWError] = useState(false);
 
     // Used to detect if a field blurred without input
     const blurred = (event, field, setFieldError, setFieldWarning) => {
@@ -169,7 +169,7 @@ const Signup = () => {
             </div>
 
             <div className={classes.container}>
-                <Button onClick={submit} variant="outlined" className={classes.button}>Login</Button>
+                <Button onClick={submit} variant="outlined" className={classes.button}>Sign Up</Button>
             </div>
         </form>
     );
