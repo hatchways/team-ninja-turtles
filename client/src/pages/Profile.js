@@ -62,7 +62,7 @@ export default function Profile() {
         setActiveTab(newActiveTab)
     }
     const getData = () => {
-        setContests(getOwnedContests(user_id, (data) => {
+        setContests(getOwnedContests(userId, (data) => {
             setContests(data) // Sets contests equal to return from get request
         }, (error) => {
             // onError
