@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import DiscoveryContent from "../components/DiscoveryContent"
+import { getAllContest } from "../apiCalls"
 
 
 const mockData = [{
@@ -80,16 +81,26 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const DiscoveryPage = () => {
     const classes = useStyles();
+    const [contests, setContests] = useState([]);
 
+    useEffect(() => {
+        getAllContest( (data) => {
+            setContests(data)
+        }, (error) => {
+            console.log("Unexpected Error")
+        })
+    }, [])
+
+    console.log(contests)
     return (
         <Grid container className={classes.root} spacing={0}>
             <Grid item xs={12}>
                 <Grid container justify="center" spacing={2}>
-                    {mockData.map((value) => (
+                    {contests.map((value) => (
                         <Grid key={value.ind} item>
                             <Paper className={classes.paper}>
                                 <DiscoveryContent
-                                    img_src={value.img}
+                                    img_src={mockData[Math.floor(Math.random() * mockData.length)].img}
                                     contest_name={value.name}
                                     creator_name={value.creator}
                                     prize={value.prize}
