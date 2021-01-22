@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 import TabPanel from '../components/TabPanel'
 import { 
@@ -13,6 +14,8 @@ import {
     GridListTileBar 
 } from '@material-ui/core'
 
+import RequestError, { getContestDetails } from '../apiCalls'
+
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
         height: 'calc(100vh - 100px)',
@@ -21,13 +24,11 @@ const useStyles = makeStyles((theme) => ({
         width: '80vw',
         margin: '4rem auto'
     },
-    backButtonDiv: {
-       
-    },
     backButton: {
         display: 'flex',
         flexDirection: 'row',
-        opacity: '0.5'
+        opacity: '0.5',
+        cursor: 'pointer'
     },
     backButtonIcon: {
         marginRight: '0.4rem'
@@ -91,69 +92,68 @@ const useStyles = makeStyles((theme) => ({
             margin: '2rem'
         }
     },
-    gridList: {
-
+    noDataMessage: {
+        display: 'flex',
+        justifyContent: 'center',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        padding: '4rem'
     }
 }))
 
-const tempData = [
-    {
-        image: 'tattoo-1.png',
-        author: 'jesse'
-    },
-    {
-        image: 'tattoo-2.png',
-        author: 'anthony'
-    },
-    {
-        image: 'tattoo-3.png',
-        author: 'denise'
-    },
-    {
-        image: 'tattoo-4.png',
-        author: 'james'
-    },
-    {
-        image: 'tattoo-5.png',
-        author: 'jesse'
-    },
-    {
-        image: 'tattoo-6.png',
-        author: 'anthony'
-    },
-    {
-        image: 'tattoo-7.png',
-        author: 'james'
-    },
-    {
-        image: 'tattoo-8.png',
-        author: 'james'
-    },
-    {
-        image: 'tattoo-9.png',
-        author: 'denise'
-    },
-    {
-        image: 'tattoo-10.png',
-        author: 'jesse'
-    },
-    {
-        image: 'tattoo-11.png',
-        author: 'denise'
-    },
-    {
-        image: 'tattoo-12.png',
-        author: 'jesse'
-    },
-]
-
-export default function ContestDetails() {
+export default function ContestDetails(props) {
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
+    const [contest, setContest] = useState(null)
+    const [gridListItems, setGridListItems] = useState(null)
+    const contestId = props.match.params.id
+    const history = useHistory()
 
     const handleTabChange = (event, newActiveTab) => {
         setActiveTab(newActiveTab)
     }
+
+    const onBackButtonClick = e => {
+        history.push('/profile')
+    }
+
+    const getContestInfo = contestId => {
+        getContestDetails(contestId, (data) => {
+            console.log(data)
+            data.title ? setContest(data) : setContest(null)
+        },  (error) => {
+            if (error instanceof RequestError && error.response.status === 400) {
+                console.log(error.response.json())
+            } else {
+                console.log("unexpected error")
+            }
+        })
+    }
+
+    useEffect(() => {
+        getContestInfo(contestId)
+        // eslint-disable-next-line
+    }, [])
+
+    useEffect(() => {
+        if (contest) {
+            if (contest.designs.length > 0) {
+                const newGridListItems = contest.designs.map((design, index) => (
+                    <GridListTile key={index}>
+                        <img src={`${process.env.PUBLIC_URL}/images/${design.image}`} alt={design.image} />
+                        <GridListTileBar title={`By @${design.author}`} />
+                    </GridListTile>
+                ))
+    
+                setGridListItems(newGridListItems)
+            } else {
+                const newGridListItems = <div>There is no designs to display</div>
+                setGridListItems(newGridListItems)
+            }
+        }
+    }, [contest])
+
+   
     
     // temporary hard code contest information
     const contestInfo = {
@@ -164,63 +164,70 @@ export default function ContestDetails() {
         prizeAmount: '150'
     }
 
-    const gridListItems = tempData.map((item, index) => (
-        <GridListTile key={index}>
-            <img src={`${process.env.PUBLIC_URL}/images/${item.image}`} alt={item.image} />
-            <GridListTileBar title={`By @${item.author}`} />
-        </GridListTile>
-    ))
-
     return (
+        contest !== null ? (
+            <div className={classes.pageContainer}>
+                <div className={classes.containerWrapper}>
+                    <div className={classes.backButtonDiv}>
+                        <div className={classes.backButton} onClick={onBackButtonClick}>
+                            <Typography className={classes.backButtonIcon}>{`<`}</Typography>
+                            <Typography className={classes.backButtonText}>Back to contests list</Typography>
+                        </div>
+                    </div>
+                    <div className={classes.contestInfoDiv}>
+                        <Grid container>
+                            <Grid item xs={7} className={classes.contestInfo}>
+                                <div className={classes.title}>
+                                    <Typography variant='h4'>
+                                        {contest.title}
+                                    </Typography>
+                                    <div className={classes.prizeAmount}>${contest.prize_contest}</div>
+                                </div>
+                                <div className={classes.author}>
+                                    <img src={`${process.env.PUBLIC_URL}/images/avatar-${contest.contest_creater}.png`} alt='designer avatar' className={classes.avatar} />
+                                    <Typography variant='h5'>{contest.creater_name}</Typography>
+                                </div>
+                            </Grid>
+                            <Grid item xs={5} className={classes.submitButtonDiv}>
+                                <Button variant='outlined' className={classes.submitDesign}>Submit Design</Button>
+                            </Grid>
+                        </Grid>
+                    </div>
+                    <div className={classes.contestDesigns}>
+                        <Paper>
+                            <Tabs
+                                value={activeTab}
+                                onChange={handleTabChange}
+                                variant='fullWidth'
+                                TabIndicatorProps={{ style: { background:'black' }}}
+                            >
+                                <Tab label='DESIGNS' />
+                                <Tab label='BRIEF' />
+                            </Tabs>
+                            <TabPanel value={activeTab} index={0} className={classes.tabPanel}>
+                                <GridList cellHeight={280} className={classes.gridList} cols={4} spacing={30}>
+                                    {gridListItems}
+                                </GridList>
+                            </TabPanel>
+                            <TabPanel value={activeTab} index={1}>
+                                Tab 2
+                            </TabPanel>
+                        </Paper>
+                    </div>
+                </div>
+            </div>
+        ) : (
         <div className={classes.pageContainer}>
-            <div className={classes.containerWrapper}>
-                <div className={classes.backButtonDiv}>
+            <div className={classes.backButtonDiv}>
                     <div className={classes.backButton}>
                         <Typography className={classes.backButtonIcon}>{`<`}</Typography>
                         <Typography className={classes.backButtonText}>Back to contests list</Typography>
                     </div>
-                </div>
-                <div className={classes.contestInfoDiv}>
-                    <Grid container>
-                        <Grid item xs={7} className={classes.contestInfo}>
-                            <div className={classes.title}>
-                                <Typography variant='h4'>
-                                    {contestInfo.title}
-                                </Typography>
-                                <div className={classes.prizeAmount}>${contestInfo.prizeAmount}</div>
-                            </div>
-                            <div className={classes.author}>
-                                <img src={`${process.env.PUBLIC_URL}/images/${contestInfo.avatar}`} alt="designer avatar" className={classes.avatar} />
-                                <Typography variant='h5'>{contestInfo.author}</Typography>
-                            </div>
-                        </Grid>
-                        <Grid item xs={5} className={classes.submitButtonDiv}>
-                            <Button variant='outlined' className={classes.submitDesign}>Submit Design</Button>
-                        </Grid>
-                    </Grid>
-                </div>
-                <div className={classes.contestDesigns}>
-                    <Paper>
-                        <Tabs
-                            value={activeTab}
-                            onChange={handleTabChange}
-                            variant='fullWidth'
-                            TabIndicatorProps={{ style: { background:'black' }}}
-                        >
-                            <Tab label='DESIGNS' />
-                            <Tab label='BRIEF' />
-                        </Tabs>
-                        <TabPanel value={activeTab} index={0} className={classes.tabPanel}>
-                            <GridList cellHeight={280} className={classes.gridList} cols={4} spacing={30}>
-                                {gridListItems}
-                            </GridList>
-                        </TabPanel>
-                        <TabPanel value={activeTab} index={1}>
-                            Tab 2
-                        </TabPanel>
-                    </Paper>
-                </div>
+            </div>
+            <div className={classes.noDataMessage}>
+                Contest does not exist
             </div>
         </div>
+        )
     )
 }

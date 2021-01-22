@@ -58,6 +58,23 @@ const makeGETRequest = async (subdom, header, onSucess, onError) => {
     .catch(error => onError(error))
 }
 
+const makeGetRequest = async (subdom, header, onSucess, onError) => {
+    fetch(hostname+subdom, {
+        method: 'GET',
+        headers: header,
+        credentials: 'include'
+    }).
+    then(response => {
+        if (response.ok) {
+            return response.json()
+        } else {
+            throw RequestError(response)
+        }
+    })
+    .then(data => onSucess(data)) 
+    .catch(error => onError(error))
+}
+
 export const login = async (username, password, onSuccess, onError) => {
     const data = {
         'username' : username,
