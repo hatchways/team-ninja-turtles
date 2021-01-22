@@ -93,14 +93,13 @@ export default function SubmitDesign() {
     ))
 
    const handleUpload = () => {
+        const urlElement = window.location.href.split('/')
 
         const data = new FormData();
         data.append('file', acceptedFiles[0]);
         data.append('file_name', acceptedFiles[0].name)
-        data.append('user_id','2')
-        data.append('status','True')
 
-        fetch('http://127.0.0.1:5000/contestImage/submission/1', {
+        fetch('http://127.0.0.1:5000/contestImage/submission/'+urlElement[4], {
             method: 'POST',
             body: data
         })
