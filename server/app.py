@@ -8,6 +8,7 @@ from api.user_handler import user_handler
 from api.submission_handler import submission_handler
 from api.socketio_handler import socketio_handler
 from api.payment_handler import payment_handler
+from api.inspirational_images_handler import inspirational_images_handler
 from config import S3_BUCKET, S3_KEY, S3_SECRET, S3_REGION
 import os
 import boto3
@@ -56,5 +57,6 @@ app.register_blueprint(contest_handler)
 app.register_blueprint(submission_handler)
 app.register_blueprint(socketio_handler)
 app.register_blueprint(payment_handler)
+app.register_blueprint(inspirational_images_handler)
 
 migrate = Migrate(app, db)

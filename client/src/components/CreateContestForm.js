@@ -13,7 +13,7 @@ import {
     GridListTile
 } from '@material-ui/core'
 
-import RequestError, { createContest } from '../apiCalls'
+import RequestError, { createContest, getInspirationalImages } from '../apiCalls'
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -71,7 +71,7 @@ export default function CreateContestForm() {
     const [date, setDate] = useState(new Date().toISOString().substr(0,10))
     const [time, setTime] = useState(new Date().toTimeString().substr(0,5))
     const [timeZone, setTimeZone] = useState('PDT')
-    const [images, setImages] = useState('')
+    const [inspirationalImages, setImages] = useState(new Array())
     const [amountError, setAmountError] = useState(false)
     const [amountHelperText, setAmountHelperText] = useState('')
 
@@ -104,12 +104,34 @@ export default function CreateContestForm() {
             }
         })
     }
-
-    // temporary hardcode image names
-    const imageNames = ['tattoo-1.png', 'tattoo-2.png', 'tattoo-3.png', 'tattoo-4.png', 'tattoo-5.png', 
-    'tattoo-6.png', 'tattoo-7.png', 'tattoo-8.png', 'tattoo-9.png', 'tattoo-10.png', 
-    'tattoo-11.png', 'tattoo-12.png', 'tattoo-13.png', 'tattoo-14.png']
-
+    useEffect(() => { // Only runs once when first rendering
+        getInspirationalImages((data) => {
+            createGridListTiles(data) // Sets images equal to return from get request
+        }, (error) => {
+            // onError
+            if (error instanceof RequestError && error.response.status === 400) {
+                console.log(error.response.json())
+            } else {
+                console.log(error)
+            }
+        })
+    }, [])
+    const createGridListTiles = (data) => {
+        const imagesMap = new Map(Object.entries(data))
+        console.log(imagesMap)
+        const images = []
+        for (var i = 0; i < imagesMap.size; i++) {
+            const imageMap = new Map(Object.entries(imagesMap.get(String(i))))
+            const imageURL = imageMap.get('image_link')
+            const imageKey = imageMap.get('id')
+            images.push(
+                <GridListTile key={imageKey} cols={1}>
+                    <img src={imageURL} alt={imageURL} />
+                </GridListTile>
+                )
+        }
+        setImages(images)
+    }
     return (
         <form className={classes.formContainer}>
             <Grid container direction='row'>
@@ -215,11 +237,7 @@ export default function CreateContestForm() {
                 <Grid item xs={12}>
                     <Box className={classes.tattooImages}>
                         <GridList cellHeight={160} className={classes.gridList} cols={4}>
-                            {imageNames.map((image, index) => (
-                                <GridListTile key={index} cols={1}>
-                                    <img src={process.env.PUBLIC_URL + '/images/' + image} alt={image} />
-                                </GridListTile>
-                            ))}
+                            {inspirationalImages}
                         </GridList>
                     </Box>
                 </Grid>

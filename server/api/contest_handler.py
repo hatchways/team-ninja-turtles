@@ -29,7 +29,7 @@ def create_contest():
                             )
         db.session.add(new_contest)
         db.session.commit()
-        return jsonify({'successMessage': request_json.get("deadline_date")})
+        return jsonify({'successMessage': "Sucessfully created contest"})
 
 
 @contest_handler.route('/contests', methods=['GET'])

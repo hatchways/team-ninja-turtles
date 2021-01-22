@@ -97,4 +97,8 @@ export const getOwnedContests = async (userId, onSuccess, onError) => {
     makeGETRequest(`/contests/owned/${userId}`, {"Content-Type": "application/json"}, onSuccess, onError)
 }
 
+export const getInspirationalImages = async (onSuccess, onError) => {
+    makeGETRequest(`/inspirational_images`, {"Content-Type": "application/json"}, onSuccess, onError)
+}
+
 export default RequestError;
