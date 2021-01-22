@@ -1,9 +1,10 @@
 const hostname = "http://localhost:5000"
 
 class RequestError extends Error {
-    constructor(response) {
+    constructor(status, body) {
         super()
-        this.response = response
+        this.status = status
+        this.body = body
     }
 }
 
@@ -14,12 +15,12 @@ const get = async(subdom, onSucess, onError) => {
     })
     .then(response => {
         if (response.ok) {
-            const json = response.json()
-            return json
+            return response
         } else {
-            throw RequestError(response);
+            return response.json().then(err => Promise.reject(new RequestError(response.status, err)))
         }
     })
+    .then(response => response.json())
     .then(data => onSucess(data)) 
     .catch(error => onError(error))
 }
@@ -33,11 +34,12 @@ const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) 
     })
     .then(response => {
         if (response.ok) {
-            return response.json()
+            return response
         } else {
-            throw RequestError(response)
+            return response.json().then(err => Promise.reject(new RequestError(response.status, err)))
         }
     })
+    .then(response => response.json())
     .then(data => onSucess(data)) 
     .catch(error => onError(error))
 }
@@ -46,14 +48,15 @@ const makeGETRequest = async (subdom, header, onSucess, onError) => {
     fetch(hostname+subdom, {
         headers: header,
         credentials: 'include'
-    }).
-    then(response => {
+    })
+    .then(response => {
         if (response.ok) {
-            return response.json()
+            return response
         } else {
-            throw RequestError(response)
+            return response.json().then(err => Promise.reject(new RequestError(response.status, err)))
         }
     })
+    .then(response => response.json())
     .then(data => onSucess(data))
     .catch(error => onError(error))
 }
@@ -98,7 +101,7 @@ export const getOwnedContests = async (userId, onSuccess, onError) => {
 }
 
 export const getContestDetails = async(contestId, onSuccess, onError) => {
-    get(`${hostname}/contest/${contestId}`, onSuccess, onError)
+    get(`/contest/${contestId}`, onSuccess, onError)
 }
 
 export default RequestError;

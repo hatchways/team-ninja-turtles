@@ -97,8 +97,8 @@ export default function CreateContestForm() {
         createContest(title, description, amount, deadline, contestCreator, data => {
             console.log('contest has been successfully created!')
         }, error => {
-            if (error instanceof RequestError && error.response.status === 400) {
-                console.log(error.response.json())
+            if (error instanceof RequestError && error.status === 400) {
+                console.log(error.body)
             } else {
                 console.log("unexpected error")
             }
