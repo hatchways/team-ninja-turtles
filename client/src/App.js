@@ -28,8 +28,8 @@ function App() {
           <Route path='/create-contest' component={CreateContestPage}></Route>
           <Route path='/submit-design' component={SubmitDesignPage}></Route>
           <Route path='/message' component={SocketPage}></Route>
-          <Route path='/' component={LandingPage} />
           <Route path="/add-card" component={PaymentInfo}></Route>
+          <Route path='/' component={LandingPage} />
         </Switch>
       </Router>
     </MuiThemeProvider>
