@@ -184,8 +184,8 @@ export default function ContestDetails(props) {
                                     <div className={classes.prizeAmount}>${contest.prize_contest}</div>
                                 </div>
                                 <div className={classes.author}>
-                                    <img src={`${process.env.PUBLIC_URL}/images/${contestInfo.avatar}`} alt='designer avatar' className={classes.avatar} />
-                                    <Typography variant='h5'>{contestInfo.author}</Typography>
+                                    <img src={`${process.env.PUBLIC_URL}/images/avatar-${contest.contest_creater}.png`} alt='designer avatar' className={classes.avatar} />
+                                    <Typography variant='h5'>{contest.creater_name}</Typography>
                                 </div>
                             </Grid>
                             <Grid item xs={5} className={classes.submitButtonDiv}>

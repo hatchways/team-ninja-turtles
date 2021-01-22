@@ -1,7 +1,7 @@
 import json
 from flask import jsonify, Blueprint, request
 from api import db
-from api.models import Contest, Submission
+from api.models import Contest, Submission, User
 from datetime import date, datetime
 contest_handler = Blueprint('contest_handler', __name__)
 
@@ -60,8 +60,16 @@ def get_contest(contest_id):
     except Exception:
         return jsonify("Contest does not exist")
 
+    try:
+        user = User.query.filter_by(id=contest.contest_creater).first()
+        if user == None: 
+            raise Exception
+    except Exception:
+        return jsonify("Contest owner not found")
+
     # Return contest contents
     if request.method == 'GET':
+        setattr(contest, 'creater_name', user.username)
         return json.dumps(contest.__dict__, default=str)
 
     # Update contest contents
