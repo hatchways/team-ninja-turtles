@@ -6,15 +6,7 @@ from api.contest_handler import contest_handler
 from api.user_handler import user_handler
 from api.submission_handler import submission_handler
 from api.socketio_handler import socketio_handler
-from config import S3_BUCKET, S3_KEY, S3_SECRET, S3_REGION
 import os
-import boto3
-
-s3 = boto3.client(
-    's3',
-    aws_access_key_id=S3_KEY,
-    aws_secret_access_key=S3_SECRET,
-    region_name=S3_REGION)
 
 app = Flask(__name__)
 
