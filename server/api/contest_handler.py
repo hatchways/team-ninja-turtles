@@ -55,7 +55,8 @@ def get_all_contests():
                     "name": contest.title,
                     "creator": user.username,
                     "prize": contest.prize_contest,
-                    "date": contest.deadline_date.strftime("%Y-%m-%d %H:%M:%S")
+                    "date": contest.deadline_date.strftime("%Y-%m-%d %H:%M:%S"),
+                    "desc": contest.description
                 })
             ind += 1
 

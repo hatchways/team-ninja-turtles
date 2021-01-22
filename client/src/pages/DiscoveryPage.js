@@ -105,7 +105,7 @@ const DiscoveryPage = () => {
                                     creator_name={value.creator}
                                     prize={value.prize}
                                     date={value.date}
-                                    desc={desc}
+                                    desc={value.desc}
                                 />
                             </Paper>
                         </Grid>
