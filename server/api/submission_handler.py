@@ -4,6 +4,7 @@ from .models import Contest, Submission, User
 from config import S3_BUCKET
 from datetime import date
 import jwt
+import app
 submission_handler = Blueprint('submission_new_handler', __name__)
 
 
