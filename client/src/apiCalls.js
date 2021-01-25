@@ -8,23 +8,6 @@ class RequestError extends Error {
     }
 }
 
-const get = async(subdom, onSucess, onError) => {
-    fetch(hostname+subdom, {
-        method: "GET",
-        credentials: 'include'
-    })
-    .then(response => {
-        if (response.ok) {
-            return response
-        } else {
-            return response.json().then(err => Promise.reject(new RequestError(response.status, err)))
-        }
-    })
-    .then(response => response.json())
-    .then(data => onSucess(data)) 
-    .catch(error => onError(error))
-}
-
 const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) => {
     fetch(hostname+subdom, {
         method: callMethod,
@@ -44,7 +27,7 @@ const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) 
     .catch(error => onError(error))
 }
 
-const makeGETRequest = async (subdom, header, onSucess, onError) => {
+const get = async (subdom, header, onSucess, onError) => {
     fetch(hostname+subdom, {
         headers: header,
         credentials: 'include'
@@ -92,12 +75,16 @@ export const createContest = async (title, description, prize_contest, deadline_
 }
 
 export const getStripeID = async (onSuccess, onError) => {
-    get("/api/get_stripe_intent", onSuccess, onError)
+    get("/api/get_stripe_intent", {}, onSuccess, onError)
     return true
 }
 
 export const getOwnedContests = async (userId, onSuccess, onError) => {
-    makeGETRequest(`/contests/owned/${userId}`, {"Content-Type": "application/json"}, onSuccess, onError)
+    get(`/contests/owned/${userId}`, {"Content-Type": "application/json"}, onSuccess, onError)
+}
+
+export const getAllContest = async (onSuccess, onError) => {
+    get("/contests", {}, onSuccess, onError)
 }
 
 export const getContestDetails = async(contestId, onSuccess, onError) => {
