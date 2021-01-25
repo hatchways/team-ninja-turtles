@@ -8,7 +8,7 @@ from datetime import datetime
 class User(db.Model):
     __tablename__ = 'user'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     username = db.Column(db.String(), unique=True, nullable=False)
     email = db.Column(db.String(), unique=True, nullable=False)
     password = db.Column(db.String(), nullable=False)
@@ -45,7 +45,7 @@ class Submission(db.Model):
     submiter_id = db.Column(db.Integer, ForeignKey('user.id'))
     active = db.Column(db.Boolean, default=False, nullable=False)
     image_link = db.Column(db.String())
-    created_time = db.Column(db.DateTime, default=func.utcnow())
+    created_time = db.Column(db.DateTime, default=datetime.utcnow())
     update_time = db.Column(db.DateTime, onupdate=func.utcnow()) # updated time of row
 
     def __init__(self, contest_id, submiter_id, active, image_link, update_time):
