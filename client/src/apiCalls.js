@@ -7,11 +7,44 @@ class RequestError extends Error {
     }
 }
 
+const get = async(subdom, onSucess, onError) => {
+    fetch(hostname+subdom, {
+        method: "GET",
+        credentials: 'include'
+    })
+    .then(response => {
+        if (response.ok) {
+            const json = response.json()
+            return json
+        } else {
+            throw RequestError(response);
+        }
+    })
+    .then(data => onSucess(data)) 
+    .catch(error => onError(error))
+}
+
 const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) => {
     fetch(hostname+subdom, {
         method: callMethod,
         headers: header,
         body: data,
+        credentials: 'include'
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json()
+        } else {
+            throw RequestError(response)
+        }
+    })
+    .then(data => onSucess(data)) 
+    .catch(error => onError(error))
+}
+
+const makeGETRequest = async (subdom, header, onSucess, onError) => {
+    fetch(hostname+subdom, {
+        headers: header,
         credentials: 'include'
     }).
     then(response => {
@@ -21,7 +54,7 @@ const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) 
             throw RequestError(response)
         }
     })
-    .then(data => onSucess(data)) 
+    .then(data => onSucess(data))
     .catch(error => onError(error))
 }
 
@@ -53,6 +86,19 @@ export const createContest = async (title, description, prize_contest, deadline_
     }
 
     makeRequest("/contest", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
+}
+
+export const getStripeID = async (onSuccess, onError) => {
+    get("/api/get_stripe_intent", onSuccess, onError)
+    return true
+}
+
+export const getOwnedContests = async (userId, onSuccess, onError) => {
+    makeGETRequest(`/contests/owned/${userId}`, {"Content-Type": "application/json"}, onSuccess, onError)
+}
+
+export const getContestDetails = async(contestId, onSuccess, onError) => {
+    get(`${hostname}/contest/${contestId}`, onSuccess, onError)
 }
 
 export default RequestError;

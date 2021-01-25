@@ -68,7 +68,7 @@ export default function SubmitDesign() {
         getInputProps
     } = useDropzone({
         accept: 'image/jpeg, image/png, img/gif',
-        maxFiles: 1
+        maxFiles: 10
     })
 
     const acceptedFileItems = acceptedFiles.map((file, index)  => (
