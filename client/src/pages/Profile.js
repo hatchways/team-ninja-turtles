@@ -66,8 +66,8 @@ export default function Profile() {
             setContests(data) // Sets contests equal to return from get request
         }, (error) => {
             // onError
-            if (error instanceof RequestError && error.response.status === 400) {
-                console.log(error.response.json())
+            if (error instanceof RequestError && error.status === 400) {
+                console.log(error.body)
             } else {
                 console.log("unexpected error")
             }
