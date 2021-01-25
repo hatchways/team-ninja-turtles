@@ -36,19 +36,29 @@ def create_contest():
 def get_all_contests():
     # Do any contests exist?
     try:
-        all_contests = Contest.query.all()
+        all_contests = db.session.query(User, Contest).outerjoin(Contest, Contest.contest_creater == User.id).all()
         if not bool(all_contests):
-            raise Exception
-    except Exception:
+            raise Exception("no contest")
+    except Exception as e:
+        print(e)
         return jsonify("No contests listed")
     # Return all contests
     else:
-        dictionary = {}
-        counter = 0
-        for contest in all_contests:
-            dictionary["contest_{contest_number}".format(contest_number = counter)] = contest.__dict__
-            counter += 1
-        return json.dumps(dictionary, default=str)
+        lst = []
+        for pair in all_contests:
+            user, contest = pair
+            if (user is not None) and (contest is not None):
+                lst.append({
+                    "img": 0,
+                    "name": contest.title,
+                    "creator": user.username,
+                    "prize": contest.prize_contest,
+                    "date": contest.deadline_date.strftime("%Y-%m-%d %H:%M:%S"),
+                    "desc": contest.description
+                })
+
+        return jsonify(lst), 201
+
 
 @contest_handler.route('/contest/<contest_id>', methods=['PUT', 'GET'])
 def get_contest(contest_id):
@@ -124,3 +134,4 @@ def get_submitted_to_contests(user_id):
             dictionary["contest_{contest_number}".format(contest_number = counter)] = contest.__dict__
             counter += 1
         return json.dumps(dictionary, default=str)
+

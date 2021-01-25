@@ -7,6 +7,8 @@ const useStyles = makeStyles((theme) => ({
     appBar: {
       flexGrow: 1,
       backgroundColor: theme.secondary,
+      position: "sticky",
+      top:0
     },
     toolBar: {
         height: '100px',

@@ -14,6 +14,7 @@ import PaymentInfo from "./pages/PaymentInfo"
 import ContestDetails from './pages/ContestDetails'
 
 import './App.css'
+import DiscoveryPage from './pages/DiscoveryPage'
 
 function App() {
   return (
@@ -29,7 +30,7 @@ function App() {
           <Route path='/submit-design' component={SubmitDesignPage}></Route>
           <Route path='/message' component={SocketPage}></Route>
           <Route path="/add-card" component={PaymentInfo}></Route>
-          <Route path='/' component={LandingPage} />
+          <Route path='/' component={DiscoveryPage} />
         </Switch>
       </Router>
     </MuiThemeProvider>
