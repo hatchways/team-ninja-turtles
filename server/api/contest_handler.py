@@ -45,12 +45,10 @@ def get_all_contests():
     # Return all contests
     else:
         lst = []
-        ind = 0
         for pair in all_contests:
             user, contest = pair
             if (user is not None) and (contest is not None):
                 lst.append({
-                    "ind": ind,
                     "img": 0,
                     "name": contest.title,
                     "creator": user.username,
@@ -58,7 +56,6 @@ def get_all_contests():
                     "date": contest.deadline_date.strftime("%Y-%m-%d %H:%M:%S"),
                     "desc": contest.description
                 })
-            ind += 1
 
         return jsonify(lst), 201
 

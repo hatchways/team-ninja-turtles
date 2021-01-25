@@ -88,6 +88,7 @@ const DiscoveryPage = () => {
             setContests(data)
         }, (error) => {
             console.log("Unexpected Error")
+            setContests([])
         })
     }, [])
 
@@ -96,8 +97,8 @@ const DiscoveryPage = () => {
         <Grid container className={classes.root} spacing={0}>
             <Grid item xs={12}>
                 <Grid container justify="center" spacing={2}>
-                    {contests.map((value) => (
-                        <Grid key={value.ind} item>
+                    {contests.map((value, index) => (
+                        <Grid key={index} item>
                             <Paper className={classes.paper}>
                                 <DiscoveryContent
                                     img_src={mockData[Math.floor(Math.random() * mockData.length)].img}
