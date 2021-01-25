@@ -25,7 +25,7 @@ function App() {
           <Route path='/signup' component={Signup}></Route>
           <Route path='/login' component={Login}></Route>
           <Route path='/profile' component={ProfilePage}></Route>
-          <Route path='/contest-details' component={ContestDetails}></Route>
+          <Route path='/contest-details/:id' component={ContestDetails}></Route>
           <Route path='/create-contest' component={CreateContestPage}></Route>
           <Route path='/submit-design' component={SubmitDesignPage}></Route>
           <Route path='/message' component={SocketPage}></Route>

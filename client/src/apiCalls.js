@@ -84,4 +84,8 @@ export const getAllContest = async (onSuccess, onError) => {
     get("/contests", {}, onSuccess, onError)
 }
 
+export const getContestDetails = async(contestId, onSuccess, onError) => {
+    get(`${hostname}/contest/${contestId}`, onSuccess, onError)
+}
+
 export default RequestError;

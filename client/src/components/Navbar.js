@@ -72,7 +72,7 @@ export default function Navbar() {
                     >
                         Create Contest
                     </Button>
-                    <img src={process.env.PUBLIC_URL + 'images/avatar-1.png'} alt='avatar' className={classes.avatar}/>
+                    <img src={process.env.PUBLIC_URL + '/images/avatar-1.png'} alt='avatar' className={classes.avatar}/>
                     <Button color='inherit' className={classes.accountLink}>Account</Button>
                 </div>
             </Toolbar>
