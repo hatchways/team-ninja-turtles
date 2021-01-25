@@ -1,10 +1,11 @@
 from flask import jsonify, Blueprint, request
-from api import db, bcrypt
+from api import db, bcrypt, s3
 from api.models import User
 from api.middleware import require_auth
 import jwt
 from datetime import datetime, timedelta
 import app
+from config import S3_BUCKET
 
 
 user_handler = Blueprint("user_handler", __name__)
@@ -77,7 +78,27 @@ def login():
     return response
 
 
-@user_handler.route('/api/test_protected', methods=['POST', 'GET'])
 @require_auth
+@user_handler.route('/api/edit_profile', methods=['POST'])
+def edit_profile():
+    s3_key = request.form["file_name"]
+
+    token = request.cookies.get("auth_token")
+    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
+    current_user = User.query.filter_by(username=data['username']).first()
+
+    try:
+        s3.upload_file(request.files['icon'], S3_BUCKET, s3_key)
+    except Exception as e:
+        return jsonify({"error": "unexpected error"}), 400
+
+    current_user.icon = s3_key
+    db.session.commit()
+
+    return jsonify({"message": "success"}), 200
+
+
+@require_auth
+@user_handler.route('/api/test_protected', methods=['POST', 'GET'])
 def protected():
     return jsonify({"message": "hello"}), 200
