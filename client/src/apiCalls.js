@@ -92,7 +92,7 @@ export const getContestDetails = async(contestId, onSuccess, onError) => {
 }
 
 export const getInspirationalImages = async (onSuccess, onError) => {
-    makeGETRequest(`/inspirational_images`, {"Content-Type": "application/json"}, onSuccess, onError)
+    get(`/inspirational_images`, {"Content-Type": "application/json"}, onSuccess, onError)
 }
 
 export default RequestError;

@@ -71,7 +71,7 @@ export default function CreateContestForm() {
     const [date, setDate] = useState(new Date().toISOString().substr(0,10))
     const [time, setTime] = useState(new Date().toTimeString().substr(0,5))
     const [timeZone, setTimeZone] = useState('PDT')
-    const [inspirationalImages, setImages] = useState(new Array())
+    const [inspirationalImages, setImages] = useState([])
     const [amountError, setAmountError] = useState(false)
     const [amountHelperText, setAmountHelperText] = useState('')
 
@@ -105,9 +105,8 @@ export default function CreateContestForm() {
         })
     }
     useEffect(() => { // Only runs once when first rendering
-        getInspirationalImages((data) => {
-            createGridListTiles(data) // Sets images equal to return from get request
-        }, (error) => {
+        getInspirationalImages(createGridListTiles, // Sets images equal to return from get request
+            (error) => {
             // onError
             if (error instanceof RequestError && error.response.status === 400) {
                 console.log(error.response.json())
