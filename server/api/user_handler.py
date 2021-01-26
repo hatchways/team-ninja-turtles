@@ -5,11 +5,12 @@ from api.middleware import require_auth
 import jwt
 from datetime import datetime, timedelta
 import app
-from config import S3_BUCKET
+from config import S3_BUCKET, S3_REGION
+import os
 
 
 user_handler = Blueprint("user_handler", __name__)
-exp = 20  # in minutes
+exp = 120  # in minutes
 
 
 @user_handler.route('/api/register', methods=['POST'])
@@ -88,7 +89,7 @@ def edit_profile():
     current_user = User.query.filter_by(username=data['user']).first()
 
     try:
-        s3.upload_file(request.files['icon'], S3_BUCKET, s3_key)
+        s3.upload_file(request.files['icon'], S3_BUCKET, s3_key, ExtraArgs={'ACL': 'public-read'})
     except Exception as e:
         return jsonify({"error": "unexpected error"}), 400
 
@@ -98,8 +99,8 @@ def edit_profile():
     return jsonify({"message": "success"}), 200
 
 
-@require_auth
 @user_handler.route('/api/get_user', methods=['GET'])
+@require_auth
 def get_user_profile():
     token = request.cookies.get("auth_token")
     data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
@@ -109,28 +110,11 @@ def get_user_profile():
     return jsonify({
         'username': current_user.username,
         'email': current_user.email,
-        'custom_icon': current_user.icon is not None and len(current_user.icon) > 0
+        'icon': "http://%s.s3.%s.amazonaws.com/%s" % (S3_BUCKET, S3_REGION, current_user.icon)
     })
 
 
-@require_auth
-@user_handler.route('/api/get_icon', methods=['GET'])
-def get_icon():
-    token = request.cookies.get("auth_token")
-    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
-    current_user = User.query.filter_by(username=data['user']).first()
-
-    if current_user.icon is None or len(current_user.icon) == 0:
-        return jsonify({"error": "user does not use custom icon"}), 400
-
-    print('temp/%s' % current_user.icon)
-
-    s3.download_file(S3_BUCKET, current_user.icon, 'temp/%s' % current_user.icon)
-
-    return send_file('temp/%s' % current_user.icon)
-
-
-@require_auth
 @user_handler.route('/api/test_protected', methods=['POST', 'GET'])
+@require_auth
 def protected():
     return jsonify({"message": "hello"}), 200
