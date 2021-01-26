@@ -22,7 +22,7 @@ def get_stripe_intent():
     except:
         return jsonify({'message': 'invalid Token'}), 401
 
-    stripe.api_key = app.app.config['STRIPE_SECRET']
+    stripe.api_key = app.app.config['STRIPE_SK']
     user = User.query.filter_by(username=username).first()
 
     if user.stripe_id is None:

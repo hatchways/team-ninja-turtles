@@ -7,6 +7,8 @@ const useStyles = makeStyles((theme) => ({
     appBar: {
       flexGrow: 1,
       backgroundColor: theme.secondary,
+      position: "sticky",
+      top:0
     },
     toolBar: {
         height: '100px',
@@ -70,7 +72,7 @@ export default function Navbar() {
                     >
                         Create Contest
                     </Button>
-                    <img src={process.env.PUBLIC_URL + 'images/avatar-1.png'} alt='avatar' className={classes.avatar}/>
+                    <img src={process.env.PUBLIC_URL + '/images/avatar-1.png'} alt='avatar' className={classes.avatar}/>
                     <Button color='inherit' className={classes.accountLink}>Account</Button>
                 </div>
             </Toolbar>

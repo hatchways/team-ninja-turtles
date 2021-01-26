@@ -14,6 +14,7 @@ import PaymentInfo from "./pages/PaymentInfo"
 import ContestDetails from './pages/ContestDetails'
 
 import './App.css'
+import DiscoveryPage from './pages/DiscoveryPage'
 
 function App() {
   return (
@@ -24,12 +25,12 @@ function App() {
           <Route path='/signup' component={Signup}></Route>
           <Route path='/login' component={Login}></Route>
           <Route path='/profile' component={ProfilePage}></Route>
-          <Route path='/contest-details' component={ContestDetails}></Route>
+          <Route path='/contest-details/:id' component={ContestDetails}></Route>
           <Route path='/create-contest' component={CreateContestPage}></Route>
           <Route path='/submit-design' component={SubmitDesignPage}></Route>
           <Route path='/message' component={SocketPage}></Route>
-          <Route path='/' component={LandingPage} />
           <Route path="/add-card" component={PaymentInfo}></Route>
+          <Route path='/' component={DiscoveryPage} />
         </Switch>
       </Router>
     </MuiThemeProvider>
