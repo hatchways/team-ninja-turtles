@@ -1,4 +1,4 @@
-from flask import jsonify, Blueprint, request
+from flask import jsonify, Blueprint, request, send_file
 from api import db, bcrypt, s3
 from api.models import User
 from api.middleware import require_auth
@@ -85,7 +85,7 @@ def edit_profile():
 
     token = request.cookies.get("auth_token")
     data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
-    current_user = User.query.filter_by(username=data['username']).first()
+    current_user = User.query.filter_by(username=data['user']).first()
 
     try:
         s3.upload_file(request.files['icon'], S3_BUCKET, s3_key)
@@ -96,6 +96,38 @@ def edit_profile():
     db.session.commit()
 
     return jsonify({"message": "success"}), 200
+
+
+@require_auth
+@user_handler.route('/api/get_user', methods=['GET'])
+def get_user_profile():
+    token = request.cookies.get("auth_token")
+    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
+    current_user = User.query.filter_by(username=data['user']).first()
+
+    # requires to call get_custom_icon if custom_icon is true
+    return jsonify({
+        'username': current_user.username,
+        'email': current_user.email,
+        'custom_icon': current_user.icon is not None and len(current_user.icon) > 0
+    })
+
+
+@require_auth
+@user_handler.route('/api/get_icon', methods=['GET'])
+def get_icon():
+    token = request.cookies.get("auth_token")
+    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
+    current_user = User.query.filter_by(username=data['user']).first()
+
+    if current_user.icon is None or len(current_user.icon) == 0:
+        return jsonify({"error": "user does not use custom icon"}), 400
+
+    print('temp/%s' % current_user.icon)
+
+    s3.download_file(S3_BUCKET, current_user.icon, 'temp/%s' % current_user.icon)
+
+    return send_file('temp/%s' % current_user.icon)
 
 
 @require_auth
