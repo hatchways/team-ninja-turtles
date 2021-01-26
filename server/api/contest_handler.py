@@ -1,7 +1,7 @@
 import json
 from flask import jsonify, Blueprint, request
 from api import db
-from api.models import Contest, Submission, User
+from api.models import Contest, Submission, User, InspirationalImage
 from datetime import date, datetime
 contest_handler = Blueprint('contest_handler', __name__)
 
@@ -18,6 +18,15 @@ def create_contest():
         deadline_date = datetime.strptime(request_json.get("deadline_date"), "%Y-%m-%dT%H:%M:%S.%fZ")
         update_time = datetime.utcnow()
         contest_creator = request_json.get('contest_creator')
+        inspirational_images = request_json.get('inspirational_images')
+
+        # Do any images exist?
+        try:
+            all_inspirational_images = InspirationalImage.query.all()
+            if not bool(all_inspirational_images):
+                raise Exception
+        except Exception as e:
+            print(e)
         
         new_contest = Contest(
                                 title=title, 
@@ -27,6 +36,11 @@ def create_contest():
                                 update_time=update_time, 
                                 contest_creater=contest_creator
                             )
+        for image in inspirational_images:
+            for image_object in all_inspirational_images:
+                if str(image_object.id) == image:
+                    new_contest.inspirational_images.append(image_object)
+                    break
         db.session.add(new_contest)
         db.session.commit()
         return jsonify({'successMessage': "Sucessfully created contest"})
@@ -76,7 +90,7 @@ def get_contest(contest_id):
             raise Exception
     except Exception:
         return jsonify("Contest owner not found")
-
+    
     # Return contest contents
     if request.method == 'GET':
         setattr(contest, 'creater_name', user.username)

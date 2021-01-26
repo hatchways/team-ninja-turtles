@@ -1,8 +1,9 @@
 from flask import jsonify, Blueprint
-from api.models import InspirationalImage
+from api.models import InspirationalImage, Contest, InspirationalImageContestLink
 from api import db, s3
 from config import S3_BUCKET, S3_REGION
 from datetime import datetime
+from sqlalchemy.orm import sessionmaker
 import boto3
 import json
 
@@ -21,7 +22,7 @@ def migrateImages():
 
             image_link = image_link_prefix + s3_file.key
             new_image_model = InspirationalImage(image_link=image_link,
-                                    update_time=datetime.utcnow())
+                                                update_time=datetime.utcnow())
             db.session.add(new_image_model)
 
     db.session.commit()
@@ -35,7 +36,7 @@ def getImages():
         if not bool(all_images):
             raise Exception
     except Exception:
-        return jsonify("No contests listed")
+        return jsonify("No images listed")
     # Return all images
     else:
         dictionary = {}
@@ -44,3 +45,20 @@ def getImages():
             dictionary[counter] = image.__dict__
             counter += 1
         return json.dumps(dictionary, default=str)
+
+@inspirational_images_handler.route('/inspirational_images/<contest_id>', methods=['GET'])
+def get_contest_inspirational_images(contest_id):
+    try:
+        all_data = db.session.query(Contest, InspirationalImage).filter(Contest.id == contest_id,
+            InspirationalImageContestLink.contest_id == Contest.id, 
+            InspirationalImageContestLink.image_id == InspirationalImage.id).order_by(InspirationalImageContestLink.contest_id).all()
+        if not bool(all_data):
+            raise Exception
+    except Exception as e:
+        return jsonify(str(e))
+
+    else:
+        images = []
+        for data in all_data:
+            images.append(data.InspirationalImage.image_link)
+        return jsonify(images)

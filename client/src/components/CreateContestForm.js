@@ -10,7 +10,10 @@ import {
     Box,
     Button,
     GridList,
-    GridListTile
+    GridListTile,
+    GridListTileBar,
+    IconButton,
+    Checkbox
 } from '@material-ui/core'
 
 import RequestError, { createContest, getInspirationalImages } from '../apiCalls'
@@ -74,6 +77,7 @@ export default function CreateContestForm() {
     const [inspirationalImages, setImages] = useState([])
     const [amountError, setAmountError] = useState(false)
     const [amountHelperText, setAmountHelperText] = useState('')
+    const [checkedInspireationalImages, setChecked] = useState([])
 
     const onAmountChange = e => {
         if (e.target.value < 0) {
@@ -85,7 +89,15 @@ export default function CreateContestForm() {
             setAmountHelperText('')
         }
     }
-
+    const handleChange = (event) => {
+        const newChecked = checkedInspireationalImages
+        if (event.target.checked) {
+            newChecked.push(event.target.name)
+        } else {
+            newChecked.splice(newChecked.indexOf(event.target.name), 1)
+        }
+        setChecked(newChecked)
+    }
     const onSubmit = () => {
         const deadline = new Date(date.replace(/-/g, '\/'))
         const hours = time.substr(0,2)
@@ -93,8 +105,7 @@ export default function CreateContestForm() {
         deadline.setHours(hours)
         deadline.setMinutes(minutes)
         const contestCreator = 1
-
-        createContest(title, description, amount, deadline, contestCreator, data => {
+        createContest(title, description, amount, deadline, contestCreator, checkedInspireationalImages, data => {
             console.log('contest has been successfully created!')
         }, error => {
             if (error instanceof RequestError && error.status === 400) {
@@ -126,6 +137,22 @@ export default function CreateContestForm() {
             images.push(
                 <GridListTile key={imageKey} cols={1}>
                     <img src={imageURL} alt={imageURL} />
+                    <GridListTileBar
+                        classes={{
+                            root: classes.titleBar,
+                            title: classes.title,
+                        }}
+                        actionIcon={
+                            <IconButton aria-label={`checkbox ${i}`}>
+                                <Checkbox
+                                    className={classes.title}
+                                    name={String(imageKey)}
+                                    color="primary"
+                                    onChange={handleChange}
+                                />
+                            </IconButton>
+                        }
+                    />
                 </GridListTile>
                 )
         }

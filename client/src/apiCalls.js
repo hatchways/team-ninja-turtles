@@ -62,13 +62,14 @@ export const register = async (username, password, email, onSuccess, onError) =>
     makeRequest("/api/register", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
 }
 
-export const createContest = async (title, description, prize_contest, deadline_date, contest_creator, onSuccess, onError) => {
+export const createContest = async (title, description, prize_contest, deadline_date, contest_creator, inspirational_images, onSuccess, onError) => {
     const data = {
         'title': title,
         'description': description,
         'prize_contest': prize_contest,
         'deadline_date': deadline_date,
-        'contest_creator': contest_creator
+        'contest_creator': contest_creator,
+        'inspirational_images': inspirational_images
     }
 
     makeRequest("/contest", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
