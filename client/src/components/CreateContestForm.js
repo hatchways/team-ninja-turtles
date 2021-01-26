@@ -16,7 +16,7 @@ import {
     Checkbox
 } from '@material-ui/core'
 
-import RequestError, { createContest, getInspirationalImages } from '../apiCalls'
+import RequestError, { createContest, getInspirationalImages, createInspirationalImage } from '../apiCalls'
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -55,7 +55,15 @@ const useStyles = makeStyles((theme) => ({
         color: 'white',
         borderRadius: '0',
         padding: '1rem',
-        margin: '5rem',
+        margin: '5rem'
+    },
+    addLinkButton: {
+        backgroundColor: 'rgba(0, 0, 0, 0.87)',
+        color: 'white',
+        borderRadius: '0',
+        padding: '1rem',
+        marginLeft: '1rem',
+        marginTop: '0.5rem'
     },
     borderedDiv: {
         width: '100%',
@@ -77,6 +85,7 @@ export default function CreateContestForm() {
     const [inspirationalImages, setImages] = useState([])
     const [amountError, setAmountError] = useState(false)
     const [amountHelperText, setAmountHelperText] = useState('')
+    const [addImageLink, setImageLink] = useState('')
     const [checkedInspireationalImages, setChecked] = useState([])
 
     const onAmountChange = e => {
@@ -97,6 +106,18 @@ export default function CreateContestForm() {
             newChecked.splice(newChecked.indexOf(event.target.name), 1)
         }
         setChecked(newChecked)
+    }
+    const onAddLink = () => {
+        createInspirationalImage(addImageLink, data => {
+            console.log('Image Successfully Added')
+        }, error => {
+            if (error instanceof RequestError && error.status === 400) {
+                console.log(error.body)
+            } else {
+                console.log("unexpected error")
+            }
+        })
+        setImageLink('')
     }
     const onSubmit = () => {
         const deadline = new Date(date.replace(/-/g, '\/'))
@@ -125,7 +146,7 @@ export default function CreateContestForm() {
                 console.log(error)
             }
         })
-    }, [])
+    }, [addImageLink])
     const createGridListTiles = (data) => {
         const imagesMap = new Map(Object.entries(data))
         console.log(imagesMap)
@@ -259,6 +280,20 @@ export default function CreateContestForm() {
                 <Grid item xs={12}>
                     <Typography className={classes.label}>Which designs do you like?</Typography>
                     <Typography>Let's start by helping your desingers understand which styles you prefer.</Typography>
+                </Grid>
+                <Grid item xs={10}>
+                    <TextField 
+                            id='title'
+                            className={classes.inputMargin}
+                            value={addImageLink}
+                            onChange={e => setImageLink(e.target.value)}
+                            label='Insert a URL to an image you like'
+                            fullWidth
+                            variant='outlined'
+                    />
+                </Grid>
+                <Grid item xs={2}>
+                    <Button className={classes.addLinkButton} onClick={onAddLink}>Add Link</Button>
                 </Grid>
                 <Grid item xs={12}>
                     <Box className={classes.tattooImages}>

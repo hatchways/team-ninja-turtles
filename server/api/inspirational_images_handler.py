@@ -1,4 +1,4 @@
-from flask import jsonify, Blueprint
+from flask import jsonify, Blueprint, request
 from api.models import InspirationalImage, Contest, InspirationalImageContestLink
 from api import db, s3
 from config import S3_BUCKET, S3_REGION
@@ -28,11 +28,22 @@ def migrateImages():
     db.session.commit()
     return jsonify({'successMessage': 'Images updated'})
 
+@inspirational_images_handler.route('/add_inspirational_images', methods=['POST'])
+def addImages():
+
+    request_json = request.get_json()
+    image_link = request_json.get("link")
+    new_image_model = InspirationalImage(image_link=image_link, update_time=datetime.utcnow())
+    db.session.add(new_image_model)
+
+    db.session.commit()
+    return jsonify({'successMessage': 'Images updated'})
+
 @inspirational_images_handler.route('/inspirational_images', methods=['GET'])
 def getImages():
     # Do any images exist?
     try:
-        all_images = InspirationalImage.query.all()
+        all_images = InspirationalImage.query.order_by(InspirationalImage.created_time.desc()).all()
         if not bool(all_images):
             raise Exception
     except Exception:

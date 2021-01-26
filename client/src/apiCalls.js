@@ -75,6 +75,14 @@ export const createContest = async (title, description, prize_contest, deadline_
     makeRequest("/contest", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
 }
 
+export const createInspirationalImage = async (link, onSuccess, onError) => {
+    const data = {
+        'link': link
+    }
+
+    makeRequest("/add_inspirational_images", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
+}
+
 export const getStripeID = async (onSuccess, onError) => {
     get("/api/get_stripe_intent", {}, onSuccess, onError)
     return true
