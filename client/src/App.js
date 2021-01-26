@@ -24,7 +24,7 @@ function App() {
           <Route path='/profile' component={ProfilePage}></Route>
           <Route path='/create-contest' component={CreateContestPage}></Route>
           <Route path='/submit-design' component={SubmitDesignPage}></Route>
-          <Route path='/message' component={SocketPage}></Route>
+          <Route path='/message/:id/:name' component={SocketPage}></Route>
           <Route path='/' component={LandingPage} />
         </Switch>
       </Router>
