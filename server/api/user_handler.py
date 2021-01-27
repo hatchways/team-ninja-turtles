@@ -79,8 +79,8 @@ def login():
     return response
 
 
-@require_auth
 @user_handler.route('/api/edit_profile', methods=['POST'])
+@require_auth
 def edit_profile():
     s3_key = request.form["file_name"]
 
