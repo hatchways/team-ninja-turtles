@@ -1,7 +1,9 @@
 import json
 from flask import jsonify, Blueprint, request
 from api import db
-from api.models import Contest, Submission, User
+from models.contest_model import Contest
+from models.submission_model import Submission
+from models.user_model import User
 from datetime import date, datetime
 contest_handler = Blueprint('contest_handler', __name__)
 
