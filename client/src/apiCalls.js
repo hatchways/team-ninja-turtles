@@ -96,4 +96,8 @@ export const getProfile = async(onSuccess, onError) => {
     get("/api/get_user", {}, onSuccess, onError)
 }
 
+export const editProfile = async (data, onSuccess, onError) => {
+    makeRequest("/api/edit_profile", "POST", {}, data, onSuccess, onError)
+}
+
 export default RequestError;

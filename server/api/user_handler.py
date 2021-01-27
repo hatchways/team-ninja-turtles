@@ -89,12 +89,13 @@ def edit_profile():
     current_user = User.query.filter_by(username=data['user']).first()
 
     try:
-        s3.upload_file(request.files['icon'], S3_BUCKET, s3_key, ExtraArgs={'ACL': 'public-read'})
+        if len(s3_key) > 0:
+            s3.upload_fileobj(request.files['icon'], S3_BUCKET, s3_key, ExtraArgs={'ACL': 'public-read'})
+            current_user.icon = s3_key
+            db.session.commit()
     except Exception as e:
+        print(e)
         return jsonify({"error": "unexpected error"}), 400
-
-    current_user.icon = s3_key
-    db.session.commit()
 
     return jsonify({"message": "success"}), 200
 
