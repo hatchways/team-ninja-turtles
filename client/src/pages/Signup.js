@@ -1,7 +1,8 @@
 import { Button, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
-import React, { useState } from "react";
-import RequestError, {register} from "../apiCalls"
+import React, { useContext, useState } from "react";
+import RequestError, {getProfile, register} from "../apiCalls"
+import { UserContext } from "../App";
 
 const warningMsg = {
     emptyFieldError: "Required",
@@ -30,6 +31,7 @@ const useStyles = makeStyles(theme => ({
 
 const Signup = () => {
     const classes = useStyles();
+    const {user, setUser} = useContext(UserContext);
     const [username, setUsername] =  useState("");
     const [email, setEmail] = useState("")
     const [password, setPassword ] = useState("");
@@ -95,6 +97,17 @@ const Signup = () => {
             register(username, password, email, (data) => {
                 // onSucess
                 console.log("SUCCESS")
+                // get profile and update context
+                getProfile((data) => {
+                    setUser({
+                        username: data.username,
+                        icon: (data.icon == null) ? process.env.PUBLIC_URL + 'images/avatar-1.png' : data.icon,
+                        email: data.email
+                    })
+                    console.log(data)
+                }, (error) => {
+                    console.log(error)
+                })
             }, (error) => {
                 // onError
                 if (error instanceof RequestError && error.status === 400) {
