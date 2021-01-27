@@ -140,8 +140,8 @@ export default function ContestDetails(props) {
             if (contest.designs.length > 0) {
                 const newGridListItems = contest.designs.map((design, index) => (
                     <GridListTile key={index}>
-                        <img src={`${process.env.PUBLIC_URL}/images/${design.image}`} alt={design.image} />
-                        <GridListTileBar title={`By @${design.author}`} />
+                        <img src={design.img} alt={design.image} />
+                        <GridListTileBar title={`By @${design.creater}`} />
                     </GridListTile>
                 ))
     

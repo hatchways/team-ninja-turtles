@@ -93,15 +93,16 @@ export default function SubmitDesign() {
     ))
 
    const handleUpload = () => {
-        const urlElement = window.location.href.split('/')
+        const contestId = 1
 
         const data = new FormData();
         data.append('file', acceptedFiles[0]);
         data.append('file_name', acceptedFiles[0].name)
 
-        fetch('http://127.0.0.1:5000/contestImage/submission/'+urlElement[4], {
+        fetch(`http://localhost:5000/contestImage/submission/${contestId}`, {
             method: 'POST',
-            body: data
+            body: data,
+            credentials: 'include'
         })
         .then(response => response.json())
         .then(data => {
@@ -109,7 +110,7 @@ export default function SubmitDesign() {
         })
         .catch((error) => {
              console.error('Error:', error);
-        });
+        })
 }
 
     return (
