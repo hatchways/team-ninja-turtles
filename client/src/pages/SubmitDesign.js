@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-export default function SubmitDesign() {
+export default function SubmitDesign(props) {
     const classes = useStyles()
     const {
         acceptedFiles,
@@ -70,6 +70,7 @@ export default function SubmitDesign() {
         accept: 'image/jpeg, image/png, img/gif',
         maxFiles: 10
     })
+    const contestId = props.location.contestId
 
     const acceptedFileItems = acceptedFiles.map((file, index)  => (
         <div key={index}>
@@ -92,26 +93,27 @@ export default function SubmitDesign() {
         </div>
     ))
 
-   const handleUpload = () => {
-        const contestId = 1
-
-        const data = new FormData();
-        data.append('file', acceptedFiles[0]);
-        data.append('file_name', acceptedFiles[0].name)
-
-        fetch(`http://localhost:5000/contestImage/submission/${contestId}`, {
-            method: 'POST',
-            body: data,
-            credentials: 'include'
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-        })
-        .catch((error) => {
-             console.error('Error:', error);
-        })
-}
+    const handleUpload = () => {
+        if (contestId) { 
+            const data = new FormData();
+            data.append('file', acceptedFiles[0]);
+            data.append('file_name', acceptedFiles[0].name)
+    
+            fetch(`http://localhost:5000/contestImage/submission/${contestId}`, {
+                method: 'POST',
+                body: data,
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                 console.error('Error:', error);
+            })
+        }
+        // TODO: handle contestId is null (alert user then redirect to all contest page or other solutions)
+    }
 
     return (
         <div className={classes.pageContainer}>

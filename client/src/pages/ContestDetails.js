@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 import TabPanel from '../components/TabPanel'
@@ -67,7 +68,10 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: '50%'
     },
     submitButtonDiv: {
-        textAlign: 'right'
+        textAlign: 'right',
+        '& a': {
+            textDecoration: 'none'
+        }
     },
     submitDesign: {
         margin: '2rem auto',
@@ -153,17 +157,6 @@ export default function ContestDetails(props) {
         }
     }, [contest])
 
-   
-    
-    // temporary hard code contest information
-    const contestInfo = {
-        author: 'Kenneth Stewart',
-        avatar: 'avatar-2.png',
-        title: 'Lion tattoo concept in minimal style',
-        description: 'Looking for cool simplicity ideas of lion',
-        prizeAmount: '150'
-    }
-
     return (
         contest !== null ? (
             <div className={classes.pageContainer}>
@@ -189,7 +182,14 @@ export default function ContestDetails(props) {
                                 </div>
                             </Grid>
                             <Grid item xs={5} className={classes.submitButtonDiv}>
-                                <Button variant='outlined' className={classes.submitDesign}>Submit Design</Button>
+                                <Link to={{
+                                        pathname: '/submit-design',
+                                        contestId: contestId
+                                }}>
+                                    <Button variant='outlined' className={classes.submitDesign}>
+                                        Submit Design
+                                    </Button>
+                                </Link>
                             </Grid>
                         </Grid>
                     </div>
