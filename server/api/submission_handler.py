@@ -10,11 +10,6 @@ submission_handler = Blueprint('submission_new_handler', __name__)
 
 @submission_handler.route('/contestImage/submission/<contest_id>', methods=['POST'])
 def create_submission(contest_id):
-    try:
-        s3.upload_fileobj(request.files['file'], S3_BUCKET, request.form["file_name"])
-    except Exception as e:
-        return jsonify({'error': "file not found"})
-
     token = request.cookies.get("auth_token")
 
     if token is None:
@@ -22,8 +17,14 @@ def create_submission(contest_id):
 
     data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
     current_user = User.query.filter_by(username=data['username']).first()
-
+    
     image = 'https://'+S3_BUCKET+'.s3.amazonaws.com/'+request.form["file_name"]
+
+    try:
+        s3.upload_fileobj(request.files['file'], S3_BUCKET, 'userid_{}/{}'.format(current_user.id, request.form["file_name"]))
+    except Exception as e:
+        return jsonify({'error': "file not found"})
+
     if request.method == 'POST':
         new_submission = Submission(contest_id=contest_id, submiter_id=current_user.id, active=True,
                                     image_link=image, update_time=date.today())
