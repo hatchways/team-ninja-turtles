@@ -2,7 +2,7 @@ from flask import jsonify, Blueprint, request
 from api import db, s3
 from .models import Contest, Submission, User
 from config import S3_BUCKET
-from datetime import date
+from datetime import date, datetime
 import jwt
 import app
 submission_handler = Blueprint('submission_new_handler', __name__)
@@ -17,13 +17,16 @@ def create_submission(contest_id):
 
     data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
     current_user = User.query.filter_by(username=data['username']).first()
-    
+
     image = 'https://'+S3_BUCKET+'.s3.amazonaws.com/'+request.form["file_name"]
 
     try:
-        s3.upload_fileobj(request.files['file'], S3_BUCKET, 'userid_{}/{}'.format(current_user.id, request.form["file_name"]))
+        s3.upload_fileobj(request.files['file'], S3_BUCKET, 'contest_id_{}/user_id_{}/{}'.format(
+            contest_id,
+            current_user.id,
+            str(datetime.now()) + "_" + request.form["file_name"]))
     except Exception as e:
-        return jsonify({'error': "file not found"})
+        return jsonify({'error': str(e)})
 
     if request.method == 'POST':
         new_submission = Submission(contest_id=contest_id, submiter_id=current_user.id, active=True,
