@@ -79,16 +79,14 @@ def get_contest(contest_id):
         return jsonify("Contest owner not found")
 
     #Load submissions
-    allSubmissions = Submission.query.filter_by(contest_id=contest_id).all()
+    allSubmissions = db.session.query(Submission.image_link, User.username).filter_by(contest_id=contest_id).join(User, User.id == Submission.submiter_id).all()
+    
     formatedSubmissions = []
-
-    for submission in allSubmissions:
-        submiterId = submission.submiter_id
-        submiterName = User.query.filter_by(id=submiterId).first().username
-
+    for pair in allSubmissions:
+        imgLink, username = pair
         formatedSubmissions.append({
-            "img": submission.image_link,
-            "creater": submiterName
+            "img": imgLink,
+            "creater": username
         })
 
     # Return contest contents
