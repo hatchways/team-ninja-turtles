@@ -1,8 +1,6 @@
 from flask import jsonify, Blueprint, request
 from api import db, s3
-from models.contest_model import Contest
-from models.submission_model import Submission
-from models.user_model import User
+from models import Contest, Submission, User
 from config import S3_BUCKET
 from datetime import date
 import jwt
