@@ -41,7 +41,7 @@ def get_all_contests():
             raise Exception("no contest")
     except Exception as e:
         print(e)
-        return jsonify("No contests listed")
+        return jsonify([]), 400
     # Return all contests
     else:
         lst = []
