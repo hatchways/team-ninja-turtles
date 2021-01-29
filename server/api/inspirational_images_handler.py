@@ -1,5 +1,5 @@
 from flask import jsonify, Blueprint, request
-from api.models import InspirationalImage, Contest, InspirationalImageContestLink
+from models import InspirationalImage, Contest, InspirationalImageContestLink
 from api import db, s3
 from config import S3_BUCKET, S3_REGION
 from datetime import datetime

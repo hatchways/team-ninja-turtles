@@ -1,6 +1,6 @@
 from flask import jsonify, Blueprint, request, send_file
 from api import db, bcrypt, s3
-from api.models import User
+from models import User
 from api.middleware import require_auth
 import jwt
 from datetime import datetime, timedelta

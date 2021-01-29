@@ -1,5 +1,5 @@
 from flask import jsonify, Blueprint, request
-from api.models import User
+from models import User
 from api import db
 import stripe
 import jwt
