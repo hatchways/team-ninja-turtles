@@ -5,25 +5,24 @@ let socket = io.connect(null, {port:5000, rememberTransport: false});
 
 
 function Socketio() {
-  const [messages, setMessages] = useState("");
+  const [chatLog, setChatLog] = useState([]);
   const [message, setMessage] = useState("");
   const urlElement = window.location.href.split('/')
   const room_id = urlElement[4]
   const username = urlElement[5]
   socket.emit("join",room_id)
+  
   useEffect(() => {
-    getMessages()
-  }, [messages.length]);
+    return socket.off("message")
+  }, []);
 
   socket.on("join", room => {
-        console.log(room)
-    })
+    console.log(room)
+  })
 
-  const getMessages = () => {
-    socket.on("message", ({name, message}) => {
-      setMessages([...messages, `${name}   :    ${message}`]);
-    });
-  };
+  socket.on("message", ({name, message}) => {
+    setChatLog([...chatLog, `${name}: ${message}`])
+  })
 
   // On Change
   const onChange = e => {
@@ -41,10 +40,10 @@ function Socketio() {
   };
 
   return (
-    <div>
-      {messages.length > 0 &&
-        messages.map(msg => (
-          <div>
+    <div key={room_id}>
+      {chatLog.length > 0 &&
+        chatLog.map((msg, key) => (
+          <div key={key}>
             <p>{msg}</p>
           </div>
         ))}
