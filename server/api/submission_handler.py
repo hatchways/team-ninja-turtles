@@ -15,8 +15,8 @@ def create_submission(contest_id):
     if token is None:
         return jsonify({"error": "auth_token missing"}), 401
 
-    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
-    current_user = User.query.filter_by(username=data['username']).first()
+    username = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])['user']
+    current_user = User.query.filter_by(username=username).first()
 
     # Replace all the ":" and " " with other charachters to have a consistent URL.
     # AWS would replace these charachters with others such as "+" or "%" and the link in the database would not match the actual link on AWS.
