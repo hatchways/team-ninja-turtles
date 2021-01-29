@@ -101,7 +101,7 @@ const Signup = () => {
                 getProfile((data) => {
                     setUser({
                         username: data.username,
-                        icon: (data.icon == null) ? process.env.PUBLIC_URL + 'images/avatar-1.png' : data.icon,
+                        icon: process.env.PUBLIC_URL + 'images/avatar-1.png',
                         email: data.email
                     })
                     console.log(data)
