@@ -30,6 +30,7 @@ const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) 
 const get = async (subdom, header, onSucess, onError) => {
     fetch(hostname+subdom, {
         headers: header,
+        cache: "no-cache",
         credentials: 'include'
     })
     .then(response => {
@@ -89,6 +90,14 @@ export const getAllContest = async (onSuccess, onError) => {
 
 export const getContestDetails = async(contestId, onSuccess, onError) => {
     get(`/contest/${contestId}`, {}, onSuccess, onError)
+}
+
+export const getProfile = async(onSuccess, onError) => {
+    get("/api/get_user", {}, onSuccess, onError)
+}
+
+export const editProfile = async (data, onSuccess, onError) => {
+    makeRequest("/api/edit_profile", "POST", {}, data, onSuccess, onError)
 }
 
 export default RequestError;

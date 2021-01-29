@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { AppBar, Typography, Button, Toolbar } from '@material-ui/core'
 import { Link } from 'react-router-dom'
+import { getProfile } from '../apiCalls'
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -53,6 +54,16 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Navbar() {
     const classes = useStyles()
+    const [iconURL, setIconURL] = useState(process.env.PUBLIC_URL + 'images/avatar-1.png')
+
+    useEffect(() => {
+        
+        getProfile((data) => {
+            setIconURL(data.icon)
+        }, (error) => {
+            console.log(error)
+        })
+    })
 
     return (
         <AppBar position='static' className={classes.appBar}>
@@ -72,7 +83,7 @@ export default function Navbar() {
                     >
                         Create Contest
                     </Button>
-                    <img src={process.env.PUBLIC_URL + '/images/avatar-1.png'} alt='avatar' className={classes.avatar}/>
+                    <img src={iconURL} alt='avatar' className={classes.avatar}/>
                     <Button color='inherit' className={classes.accountLink}>Account</Button>
                 </div>
             </Toolbar>

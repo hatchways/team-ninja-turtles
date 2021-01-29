@@ -12,6 +12,7 @@ import SocketPage from './pages/SocketioConnection'
 import SubmitDesignPage from './pages/SubmitDesign' 
 import PaymentInfo from "./pages/PaymentInfo"
 import ContestDetails from './pages/ContestDetails'
+import EditProfilePage from "./pages/EditProfilePage"
 
 import './App.css'
 import DiscoveryPage from './pages/DiscoveryPage'
@@ -30,6 +31,7 @@ function App() {
           <Route path='/submit-design' component={SubmitDesignPage}></Route>
           <Route path='/message' component={SocketPage}></Route>
           <Route path="/add-card" component={PaymentInfo}></Route>
+          <Route path="/edit-profile" component={EditProfilePage} />
           <Route path='/' component={DiscoveryPage} />
         </Switch>
       </Router>

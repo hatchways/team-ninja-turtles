@@ -92,7 +92,6 @@ const DiscoveryPage = () => {
         })
     }, [])
 
-    console.log(contests)
     return (
         <Grid container className={classes.root} spacing={0}>
             <Grid item xs={12}>
