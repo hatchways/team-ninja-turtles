@@ -3,6 +3,7 @@ from api import db
 from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey
 from datetime import datetime
+from sqlalchemy.orm import relationship
 
 
 class User(db.Model):
@@ -29,6 +30,7 @@ class Contest(db.Model):
     created_time = db.Column(db.DateTime, default=datetime.utcnow())
     update_time = db.Column(db.DateTime, onupdate=datetime.utcnow()) # store updated time of row
     contest_creater = db.Column(db.Integer, ForeignKey('user.id'))
+    inspirational_images = db.relationship('InspirationalImage', secondary = 'image_contest_link')
 
     def __init__(self, title, description, prize_contest, deadline_date, update_time, contest_creater):
         self.title = title
@@ -56,3 +58,22 @@ class Submission(db.Model):
         self.active = active
         self.image_link = image_link
         self.update_time = update_time
+
+class InspirationalImage(db.Model):
+    __tablename__ = 'image'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    image_link = db.Column(db.String())
+    created_time = db.Column(db.DateTime, default=datetime.utcnow())
+    update_time = db.Column(db.DateTime, onupdate=datetime.utcnow()) # updated time of row
+    contests = db.relationship('Contest', secondary = 'image_contest_link')
+
+    def __init__(self, image_link, update_time):
+        self.image_link = image_link
+        self.update_time = update_time
+
+class InspirationalImageContestLink(db.Model):
+    __tablename__ = 'image_contest_link'
+
+    contest_id = db.Column(db.Integer, ForeignKey('contest.id'), primary_key = True)
+    image_id = db.Column(db.Integer, ForeignKey('image.id'), primary_key = True)
