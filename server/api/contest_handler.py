@@ -41,7 +41,7 @@ def get_all_contests():
             raise Exception("no contest")
     except Exception as e:
         print(e)
-        return jsonify("No contests listed")
+        return jsonify([]), 400
     # Return all contests
     else:
         lst = []
@@ -70,6 +70,7 @@ def get_contest(contest_id):
     except Exception:
         return jsonify("Contest does not exist")
 
+    #Load user info
     try:
         user = User.query.filter_by(id=contest.contest_creater).first()
         if user == None: 
@@ -77,8 +78,20 @@ def get_contest(contest_id):
     except Exception:
         return jsonify("Contest owner not found")
 
+    #Load submissions
+    allSubmissions = db.session.query(Submission.image_link, User.username).filter_by(contest_id=contest_id).join(User, User.id == Submission.submiter_id).all()
+    
+    formatedSubmissions = []
+    for pair in allSubmissions:
+        imgLink, username = pair
+        formatedSubmissions.append({
+            "img": imgLink,
+            "creater": username
+        })
+
     # Return contest contents
     if request.method == 'GET':
+        setattr(contest, 'designs', formatedSubmissions)
         setattr(contest, 'creater_name', user.username)
         return json.dumps(contest.__dict__, default=str)
 

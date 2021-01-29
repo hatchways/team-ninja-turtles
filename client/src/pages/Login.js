@@ -71,6 +71,7 @@ const Login = () => {
             login(username, password, (data) => {
                 // get profile and update context
                 getProfile((data) => {
+                    console.log(data.icon)
                     setUser({
                         username: data.username,
                         icon: (data.icon == null) ? process.env.PUBLIC_URL + 'images/avatar-1.png' : data.icon,
