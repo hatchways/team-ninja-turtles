@@ -18,9 +18,9 @@ def create_submission(contest_id):
     data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
     current_user = User.query.filter_by(username=data['username']).first()
 
-    # Replace all the ":", ".", and " " with other charachters to have a consistent URL.
+    # Replace all the ":" and " " with other charachters to have a consistent URL.
     # AWS would replace these charachters with others such as "+" or "%" and the link in the database would not match the actual link on AWS.
-    file_name = (str(datetime.now()) + "_" + request.form["file_name"]).replace(":", "-").replace(".", "-").replace(" ", "_")
+    file_name = (str(datetime.now()) + "_" + request.form["file_name"]).replace(":", "-").replace(" ", "_")
     folder_path = 'contest_id_{}/user_id_{}/{}'.format(
             contest_id,
             current_user.id,
