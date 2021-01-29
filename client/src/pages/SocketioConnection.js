@@ -5,7 +5,7 @@ let socket = io.connect(null, {port:5000, rememberTransport: false});
 
 
 function Socketio() {
-  const [chatLog, setChatLog] = useState([]);
+  const [messageLog, setMessageLog] = useState([]);
   const [message, setMessage] = useState("");
   const urlElement = window.location.href.split('/')
   const room_id = urlElement[4]
@@ -21,7 +21,7 @@ function Socketio() {
   })
 
   socket.on("message", ({name, message}) => {
-    setChatLog([...chatLog, `${name}: ${message}`])
+    setMessageLog([...messageLog, `${name}: ${message}`])
   })
 
   // On Change
@@ -41,8 +41,8 @@ function Socketio() {
 
   return (
     <div key={room_id}>
-      {chatLog.length > 0 &&
-        chatLog.map((msg, key) => (
+      {messageLog.length > 0 &&
+        messageLog.map((msg, key) => (
           <div key={key}>
             <p>{msg}</p>
           </div>
