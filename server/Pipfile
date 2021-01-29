@@ -12,6 +12,7 @@ awscli = "*"
 pyjwt = "*"
 flask-sqlalchemy = "*"
 flask-bcrypt = "*"
+flask-socketio = "*"
 psycopg2 = "*"
 stripe = "*"
 

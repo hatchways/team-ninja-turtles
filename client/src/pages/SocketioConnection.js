@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 let endPoint = "http://127.0.0.1:5000/";
-let socket = io.connect(`${endPoint}`);
+let socket = io.connect(null, {port:5000, rememberTransport: false});
 
 
 function Socketio() {
-  const [messages, setMessages] = useState(["Hello And Welcome"]);
+  const [messageLog, setMessageLog] = useState([]);
   const [message, setMessage] = useState("");
-
+  const urlElement = window.location.href.split('/')
+  const room_id = urlElement[4]
+  const username = urlElement[5]
+  socket.emit("join",room_id)
+  
   useEffect(() => {
-    getMessages();
-  }, [messages.length]);
+    return socket.off("message")
+  }, []);
 
-  const getMessages = () => {
-    socket.on("message", msg => {
-      setMessages([...messages, msg]);
-    });
-  };
+  socket.on("join", room => {
+    console.log(room)
+  })
+
+  socket.on("message", ({name, message}) => {
+    setMessageLog([...messageLog, `${name}: ${message}`])
+  })
 
   // On Change
   const onChange = e => {
@@ -26,7 +32,7 @@ function Socketio() {
   // On Click
   const onClick = () => {
     if (message !== "") {
-      socket.emit("message", message);
+      socket.emit("message", {message,room_id,username});
       setMessage("");
     } else {
       alert("Please Add A Message");
@@ -34,10 +40,10 @@ function Socketio() {
   };
 
   return (
-    <div>
-      {messages.length > 0 &&
-        messages.map(msg => (
-          <div>
+    <div key={room_id}>
+      {messageLog.length > 0 &&
+        messageLog.map((msg, key) => (
+          <div key={key}>
             <p>{msg}</p>
           </div>
         ))}

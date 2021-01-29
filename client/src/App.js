@@ -53,6 +53,7 @@ function App() {
             <Route path='/message' component={SocketPage}></Route>
             <Route path="/add-card" component={PaymentInfo}></Route>
             <Route path="/edit-profile" component={EditProfilePage} />
+            <Route path='/message/:id/:name' component={SocketPage}></Route>
             <Route path='/' component={DiscoveryPage} />
           </Switch>
         </Router>
