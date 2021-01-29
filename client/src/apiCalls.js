@@ -1,9 +1,10 @@
 const hostname = "http://localhost:5000"
 
 class RequestError extends Error {
-    constructor(response) {
+    constructor(status, body) {
         super()
-        this.response = response
+        this.status = status
+        this.body = body
     }
 }
 
@@ -13,15 +14,34 @@ const makeRequest = async (subdom, callMethod, header, data, onSucess, onError) 
         headers: header,
         body: data,
         credentials: 'include'
-    }).
-    then(response => {
+    })
+    .then(response => {
         if (response.ok) {
-            return response.json()
+            return response
         } else {
-            throw RequestError(response)
+            return response.json().then(err => Promise.reject(new RequestError(response.status, err)))
         }
     })
+    .then(response => response.json())
     .then(data => onSucess(data)) 
+    .catch(error => onError(error))
+}
+
+const get = async (subdom, header, onSucess, onError) => {
+    fetch(hostname+subdom, {
+        headers: header,
+        cache: "no-cache",
+        credentials: 'include'
+    })
+    .then(response => {
+        if (response.ok) {
+            return response
+        } else {
+            return response.json().then(err => Promise.reject(new RequestError(response.status, err)))
+        }
+    })
+    .then(response => response.json())
+    .then(data => onSucess(data))
     .catch(error => onError(error))
 }
 
@@ -53,6 +73,31 @@ export const createContest = async (title, description, prize_contest, deadline_
     }
 
     makeRequest("/contest", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
+}
+
+export const getStripeID = async (onSuccess, onError) => {
+    get("/api/get_stripe_intent", {}, onSuccess, onError)
+    return true
+}
+
+export const getOwnedContests = async (userId, onSuccess, onError) => {
+    get(`/contests/owned/${userId}`, {"Content-Type": "application/json"}, onSuccess, onError)
+}
+
+export const getAllContest = async (onSuccess, onError) => {
+    get("/contests", {}, onSuccess, onError)
+}
+
+export const getContestDetails = async(contestId, onSuccess, onError) => {
+    get(`/contest/${contestId}`, {}, onSuccess, onError)
+}
+
+export const getProfile = async(onSuccess, onError) => {
+    get("/api/get_user", {}, onSuccess, onError)
+}
+
+export const editProfile = async (data, onSuccess, onError) => {
+    makeRequest("/api/edit_profile", "POST", {}, data, onSuccess, onError)
 }
 
 export default RequestError;

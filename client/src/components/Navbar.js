@@ -1,12 +1,16 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { AppBar, Typography, Button, Toolbar } from '@material-ui/core'
 import { Link } from 'react-router-dom'
+import { getProfile } from '../apiCalls'
+import {UserContext} from '../App'
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
       flexGrow: 1,
       backgroundColor: theme.secondary,
+      position: "sticky",
+      top:0
     },
     toolBar: {
         height: '100px',
@@ -51,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Navbar() {
     const classes = useStyles()
+    const {user, setUser} = useContext(UserContext);
 
     return (
         <AppBar position='static' className={classes.appBar}>
@@ -70,7 +75,7 @@ export default function Navbar() {
                     >
                         Create Contest
                     </Button>
-                    <img src={process.env.PUBLIC_URL + 'images/avatar-1.png'} alt='avatar' className={classes.avatar}/>
+                    <img src={user.icon} alt='avatar' className={classes.avatar}/>
                     <Button color='inherit' className={classes.accountLink}>Account</Button>
                 </div>
             </Toolbar>
