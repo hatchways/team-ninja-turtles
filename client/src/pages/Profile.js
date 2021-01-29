@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { Button, Typography, Tabs, Tab, Paper } from '@material-ui/core'
 import TabPanel from '../components/TabPanel'
@@ -54,7 +54,7 @@ const userId = 1
 
 export default function Profile() {
     const classes = useStyles()
-    const {user, setUser} = useEffect(UserContext)
+    const {user, setUser} = useContext(UserContext)
     const [activeTab, setActiveTab] = useState(0)
     const [contests, setContests] = useState([])    
     const [inProgressContestCards, getInProgressContestCards] = useState([])
