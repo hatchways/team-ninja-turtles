@@ -12,7 +12,11 @@ import {
     Paper, 
     GridList, 
     GridListTile, 
-    GridListTileBar 
+    GridListTileBar,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from '@material-ui/core'
 
 import RequestError, { getContestDetails } from '../apiCalls'
@@ -102,13 +106,27 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '2rem',
         fontWeight: 'bold',
         padding: '4rem'
+    },
+    designImage: {
+        cursor: 'pointer'
+    },
+    dialog: {
+        '& .MuiDialog-paper': {
+            minWidth: '40vw'
+        }
+    },
+    dialogImage: {
+        width: '100%',
+        height: '100%'
     }
 }))
 
 export default function ContestDetails(props) {
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
+    const [openDialog, setOpenDialog] = useState(false)
     const [contest, setContest] = useState(null)
+    const [designOpening, setDesignOpening] = useState({})
     const [gridListItems, setGridListItems] = useState(null)
     const contestId = props.match.params.id
     const history = useHistory()
@@ -117,8 +135,20 @@ export default function ContestDetails(props) {
         setActiveTab(newActiveTab)
     }
 
+    const handleClose = () => {
+        setOpenDialog(false);
+    }
+
     const onBackButtonClick = e => {
         history.push('/profile')
+    }
+
+    const onDesignClick = e => {
+        const index = e.target.id
+        if (index) {
+            setDesignOpening(contest.designs[index])
+            setOpenDialog(true)
+        }
     }
 
     const getContestInfo = contestId => {
@@ -143,8 +173,8 @@ export default function ContestDetails(props) {
         if (contest) {
             if (contest.designs.length > 0) {
                 const newGridListItems = contest.designs.map((design, index) => (
-                    <GridListTile key={index}>
-                        <img src={design.img} alt={design.image} />
+                    <GridListTile key={index} >
+                        <img src={design.img} alt={design.image} id={index} onClick={onDesignClick} className={classes.designImage} />
                         <GridListTileBar title={`By @${design.creater}`} />
                     </GridListTile>
                 ))
@@ -161,6 +191,17 @@ export default function ContestDetails(props) {
         contest !== null ? (
             <div className={classes.pageContainer}>
                 <div className={classes.containerWrapper}>
+                    <Dialog open={openDialog} onClose={handleClose} className={classes.dialog}>
+                        <DialogTitle id="design-creater">
+                            {`Designed by ${designOpening.creater}`}
+                        </DialogTitle>
+                        <DialogContent>
+                            <img src={designOpening.img} alt={`designed created by ${designOpening.creater}`} className={classes.dialogImage} />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose} color="primary">Close</Button>
+                        </DialogActions>
+                    </Dialog>
                     <div className={classes.backButtonDiv}>
                         <div className={classes.backButton} onClick={onBackButtonClick}>
                             <Typography className={classes.backButtonIcon}>{`<`}</Typography>

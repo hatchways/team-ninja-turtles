@@ -1,4 +1,5 @@
 import React from 'react'
+import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 import { Paper, Typography, Button, Box } from '@material-ui/core'
 import { useDropzone } from 'react-dropzone'
@@ -60,6 +61,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function SubmitDesign(props) {
+    const history = useHistory()
     const classes = useStyles()
     const {
         acceptedFiles,
@@ -107,6 +109,8 @@ export default function SubmitDesign(props) {
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
+                alert("Successfully upload the image")
+                history.goBack()
             })
             .catch((error) => {
                  console.error('Error:', error);
