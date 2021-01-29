@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { makeStyles } from "@material-ui/core/styles"
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import { Button, InputLabel, OutlinedInput} from '@material-ui/core'
+import { makeStyles } from "@material-ui/core/styles"
 import { getProfile, editProfile } from "../apiCalls"
-import Dropzone, { useDropzone } from 'react-dropzone'
+import { UserContext } from '../App'
 
 
 const useStyles = makeStyles(theme => ({
@@ -66,7 +66,6 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-
 const ColoredLine = ({ color, marginTop, marginBottom, marginLeft }) => (
     <hr
         style={{
@@ -82,24 +81,18 @@ const ColoredLine = ({ color, marginTop, marginBottom, marginLeft }) => (
 
 const EditProfilePage = () => {
     const classes = useStyles();
-    const defaultIcon = process.env.PUBLIC_URL + 'images/avatar-1.png';
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [iconURL, setIconURL] = useState(defaultIcon)
+    const {user, setUser} = useContext(UserContext)
+    const [username, setUsername] = useState(user.username);
+    const [email, setEmail] = useState(user.email);
+    const [iconURL, setIconURL] = useState(user.icon)
     const [imageFile, setImageFile] = useState(null)
     const hiddenFileInput = useRef(null);
 
     useEffect(() => {
-        getProfile((data) => {
-            setUsername(data.username)
-            setEmail(data.email)
-            if (data.icon != null) {
-                setIconURL(data.icon)
-            }
-        }, (error) => {
-            console.log(error)
-        })
-    }, [])
+        setUsername(user.username)
+        setEmail(user.email)
+        setIconURL(user.icon)
+    }, [user])
 
     const uploadFile = (event) => {
         hiddenFileInput.current.click()
@@ -121,6 +114,17 @@ const EditProfilePage = () => {
         }
         editProfile(data, (data) => {
             console.log("success")
+            // get profile and update context
+            getProfile((data) => {
+                setUser({
+                    username: data.username,
+                    icon: (data.icon == null) ? process.env.PUBLIC_URL + 'images/avatar-1.png' : data.icon,
+                    email: data.email
+                })
+                console.log(data)
+            }, (error) => {
+                console.log(error)
+            })
         }, (error) => {
             console.log(error)
         })

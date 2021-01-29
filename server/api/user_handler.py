@@ -106,12 +106,14 @@ def get_user_profile():
     token = request.cookies.get("auth_token")
     data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
     current_user = User.query.filter_by(username=data['user']).first()
+    icon = None if current_user.icon is None else \
+        "http://%s.s3.%s.amazonaws.com/%s" % (S3_BUCKET, S3_REGION, current_user.icon)
 
     # requires to call get_custom_icon if custom_icon is true
     return jsonify({
         'username': current_user.username,
         'email': current_user.email,
-        'icon': "http://%s.s3.%s.amazonaws.com/%s" % (S3_BUCKET, S3_REGION, current_user.icon)
+        'icon': icon
     })
 
 

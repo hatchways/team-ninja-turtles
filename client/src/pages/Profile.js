@@ -4,6 +4,7 @@ import { Button, Typography, Tabs, Tab, Paper } from '@material-ui/core'
 import TabPanel from '../components/TabPanel'
 import ContestCard from '../components/ContestCard'
 import RequestError, { getOwnedContests, getProfile } from '../apiCalls'
+import { UserContext } from '../App'
 
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
@@ -53,6 +54,7 @@ const userId = 1
 
 export default function Profile() {
     const classes = useStyles()
+    const {user, setUser} = useEffect(UserContext)
     const [activeTab, setActiveTab] = useState(0)
     const [contests, setContests] = useState([])    
     const [inProgressContestCards, getInProgressContestCards] = useState([])
@@ -75,15 +77,12 @@ export default function Profile() {
                 console.log("unexpected error")
             }
         }))
-
-        getProfile((data) => {
-            setUsername(data.username)
-            setIconURL(data.icon)
-        }, (error) => {
-            console.log(error)
-        })
-
     }, [])
+
+    useEffect(() => { 
+        setUsername(user.username)
+        setIconURL(user.icon)
+    }, [user])
 
     useEffect(() => { // Once get request returns a response, set contest cards
         try {
