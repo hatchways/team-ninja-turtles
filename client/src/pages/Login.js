@@ -1,7 +1,8 @@
 import { Button, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
-import React, { useState } from "react";
-import RequestError, { login } from "../apiCalls";
+import React, { useContext, useState } from "react";
+import RequestError, { login, getProfile } from "../apiCalls";
+import {UserContext} from "../App"
 
 const warningMsg = {
     emptyFieldError: "Required",
@@ -30,6 +31,7 @@ const useStyles = makeStyles(theme => ({
 
 const Login = () => {
     const classes = useStyles();
+    const {user, setUser} = useContext(UserContext);
     const [username, setUsername] =  useState("");
     const [password, setPassword ] = useState("");
     const [usernameWarning, setUsernameWarning] = useState("");
@@ -67,7 +69,18 @@ const Login = () => {
     const submit = () => {
         if (!passwordError && !usernameError) {
             login(username, password, (data) => {
-                console.log("SUCCESS")
+                // get profile and update context
+                getProfile((data) => {
+                    console.log(data.icon)
+                    setUser({
+                        username: data.username,
+                        icon: (data.icon == null) ? process.env.PUBLIC_URL + 'images/avatar-1.png' : data.icon,
+                        email: data.email
+                    })
+                    console.log(data)
+                }, (error) => {
+                    console.log(error)
+                })
             },  (error) => {
                 // onError
                 console.log(error)

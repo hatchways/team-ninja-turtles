@@ -1,14 +1,16 @@
-from flask import jsonify, Blueprint, request
-from api import db, bcrypt
-from api.models import User
+from flask import jsonify, Blueprint, request, send_file
+from api import db, bcrypt, s3
+from models import User
 from api.middleware import require_auth
 import jwt
 from datetime import datetime, timedelta
 import app
+from config import S3_BUCKET, S3_REGION
+import os
 
 
 user_handler = Blueprint("user_handler", __name__)
-exp = 20  # in minutes
+exp = 120  # in minutes
 
 
 @user_handler.route('/api/register', methods=['POST'])
@@ -75,6 +77,44 @@ def login():
     response.status_code = 201
     response.set_cookie('auth_token', value=token, httponly=True)
     return response
+
+
+@user_handler.route('/api/edit_profile', methods=['POST'])
+@require_auth
+def edit_profile():
+    s3_key = request.form["file_name"]
+
+    token = request.cookies.get("auth_token")
+    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
+    current_user = User.query.filter_by(username=data['user']).first()
+
+    try:
+        if len(s3_key) > 0:
+            s3.upload_fileobj(request.files['icon'], S3_BUCKET, s3_key, ExtraArgs={'ACL': 'public-read'})
+            current_user.icon = s3_key
+            db.session.commit()
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "unexpected error"}), 400
+
+    return jsonify({"message": "success"}), 200
+
+
+@user_handler.route('/api/get_user', methods=['GET'])
+@require_auth
+def get_user_profile():
+    token = request.cookies.get("auth_token")
+    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
+    current_user = User.query.filter_by(username=data['user']).first()
+    icon = None if current_user.icon is None else \
+        "http://%s.s3.%s.amazonaws.com/%s" % (S3_BUCKET, S3_REGION, current_user.icon)
+
+    # requires to call get_custom_icon if custom_icon is true
+    return jsonify({
+        'username': current_user.username,
+        'email': current_user.email,
+        'icon': icon
+    })
 
 
 @user_handler.route('/api/test_protected', methods=['POST', 'GET'])

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { Button, Typography, Tabs, Tab, Paper } from '@material-ui/core'
 import TabPanel from '../components/TabPanel'
 import ContestCard from '../components/ContestCard'
-import RequestError, { getOwnedContests } from '../apiCalls'
+import RequestError, { getOwnedContests, getProfile } from '../apiCalls'
+import { UserContext } from '../App'
 
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
@@ -53,14 +54,18 @@ const userId = 1
 
 export default function Profile() {
     const classes = useStyles()
+    const {user, setUser} = useContext(UserContext)
     const [activeTab, setActiveTab] = useState(0)
     const [contests, setContests] = useState([])    
     const [inProgressContestCards, getInProgressContestCards] = useState([])
     const [completedContestCards, getCompletedContestCards] = useState([])
+    const [username, setUsername] = useState("")
+    const [iconURL, setIconURL] = useState(process.env.PUBLIC_URL + 'images/avatar-1.png')
 
     const handleTabChange = (event, newActiveTab) => {
         setActiveTab(newActiveTab)
     }
+
     useEffect(() => { // Only runs once when first rendering
         setContests(getOwnedContests(userId, (data) => {
             setContests(data) // Sets contests equal to return from get request
@@ -73,6 +78,12 @@ export default function Profile() {
             }
         }))
     }, [])
+
+    useEffect(() => { 
+        setUsername(user.username)
+        setIconURL(user.icon)
+    }, [user])
+
     useEffect(() => { // Once get request returns a response, set contest cards
         try {
             console.log(contests)
@@ -98,6 +109,7 @@ export default function Profile() {
             console.log(error)
         }
     }, [contests])
+
     const pushContestCard = (cardList, contest, i) => {
         cardList.push(
             <ContestCard 
@@ -110,11 +122,12 @@ export default function Profile() {
             />
         )
     }
+
     return (
         <div className={classes.pageContainer}>
             <div className={classes.profileSection}>
-                <img src={process.env.PUBLIC_URL + 'images/avatar-1.png'} alt='avatar' className={classes.avatar}/>
-                <Typography className={classes.userName}>Laurent Tang</Typography>
+                <img src={iconURL} alt='avatar' className={classes.avatar}/>
+                <Typography className={classes.userName}>{username}</Typography>
             </div>
             <div className={classes.buttonDiv}>
                 <Button className={classes.editButton} variant='outlined'>
