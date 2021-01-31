@@ -224,8 +224,7 @@ export default function ContestDetails(props) {
                             </Grid>
                             <Grid item xs={5} className={classes.submitButtonDiv}>
                                 <Link to={{
-                                        pathname: '/submit-design',
-                                        contestId: contestId
+                                        pathname: `/submit-design/${contestId}`
                                 }}>
                                     <Button variant='outlined' className={classes.submitDesign}>
                                         Submit Design

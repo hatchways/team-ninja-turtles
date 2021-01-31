@@ -72,7 +72,7 @@ export default function SubmitDesign(props) {
         accept: 'image/jpeg, image/png, img/gif',
         maxFiles: 10
     })
-    const contestId = props.location.contestId
+    const contestId = props.match.params.id
 
     const acceptedFileItems = acceptedFiles.map((file, index)  => (
         <div key={index}>
@@ -96,27 +96,23 @@ export default function SubmitDesign(props) {
     ))
 
     const handleUpload = () => {
-        if (contestId) { 
-            const data = new FormData();
-            data.append('file', acceptedFiles[0]);
-            data.append('file_name', acceptedFiles[0].name)
-    
-            fetch(`http://localhost:5000/contestImage/submission/${contestId}`, {
-                method: 'POST',
-                body: data,
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                alert("Successfully upload the image")
-                history.goBack()
-            })
-            .catch((error) => {
-                 console.error('Error:', error);
-            })
-        }
-        // TODO: handle contestId is null (alert user then redirect to all contest page or other solutions)
+        const data = new FormData();
+        data.append('file', acceptedFiles[0]);
+        data.append('file_name', acceptedFiles[0].name)
+
+        fetch(`http://localhost:5000/contestImage/submission/${contestId}`, {
+            method: 'POST',
+            body: data,
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert("Successfully upload the image")
+            history.push(`/contest-details/${contestId}`)
+        })
+        .catch((error) => {
+                console.error('Error:', error);
+        })
     }
 
     return (
