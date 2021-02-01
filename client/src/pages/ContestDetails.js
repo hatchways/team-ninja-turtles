@@ -124,9 +124,10 @@ const useStyles = makeStyles((theme) => ({
 export default function ContestDetails(props) {
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
-    const [openDialog, setOpenDialog] = useState(false)
+    const [openDesignDialog, setOpenDialog] = useState(false)
+    const [openInspirationalDialog, setOpenInspirationalDialog] = useState(false)
     const [contest, setContest] = useState(null)
-    const [designOpening, setDesignOpening] = useState({})
+    const [imageOpening, setDesignOpening] = useState({})
     const [gridListItems, setGridListItems] = useState(null)
     const [tabLable, setTabLable] = useState("Inspirational Images")
     const contestId = props.match.params.id
@@ -139,6 +140,7 @@ export default function ContestDetails(props) {
 
     const handleClose = () => {
         setOpenDialog(false);
+        setOpenInspirationalDialog(false);
     }
 
     const onBackButtonClick = e => {
@@ -150,6 +152,14 @@ export default function ContestDetails(props) {
         if (index) {
             setDesignOpening(contest.designs[index])
             setOpenDialog(true)
+        }
+    }
+
+    const onInspirationalImageClick = e => {
+        const index = e.target.id
+        if (index) {
+            setDesignOpening(contest.attached_inspirational_images[index])
+            setOpenInspirationalDialog(true)
         }
     }
 
@@ -190,7 +200,7 @@ export default function ContestDetails(props) {
                 if (contest.attached_inspirational_images.length > 0) {
                     newGridListItems = contest.attached_inspirational_images.map((attached_inspirational_images, index) => (
                         <GridListTile key={index}>  
-                            <img src={attached_inspirational_images} alt={attached_inspirational_images.image} id={index} onClick={onDesignClick} className={classes.designImage} />
+                            <img src={attached_inspirational_images} alt={attached_inspirational_images.image} id={index} onClick={onInspirationalImageClick} className={classes.designImage} />
                         </GridListTile>
                     ))
                 } else {
@@ -219,12 +229,20 @@ export default function ContestDetails(props) {
         contest !== null ? (
             <div className={classes.pageContainer}>
                 <div className={classes.containerWrapper}>
-                    <Dialog open={openDialog} onClose={handleClose} className={classes.dialog}>
+                    <Dialog open={openDesignDialog} onClose={handleClose} className={classes.dialog}>
                         <DialogTitle id="design-creater">
-                            {`Designed by ${designOpening.creater}`}
+                            {`Designed by ${imageOpening.creater}`}
                         </DialogTitle>
                         <DialogContent>
-                            <img src={designOpening.img} alt={`designed created by ${designOpening.creater}`} className={classes.dialogImage} />
+                            <img src={imageOpening.img} alt={`designed created by ${imageOpening.creater}`} className={classes.dialogImage} />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose} color="primary">Close</Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={openInspirationalDialog} onClose={handleClose} className={classes.dialog}>
+                        <DialogContent>
+                            <img src={imageOpening} className={classes.dialogImage} />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose} color="primary">Close</Button>
