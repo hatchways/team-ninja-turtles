@@ -17,9 +17,11 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    IconButton,
+    Radio,
 } from '@material-ui/core'
 
-import RequestError, { getContestDetails } from '../apiCalls'
+import RequestError, { getContestDetails, setContestWinner } from '../apiCalls'
 
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
@@ -124,10 +126,14 @@ const useStyles = makeStyles((theme) => ({
 export default function ContestDetails(props) {
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
-    const [openDialog, setOpenDialog] = useState(false)
+    const [openDesignDialog, setOpenDesignDialog] = useState(false)
+    const [openInspirationalImageDialog, setOpenInspirationalImageDialog] = useState(false)
     const [contest, setContest] = useState(null)
     const [designOpening, setDesignOpening] = useState({})
     const [gridListItems, setGridListItems] = useState(null)
+    const [tabLable, setTabLable] = useState("Inspirational Images")
+    const [submitButton, setSubmitButton] = useState(null)
+    const [winningSubmission, setWinningSubmission] = useState(null)
     const contestId = props.match.params.id
     const history = useHistory()
 
@@ -136,9 +142,26 @@ export default function ContestDetails(props) {
     }
 
     const handleClose = () => {
-        setOpenDialog(false);
+        setOpenDesignDialog(false);
+        setOpenInspirationalImageDialog(false);
     }
 
+    const handleWinnerChange = e => {
+        setWinningSubmission(parseInt(e.target.value))
+    }
+
+    const onWinnerSubmit = e => {
+        setContestWinner(contestId, winningSubmission, data => {
+            console.log('Winner Successfully Declared')
+        }, error => {
+            if (error instanceof RequestError && error.status === 400) {
+                console.log(error.body)
+            } else {
+                console.log("unexpected error")
+            }
+        })
+        getContestInfo(contestId)
+    }
     const onBackButtonClick = e => {
         history.push('/profile')
     }
@@ -147,7 +170,15 @@ export default function ContestDetails(props) {
         const index = e.target.id
         if (index) {
             setDesignOpening(contest.designs[index])
-            setOpenDialog(true)
+            setOpenDesignDialog(true)
+        }
+    }
+
+    const onInspirationalImageClick = e => {
+        const index = e.target.id
+        if (index) {
+            setDesignOpening(contest.attached_inspirational_images[index])
+            setOpenInspirationalImageDialog(true)
         }
     }
 
@@ -171,32 +202,87 @@ export default function ContestDetails(props) {
 
     useEffect(() => {
         if (contest) {
-            if (contest.designs.length > 0) {
-                const newGridListItems = contest.designs.map((design, index) => (
-                    <GridListTile key={index} >
-                        <img src={design.img} alt={design.image} id={index} onClick={onDesignClick} className={classes.designImage} />
-                        <GridListTileBar title={`By @${design.creater}`} />
-                    </GridListTile>
-                ))
-    
-                setGridListItems(newGridListItems)
-            } else {
-                const newGridListItems = <div>There is no designs to display</div>
-                setGridListItems(newGridListItems)
+            var newGridListItems = null
+            if (contest.hasOwnProperty('designs')) { // If contest does not have property 'designs', that means it is not the contest owner accessing the page
+                if (contest.designs.length > 0) { // Render this if it is the contest owner and there have been designs submitted
+                    newGridListItems = contest.designs.map((design, index) => (
+                        <GridListTile key={index}>
+                            <img src={design.img} alt={design.image} id={index} onClick={onDesignClick} className={classes.designImage} />
+                            <GridListTileBar title={`By @${design.creater}`}
+                                actionIcon={
+                                    <IconButton aria-label={`checkbox ${index}`}>
+                                        <Radio
+                                            checked={winningSubmission === design.submission_id}
+                                            onChange={handleWinnerChange}
+                                            value={design.submission_id}
+                                            name={`radio_button_${index}`}
+                                        />
+                                    </IconButton>
+                                }/>
+                            </GridListTile>
+                    ))
+                    if (Date.parse(contest.deadline_date) < Date.now() && contest.winner == null) {
+                        createSubmitWinnerButton()
+                    }
+                } else {
+                    newGridListItems = <div>There is no images to display</div>
+                }
+                setTabLable("Designs")
+            } else { // Render this if it is not the contest owner
+                if (contest.attached_inspirational_images.length > 0) {
+                    newGridListItems = contest.attached_inspirational_images.map((attached_inspirational_images, index) => (
+                        <GridListTile key={index}>  
+                            <img src={attached_inspirational_images} alt={attached_inspirational_images.image} id={index} onClick={onInspirationalImageClick} className={classes.designImage} />
+                        </GridListTile>
+                    ))
+                } else {
+                    newGridListItems = <div>There is no images to display</div>
+                }
+                setTabLable("Inspirational Images")
+                createSubmitDesignButton()
             }
+            setGridListItems(newGridListItems)
         }
-    }, [contest])
+    }, [contest, winningSubmission])
+
+    const createSubmitDesignButton = () => {
+        setSubmitButton(
+            <Link to={{
+                    pathname: `/submit-design/${contestId}`
+            }}>
+                <Button variant='outlined' className={classes.submitDesign}>
+                    Submit Design
+                </Button>
+            </Link>
+        )
+    }
+
+    const createSubmitWinnerButton = () => {
+        setSubmitButton(
+            <Button variant='outlined' className={classes.submitDesign} onClick = {onWinnerSubmit}>
+                Submit Winner
+            </Button>
+        )
+    }
 
     return (
         contest !== null ? (
             <div className={classes.pageContainer}>
                 <div className={classes.containerWrapper}>
-                    <Dialog open={openDialog} onClose={handleClose} className={classes.dialog}>
+                    <Dialog open={openDesignDialog} onClose={handleClose} className={classes.dialog}>
                         <DialogTitle id="design-creater">
                             {`Designed by ${designOpening.creater}`}
                         </DialogTitle>
                         <DialogContent>
                             <img src={designOpening.img} alt={`designed created by ${designOpening.creater}`} className={classes.dialogImage} />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose} color="primary">Close</Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={openInspirationalImageDialog} onClose={handleClose} className={classes.dialog}>
+                        <DialogContent>
+                            <img src={designOpening} className={classes.dialogImage} />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose} color="primary">Close</Button>
@@ -223,13 +309,7 @@ export default function ContestDetails(props) {
                                 </div>
                             </Grid>
                             <Grid item xs={5} className={classes.submitButtonDiv}>
-                                <Link to={{
-                                        pathname: `/submit-design/${contestId}`
-                                }}>
-                                    <Button variant='outlined' className={classes.submitDesign}>
-                                        Submit Design
-                                    </Button>
-                                </Link>
+                                {submitButton}
                             </Grid>
                         </Grid>
                     </div>
@@ -241,7 +321,7 @@ export default function ContestDetails(props) {
                                 variant='fullWidth'
                                 TabIndicatorProps={{ style: { background:'black' }}}
                             >
-                                <Tab label='DESIGNS' />
+                                <Tab label={tabLable} />
                                 <Tab label='BRIEF' />
                             </Tabs>
                             <TabPanel value={activeTab} index={0} className={classes.tabPanel}>

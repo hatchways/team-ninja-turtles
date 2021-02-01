@@ -98,7 +98,7 @@ export default function CreateContestForm() {
             setAmountHelperText('')
         }
     }
-    const handleChange = (event) => {
+    const handleCheckboxChange = (event) => {
         const newChecked = checkedInspireationalImages
         if (event.target.checked) {
             newChecked.push(event.target.name)
@@ -169,7 +169,7 @@ export default function CreateContestForm() {
                                     className={classes.title}
                                     name={String(imageKey)}
                                     color="primary"
-                                    onChange={handleChange}
+                                    onChange={handleCheckboxChange}
                                 />
                             </IconButton>
                         }
