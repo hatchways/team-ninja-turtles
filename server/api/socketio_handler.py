@@ -6,6 +6,7 @@ import jwt
 from models import User, RoomSession, Message
 from app import app
 
+
 socketio_handler = Blueprint('socketio_new_handler', __name__)
 
 
