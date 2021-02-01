@@ -49,7 +49,7 @@ function App() {
             <Route path='/profile' component={ProfilePage}></Route>
             <Route path='/contest-details/:id' component={ContestDetails}></Route>
             <Route path='/create-contest' component={CreateContestPage}></Route>
-            <Route path='/submit-design' component={SubmitDesignPage}></Route>
+            <Route path='/submit-design/:id' component={SubmitDesignPage}></Route>
             <Route path='/message' component={SocketPage}></Route>
             <Route path="/add-card" component={PaymentInfo}></Route>
             <Route path="/edit-profile" component={EditProfilePage} />
