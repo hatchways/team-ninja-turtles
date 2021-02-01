@@ -63,16 +63,25 @@ export const register = async (username, password, email, onSuccess, onError) =>
     makeRequest("/api/register", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
 }
 
-export const createContest = async (title, description, prize_contest, deadline_date, contest_creator, onSuccess, onError) => {
+export const createContest = async (title, description, prize_contest, deadline_date, contest_creator, inspirational_images, onSuccess, onError) => {
     const data = {
         'title': title,
         'description': description,
         'prize_contest': prize_contest,
         'deadline_date': deadline_date,
-        'contest_creator': contest_creator
+        'contest_creator': contest_creator,
+        'inspirational_images': inspirational_images
     }
 
     makeRequest("/contest", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
+}
+
+export const createInspirationalImage = async (link, onSuccess, onError) => {
+    const data = {
+        'link': link
+    }
+
+    makeRequest("/add_inspirational_images", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
 }
 
 export const getStripeID = async (onSuccess, onError) => {
@@ -98,6 +107,10 @@ export const getProfile = async(onSuccess, onError) => {
 
 export const editProfile = async (data, onSuccess, onError) => {
     makeRequest("/api/edit_profile", "POST", {}, data, onSuccess, onError)
+}
+
+export const getInspirationalImages = async (onSuccess, onError) => {
+    get(`/inspirational_images`, {"Content-Type": "application/json"}, onSuccess, onError)
 }
 
 export default RequestError;

@@ -10,10 +10,13 @@ import {
     Box,
     Button,
     GridList,
-    GridListTile
+    GridListTile,
+    GridListTileBar,
+    IconButton,
+    Checkbox
 } from '@material-ui/core'
 
-import RequestError, { createContest } from '../apiCalls'
+import RequestError, { createContest, getInspirationalImages, createInspirationalImage } from '../apiCalls'
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -52,7 +55,15 @@ const useStyles = makeStyles((theme) => ({
         color: 'white',
         borderRadius: '0',
         padding: '1rem',
-        margin: '5rem',
+        margin: '5rem'
+    },
+    addLinkButton: {
+        backgroundColor: 'rgba(0, 0, 0, 0.87)',
+        color: 'white',
+        borderRadius: '0',
+        padding: '1rem',
+        marginLeft: '1rem',
+        marginTop: '0.5rem'
     },
     borderedDiv: {
         width: '100%',
@@ -71,9 +82,11 @@ export default function CreateContestForm() {
     const [date, setDate] = useState(new Date().toISOString().substr(0,10))
     const [time, setTime] = useState(new Date().toTimeString().substr(0,5))
     const [timeZone, setTimeZone] = useState('PDT')
-    const [images, setImages] = useState('')
+    const [inspirationalImages, setImages] = useState([])
     const [amountError, setAmountError] = useState(false)
     const [amountHelperText, setAmountHelperText] = useState('')
+    const [addImageLink, setImageLink] = useState('')
+    const [checkedInspireationalImages, setChecked] = useState([])
 
     const onAmountChange = e => {
         if (e.target.value < 0) {
@@ -85,7 +98,27 @@ export default function CreateContestForm() {
             setAmountHelperText('')
         }
     }
-
+    const handleChange = (event) => {
+        const newChecked = checkedInspireationalImages
+        if (event.target.checked) {
+            newChecked.push(event.target.name)
+        } else {
+            newChecked.splice(newChecked.indexOf(event.target.name), 1)
+        }
+        setChecked(newChecked)
+    }
+    const onAddLink = () => {
+        createInspirationalImage(addImageLink, data => {
+            console.log('Image Successfully Added')
+        }, error => {
+            if (error instanceof RequestError && error.status === 400) {
+                console.log(error.body)
+            } else {
+                console.log("unexpected error")
+            }
+        })
+        setImageLink('')
+    }
     const onSubmit = () => {
         const deadline = new Date(date.replace(/-/g, '\/'))
         const hours = time.substr(0,2)
@@ -93,8 +126,7 @@ export default function CreateContestForm() {
         deadline.setHours(hours)
         deadline.setMinutes(minutes)
         const contestCreator = 1
-
-        createContest(title, description, amount, deadline, contestCreator, data => {
+        createContest(title, description, amount, deadline, contestCreator, checkedInspireationalImages, data => {
             console.log('contest has been successfully created!')
         }, error => {
             if (error instanceof RequestError && error.status === 400) {
@@ -104,12 +136,49 @@ export default function CreateContestForm() {
             }
         })
     }
-
-    // temporary hardcode image names
-    const imageNames = ['tattoo-1.png', 'tattoo-2.png', 'tattoo-3.png', 'tattoo-4.png', 'tattoo-5.png', 
-    'tattoo-6.png', 'tattoo-7.png', 'tattoo-8.png', 'tattoo-9.png', 'tattoo-10.png', 
-    'tattoo-11.png', 'tattoo-12.png', 'tattoo-13.png', 'tattoo-14.png']
-
+    useEffect(() => { // Only runs once when first rendering
+        getInspirationalImages(createGridListTiles, // Sets images equal to return from get request
+            (error) => {
+            // onError
+            if (error instanceof RequestError && error.response.status === 400) {
+                console.log(error.response.json())
+            } else {
+                console.log(error)
+            }
+        })
+    }, [addImageLink])
+    const createGridListTiles = (data) => {
+        const imagesMap = new Map(Object.entries(data))
+        console.log(imagesMap)
+        const images = []
+        for (var i = 0; i < imagesMap.size; i++) {
+            const imageMap = new Map(Object.entries(imagesMap.get(String(i))))
+            const imageURL = imageMap.get('image_link')
+            const imageKey = imageMap.get('id')
+            images.push(
+                <GridListTile key={imageKey} cols={1}>
+                    <img src={imageURL} alt={imageURL} />
+                    <GridListTileBar
+                        classes={{
+                            root: classes.titleBar,
+                            title: classes.title,
+                        }}
+                        actionIcon={
+                            <IconButton aria-label={`checkbox ${i}`}>
+                                <Checkbox
+                                    className={classes.title}
+                                    name={String(imageKey)}
+                                    color="primary"
+                                    onChange={handleChange}
+                                />
+                            </IconButton>
+                        }
+                    />
+                </GridListTile>
+                )
+        }
+        setImages(images)
+    }
     return (
         <form className={classes.formContainer}>
             <Grid container direction='row'>
@@ -212,14 +281,24 @@ export default function CreateContestForm() {
                     <Typography className={classes.label}>Which designs do you like?</Typography>
                     <Typography>Let's start by helping your desingers understand which styles you prefer.</Typography>
                 </Grid>
+                <Grid item xs={10}>
+                    <TextField 
+                            id='title'
+                            className={classes.inputMargin}
+                            value={addImageLink}
+                            onChange={e => setImageLink(e.target.value)}
+                            label='Insert a URL to an image you like'
+                            fullWidth
+                            variant='outlined'
+                    />
+                </Grid>
+                <Grid item xs={2}>
+                    <Button className={classes.addLinkButton} onClick={onAddLink}>Add Link</Button>
+                </Grid>
                 <Grid item xs={12}>
                     <Box className={classes.tattooImages}>
                         <GridList cellHeight={160} className={classes.gridList} cols={4}>
-                            {imageNames.map((image, index) => (
-                                <GridListTile key={index} cols={1}>
-                                    <img src={process.env.PUBLIC_URL + '/images/' + image} alt={image} />
-                                </GridListTile>
-                            ))}
+                            {inspirationalImages}
                         </GridList>
                     </Box>
                 </Grid>
