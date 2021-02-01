@@ -1,10 +1,10 @@
-from flask import jsonify, Blueprint, request
+from flask import jsonify, Blueprint, request, g
 from models import User
 from api import db
 import stripe
 import jwt
 import app
-from api.middleware import require_auth
+from api.middleware import require_auth, get_current_user
 
 payment_handler = Blueprint("payment_handler", __name__)
 
@@ -15,15 +15,11 @@ def get_price_val(data):
 
 
 @payment_handler.route("/api/get_stripe_intent", methods=["GET"])
+@require_auth
+@get_current_user
 def get_stripe_intent():
-    token = request.cookies.get("auth_token")
-    try:
-        username = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])['user']
-    except:
-        return jsonify({'message': 'invalid Token'}), 401
-
+    user = g.current_user
     stripe.api_key = app.app.config['STRIPE_SK']
-    user = User.query.filter_by(username=username).first()
 
     if user.stripe_id is None:
         new_stripe_id = stripe.Customer.create(email=user.email, description=user.username).get("id")

@@ -1,12 +1,14 @@
 import json
-from flask import jsonify, Blueprint, request
+from flask import jsonify, Blueprint, request, g
 from api import db
 from models import Contest, Submission, User, InspirationalImage
+from api.middleware import require_auth, get_current_user
 from datetime import date, datetime
 contest_handler = Blueprint('contest_handler', __name__)
 
 
 @contest_handler.route('/contest', methods=['POST'])
+@require_auth
 def create_contest():
     # Create new contests
     if request.method == 'POST':
@@ -47,6 +49,7 @@ def create_contest():
 
 
 @contest_handler.route('/contests', methods=['GET'])
+@require_auth
 def get_all_contests():
     # Do any contests exist?
     try:
@@ -75,6 +78,7 @@ def get_all_contests():
 
 
 @contest_handler.route('/contest/<contest_id>', methods=['PUT', 'GET'])
+@require_auth
 def get_contest(contest_id):
     # Does contest exist?
     try:
@@ -124,6 +128,7 @@ def get_contest(contest_id):
 
 
 @contest_handler.route('/contests/owned/<user_id>', methods=['GET'])
+@require_auth
 def get_owned_contests(user_id):
     # Do any contests exist for this user?
     try:
@@ -144,6 +149,7 @@ def get_owned_contests(user_id):
 
 
 @contest_handler.route('/contests/submitted/to/<user_id>', methods=['GET'])
+@require_auth
 def get_submitted_to_contests(user_id):
     # Do any submissions exist for this user?
     try:
