@@ -3,6 +3,9 @@ from flask import jsonify, Blueprint, request
 from api import db
 from models import Contest, Submission, User, InspirationalImage
 from datetime import date, datetime
+from api.inspirational_images_handler import get_contest_inspirational_images
+import jwt
+import app
 contest_handler = Blueprint('contest_handler', __name__)
 
 
@@ -76,6 +79,14 @@ def get_all_contests():
 
 @contest_handler.route('/contest/<contest_id>', methods=['PUT', 'GET'])
 def get_contest(contest_id):
+
+    try:
+        token = request.cookies.get("auth_token")
+        data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
+        current_user = User.query.filter_by(username=data['user']).first()
+    except Exception:
+        current_user = None
+
     # Does contest exist?
     try:
         contest = Contest.query.get(contest_id)
@@ -84,30 +95,34 @@ def get_contest(contest_id):
     except Exception:
         return jsonify("Contest does not exist")
 
-    #Load user info
-    try:
-        user = User.query.filter_by(id=contest.contest_creater).first()
-        if user == None: 
-            raise Exception
-    except Exception:
-        return jsonify("Contest owner not found")
-    
-    #Load submissions
-    allSubmissions = db.session.query(Submission.image_link, User.username).filter_by(contest_id=contest_id).join(User, User.id == Submission.submiter_id).all()
-    
-    formatedSubmissions = []
-
-    for pair in allSubmissions:
-        imgLink, username = pair
-        formatedSubmissions.append({
-            "img": imgLink,
-            "creater": username
-        })
-
-    # Return contest contents
     if request.method == 'GET':
-        setattr(contest, 'designs', formatedSubmissions)
-        setattr(contest, 'creater_name', user.username)
+        #Load user info
+        try:
+            contest_creater_user = User.query.filter_by(id=contest.contest_creater).first()
+            if contest_creater_user == None: 
+                raise Exception
+        except Exception as e:
+            return jsonify("Contest owner not found")
+
+        if contest_creater_user == current_user:
+            #Load submissions
+            allSubmissions = db.session.query(Submission.image_link, User.username).filter_by(contest_id=contest_id).join(User, User.id == Submission.submiter_id).all()
+
+            formatedSubmissions = []
+
+            for pair in allSubmissions:
+                imgLink, username = pair
+                formatedSubmissions.append({
+                    "img": imgLink,
+                    "creater": username
+                })
+            setattr(contest, 'designs', formatedSubmissions)
+
+        inspirational_images = json.loads(get_contest_inspirational_images(contest_id).data)
+
+        # Return contest contents
+        setattr(contest, 'creater_name', contest_creater_user.username)
+        setattr(contest, 'attached_inspirational_images', inspirational_images)
         return json.dumps(contest.__dict__, default=str)
 
     # Update contest contents

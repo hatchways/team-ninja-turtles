@@ -110,8 +110,10 @@ export default function ContestDetails(props) {
     const [activeTab, setActiveTab] = useState(0)
     const [contest, setContest] = useState(null)
     const [gridListItems, setGridListItems] = useState(null)
+    const [tabLable, setTabLable] = useState("Inspirational Images")
     const contestId = props.match.params.id
     const history = useHistory()
+    const [submitButton, setSubmitButton] = useState(null)
 
     const handleTabChange = (event, newActiveTab) => {
         setActiveTab(newActiveTab)
@@ -141,21 +143,48 @@ export default function ContestDetails(props) {
 
     useEffect(() => {
         if (contest) {
-            if (contest.designs.length > 0) {
-                const newGridListItems = contest.designs.map((design, index) => (
-                    <GridListTile key={index}>
-                        <img src={design.img} alt={design.image} />
-                        <GridListTileBar title={`By @${design.creater}`} />
-                    </GridListTile>
-                ))
-    
-                setGridListItems(newGridListItems)
-            } else {
-                const newGridListItems = <div>There is no designs to display</div>
-                setGridListItems(newGridListItems)
+            var newGridListItems = null
+            if (contest.hasOwnProperty('designs')) { // If contest does not have property 'designs', that means it is not the contest owner accessing the page
+                if (contest.designs.length > 0) { // Render this if it is the contest owner and there have been designs submitted
+                    newGridListItems = contest.designs.map((design, index) => (
+                        <GridListTile key={index}>
+                            <img src={design.img} alt={design.image} />
+                            <GridListTileBar title={`By @${design.creater}`} />
+                        </GridListTile>
+                    ))
+                } else {
+                    newGridListItems = <div>There is no images to display</div>
+                }
+                setTabLable("Designs")
+            } else { // Render this if it is not the contest owner
+                if (contest.attached_inspirational_images.length > 0) {
+                    newGridListItems = contest.attached_inspirational_images.map((attached_inspirational_images, index) => (
+                        <GridListTile key={index}>  
+                            <img src={attached_inspirational_images} alt={attached_inspirational_images.image} />
+                        </GridListTile>
+                    ))
+                } else {
+                    newGridListItems = <div>There is no images to display</div>
+                }
+                setTabLable("Inspirational Images")
+                createSubmitButton()
             }
+            setGridListItems(newGridListItems)
         }
     }, [contest])
+
+    const createSubmitButton = () => {
+        setSubmitButton(
+            <Link to={{
+                    pathname: '/submit-design',
+                    contestId: contestId
+            }}>
+                <Button variant='outlined' className={classes.submitDesign}>
+                    Submit Design
+                </Button>
+            </Link>
+        )
+    }
 
     return (
         contest !== null ? (
@@ -182,14 +211,7 @@ export default function ContestDetails(props) {
                                 </div>
                             </Grid>
                             <Grid item xs={5} className={classes.submitButtonDiv}>
-                                <Link to={{
-                                        pathname: '/submit-design',
-                                        contestId: contestId
-                                }}>
-                                    <Button variant='outlined' className={classes.submitDesign}>
-                                        Submit Design
-                                    </Button>
-                                </Link>
+                                {submitButton}
                             </Grid>
                         </Grid>
                     </div>
@@ -201,7 +223,7 @@ export default function ContestDetails(props) {
                                 variant='fullWidth'
                                 TabIndicatorProps={{ style: { background:'black' }}}
                             >
-                                <Tab label='DESIGNS' />
+                                <Tab label={tabLable} />
                                 <Tab label='BRIEF' />
                             </Tabs>
                             <TabPanel value={activeTab} index={0} className={classes.tabPanel}>
