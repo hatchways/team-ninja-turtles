@@ -216,7 +216,7 @@ export default function ContestDetails(props) {
     const createSubmitButton = () => {
         setSubmitButton(
             <Link to={{
-                    pathname: '/submit-design/${contestId}'
+                    pathname: `/submit-design/${contestId}`
             }}>
                 <Button variant='outlined' className={classes.submitDesign}>
                     Submit Design
