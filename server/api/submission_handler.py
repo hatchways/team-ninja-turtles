@@ -1,4 +1,4 @@
-from flask import jsonify, Blueprint, request, g
+from flask import jsonify, Blueprint, request
 from api import db, s3
 from models import Contest, Submission, User
 from api.middleware import require_auth, get_current_user
@@ -12,9 +12,7 @@ submission_handler = Blueprint('submission_new_handler', __name__)
 @submission_handler.route('/contestImage/submission/<contest_id>', methods=['POST'])
 @require_auth
 @get_current_user
-def create_submission(contest_id):
-    current_user = g.current_user
-
+def create_submission(current_user, contest_id):
     # Replace all the ":" and " " with other charachters to have a consistent URL.
     # AWS would replace these charachters with others such as "+" or "%" and the link in the database would not match the actual link on AWS.
     file_name = (str(datetime.now()) + "_" + request.form["file_name"]).replace(":", "-").replace(" ", "_")

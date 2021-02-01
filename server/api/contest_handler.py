@@ -1,5 +1,5 @@
 import json
-from flask import jsonify, Blueprint, request, g
+from flask import jsonify, Blueprint, request
 from api import db
 from models import Contest, Submission, User, InspirationalImage
 from api.middleware import require_auth, get_current_user

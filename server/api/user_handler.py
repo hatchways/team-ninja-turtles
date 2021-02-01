@@ -1,4 +1,4 @@
-from flask import jsonify, Blueprint, request, send_file, g
+from flask import jsonify, Blueprint, request, send_file
 from api import db, bcrypt, s3
 from models import User
 from api.middleware import require_auth, get_current_user
@@ -82,10 +82,8 @@ def login():
 @user_handler.route('/api/edit_profile', methods=['POST'])
 @require_auth
 @get_current_user
-def edit_profile():
+def edit_profile(current_user):
     s3_key = request.form["file_name"]
-
-    current_user = g.current_user
 
     try:
         if len(s3_key) > 0:
@@ -102,8 +100,7 @@ def edit_profile():
 @user_handler.route('/api/get_user', methods=['GET'])
 @require_auth
 @get_current_user
-def get_user_profile():
-    current_user = g.current_user
+def get_user_profile(current_user):
     icon = None if current_user.icon is None else \
         "http://%s.s3.%s.amazonaws.com/%s" % (S3_BUCKET, S3_REGION, current_user.icon)
 

@@ -1,4 +1,4 @@
-from flask import jsonify, Blueprint, request, g
+from flask import jsonify, Blueprint, request
 from models import User
 from api import db
 import stripe
@@ -17,8 +17,7 @@ def get_price_val(data):
 @payment_handler.route("/api/get_stripe_intent", methods=["GET"])
 @require_auth
 @get_current_user
-def get_stripe_intent():
-    user = g.current_user
+def get_stripe_intent(user):
     stripe.api_key = app.app.config['STRIPE_SK']
 
     if user.stripe_id is None:
