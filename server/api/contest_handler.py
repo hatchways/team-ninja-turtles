@@ -1,7 +1,7 @@
 import json
 from flask import jsonify, Blueprint, request
 from api import db
-from models import Contest, Submission, User, InspirationalImage
+from models import Contest, Submission, User, InspirationalImage, InspirationalImageContestLink
 from api.middleware import require_auth, get_current_user
 from datetime import date, datetime
 contest_handler = Blueprint('contest_handler', __name__)
@@ -65,8 +65,10 @@ def get_all_contests():
         for pair in all_contests:
             user, contest = pair
             if (user is not None) and (contest is not None):
+                # Load contest inspirational image
+                ins_image_link = db.session.query(InspirationalImage.image_link).join(InspirationalImageContestLink, InspirationalImageContestLink.image_id==InspirationalImage.id).filter_by(contest_id=contest.id).first()
                 lst.append({
-                    "img": 0,
+                    "img": ins_image_link,
                     "name": contest.title,
                     "creator": user.username,
                     "prize": contest.prize_contest,
@@ -74,7 +76,7 @@ def get_all_contests():
                     "desc": contest.description
                 })
 
-        return jsonify(lst), 201
+        return jsonify(lst), 200
 
 
 @contest_handler.route('/contest/<contest_id>', methods=['PUT', 'GET'])
