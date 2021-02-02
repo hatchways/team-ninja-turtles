@@ -4,10 +4,11 @@ from api.middleware import require_auth
 from flask_socketio import send, emit, join_room
 import jwt
 from models import User, RoomSession, Message
-from app import app
+from sqlalchemy import or_
+import app
 
 
-socketio_handler = Blueprint('socketio_new_handler', __name__)
+socketio_handler = Blueprint('socketio_handler', __name__)
 
 
 @socketio.on("message")
@@ -27,12 +28,35 @@ def on_join(data):
     return None
 
 
-@socketio.route("/message-log")
+@socketio_handler.route("/get_all_session", methods=["GET"])
+@require_auth
+def get_all_session():
+    token = request.cookies.get("auth_token")
+    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
+    username = data['user']
+    user = User.query.filter_by(username=username).first()
+
+    result = []
+
+    for session in user.sessions:
+        target_user = session.users[1] if session.users[0].username == username else session.users[0]
+        result.append({
+            "session_id": session.id,
+            "user": {
+                "username": target_user.username,
+                "icon": target_user.icon
+            }
+        })
+
+    return jsonify(result), 201
+
+
+@socketio_handler.route("/message_log")
 @require_auth
 def get_log():
     session = RoomSession.query.filter_by(id=request.json['session']).first()
     token = request.cookies.get("auth_token")
-    data = jwt.decode(token, app.config['JWT_SECRET'], algorithms=['HS256'])
+    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
     user = data['user']
 
     if session is None:
@@ -54,18 +78,22 @@ def get_log():
     return jsonify(log), 201
 
 
-@socketio.route("/create-room")
+@socketio_handler.route("/create_room", methods=['POST'])
 @require_auth
 def create_room():
     token = request.cookies.get("auth_token")
-    data = jwt.decode(token, app.config['JWT_SECRET'], algorithms=['HS256'])
-    users = [User.query.filter_by(username=data['user']).first(),
-             User.query.filter_by(username=request.json['user']).first()]
+    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
+    users = [data['user'], request.get_json().get('user')]
 
-    session = RoomSession.query.filter(RoomSession.user1.in_(users), RoomSession.user2.in_(users)).first()
+    session = RoomSession.query.filter(RoomSession.users.any(User.username == users[0])).\
+        filter(RoomSession.users.any(User.username == users[1])).first()
 
     if session is None:
-        session = RoomSession(user1=users[0].id, user2=users[1].id)
+        session = RoomSession()
+        user1 = User.query.filter_by(username=users[0]).first()
+        user2 = User.query.filter_by(username=users[1]).first()
+        session.users.append(user1)
+        session.users.append(user2)
         db.session.add(session)
         db.session.commit()
 
