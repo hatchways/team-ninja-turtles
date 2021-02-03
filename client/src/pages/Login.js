@@ -2,7 +2,8 @@ import { Button, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
 import React, { useContext, useState } from "react";
 import RequestError, { login, getProfile } from "../apiCalls";
-import {UserContext} from "../App"
+import { UserContext } from "../App"
+import { useHistory } from "react-router-dom"
 
 const warningMsg = {
     emptyFieldError: "Required",
@@ -32,6 +33,7 @@ const useStyles = makeStyles(theme => ({
 const Login = () => {
     const classes = useStyles();
     const {user, setUser} = useContext(UserContext);
+    const history = useHistory();
     const [username, setUsername] =  useState("");
     const [password, setPassword ] = useState("");
     const [usernameWarning, setUsernameWarning] = useState("");
@@ -77,15 +79,24 @@ const Login = () => {
                         icon: (data.icon == null) ? process.env.PUBLIC_URL + 'images/avatar-1.png' : data.icon,
                         email: data.email
                     })
-                    console.log(data)
+                    history.push("/")
                 }, (error) => {
-                    console.log(error)
+                    console.log("Unexpected Error")
                 })
             },  (error) => {
                 // onError
                 console.log(error)
                 if (error instanceof RequestError && error.status === 400) {
-                    console.log(error.body)
+                    const errMsg = error.body
+                    if (errMsg.password_error) {
+                        setPasswordError(true)
+                        setPasswordWarning(errMsg.password_error)
+                    }
+
+                    if (errMsg.user_error) {
+                        setUsernameError(true)
+                        setUsernameWarning(errMsg.user_error)
+                    }
                 } else {
                     console.log("unexpected error")
                 }

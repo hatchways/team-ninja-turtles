@@ -6,7 +6,6 @@ import jwt
 from datetime import datetime, timedelta
 import app
 from config import S3_BUCKET, S3_REGION
-import os
 
 
 user_handler = Blueprint("user_handler", __name__)
@@ -30,10 +29,19 @@ def register():
 
     # check input errors
     if len(password) < 6:
-        return jsonify({"Error": "Password must have at least 6 characters."}), 400
+        return jsonify({"password_error": "Password must have at least 6 characters."}), 400
 
-    if User.query.filter_by(email=email, username=username).first() is not None:
-        return jsonify({"error": "email or username already exist"}), 400
+    check_user = User.query.filter((User.email == email) | (User.username == username)).all()
+
+    if len(check_user) > 0:
+        check_username = map(lambda x: x.username, check_user)
+        check_email = map(lambda x: x.email, check_user)
+        response = {}
+        if username in check_username:
+            response['user_error'] = "username already exist"
+        if email in check_email:
+            response['email_error'] = "email already exist"
+        return jsonify(response), 400
 
     user = User(username=username, email=email, password=bcrypt.generate_password_hash(password).decode('utf-8'))
     db.session.add(user)
@@ -53,22 +61,22 @@ def login():
     request_json = request.get_json()
 
     if request_json is None:
-        return jsonify({"Error": "required input missing"}), 400
+        return jsonify({"error": "required input missing"}), 400
 
     username = request_json.get("username")
     password = request_json.get("password")
 
     # input missing
     if username is None or password is None:
-        return jsonify({"Error": "required input missing"}), 400
+        return jsonify({"error": "required input missing"}), 400
 
     user = User.query.filter_by(username=username).first()
 
     if user is None:
-        return jsonify({"Error": "user does not exist"}), 400
+        return jsonify({"user_error": "user does not exist"}), 400
 
     if not bcrypt.check_password_hash(user.password, password):
-        return jsonify({"Error": "incorrect password"}), 400
+        return jsonify({"password_error": "incorrect password"}), 400
 
     token = jwt.encode({"user": username, "exp": datetime.utcnow() + timedelta(minutes=exp)}, \
                        app.app.config['JWT_SECRET'])

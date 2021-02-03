@@ -1,6 +1,7 @@
 import { Button, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
 import React, { useContext, useState } from "react";
+import { useHistory } from "react-router-dom";
 import RequestError, {getProfile, register} from "../apiCalls"
 import { UserContext } from "../App";
 
@@ -31,6 +32,7 @@ const useStyles = makeStyles(theme => ({
 
 const Signup = () => {
     const classes = useStyles();
+    const history = useHistory();
     const {user, setUser} = useContext(UserContext);
     const [username, setUsername] =  useState("");
     const [email, setEmail] = useState("")
@@ -104,14 +106,29 @@ const Signup = () => {
                         icon: process.env.PUBLIC_URL + 'images/avatar-1.png',
                         email: data.email
                     })
-                    console.log(data)
+                    history.push("/")
                 }, (error) => {
                     console.log(error)
                 })
             }, (error) => {
                 // onError
                 if (error instanceof RequestError && error.status === 400) {
-                    console.log(error.body)
+                    const errMsg = error.body
+                    console.log(errMsg)
+                    if (errMsg.password_error) {
+                        setPasswordError(true)
+                        setPasswordWarning(errMsg.password_error)
+                    }
+
+                    if (errMsg.user_error) {
+                        setUsernameError(true)
+                        setUsernameWarning(errMsg.user_error)
+                    }
+
+                    if (errMsg.email_error) {
+                        setEmailError(true)
+                        setEmailWarning(errMsg.email_error)
+                    }
                 } else {
                     console.log("unexpected error")
                 }
