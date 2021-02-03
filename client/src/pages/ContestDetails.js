@@ -127,11 +127,9 @@ export default function ContestDetails(props) {
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
     const [openDesignDialog, setOpenDesignDialog] = useState(false)
-    const [openInspirationalImageDialog, setOpenInspirationalImageDialog] = useState(false)
     const [contest, setContest] = useState(null)
     const [designOpening, setDesignOpening] = useState({})
     const [gridListItems, setGridListItems] = useState(null)
-    const [tabLable, setTabLable] = useState("Inspirational Images")
     const [submitButton, setSubmitButton] = useState(null)
     const [winningSubmission, setWinningSubmission] = useState(null)
     const contestId = props.match.params.id
@@ -143,7 +141,6 @@ export default function ContestDetails(props) {
 
     const handleClose = () => {
         setOpenDesignDialog(false);
-        setOpenInspirationalImageDialog(false);
     }
 
     const handleWinnerChange = e => {
@@ -174,14 +171,6 @@ export default function ContestDetails(props) {
         }
     }
 
-    const onInspirationalImageClick = e => {
-        const index = e.target.id
-        if (index) {
-            setDesignOpening(contest.attached_inspirational_images[index])
-            setOpenInspirationalImageDialog(true)
-        }
-    }
-
     const getContestInfo = contestId => {
         getContestDetails(contestId, (data) => {
             console.log(data)
@@ -203,7 +192,7 @@ export default function ContestDetails(props) {
     useEffect(() => {
         if (contest) {
             var newGridListItems = null
-            if (contest.hasOwnProperty('designs')) { // If contest does not have property 'designs', that means it is not the contest owner accessing the page
+            if (contest.hasOwnProperty('is_owner')) { // If contest does not have property 'designs', that means it is not the contest owner accessing the page
                 if (contest.designs.length > 0) { // Render this if it is the contest owner and there have been designs submitted
                     newGridListItems = contest.designs.map((design, index) => (
                         <GridListTile key={index}>
@@ -227,18 +216,17 @@ export default function ContestDetails(props) {
                 } else {
                     newGridListItems = <div>There is no images to display</div>
                 }
-                setTabLable("Designs")
             } else { // Render this if it is not the contest owner
                 if (contest.attached_inspirational_images.length > 0) {
-                    newGridListItems = contest.attached_inspirational_images.map((attached_inspirational_images, index) => (
-                        <GridListTile key={index}>  
-                            <img src={attached_inspirational_images} alt={attached_inspirational_images.image} id={index} onClick={onInspirationalImageClick} className={classes.designImage} />
+                    newGridListItems = contest.designs.map((design, index) => (
+                        <GridListTile key={index}>
+                            <img src={design.img} alt={design.image} id={index} onClick={onDesignClick} className={classes.designImage} />
+                            <GridListTileBar title={`By @${design.creater}`}/>
                         </GridListTile>
                     ))
                 } else {
                     newGridListItems = <div>There is no images to display</div>
                 }
-                setTabLable("Inspirational Images")
                 createSubmitDesignButton()
             }
             setGridListItems(newGridListItems)
@@ -280,14 +268,6 @@ export default function ContestDetails(props) {
                             <Button onClick={handleClose} color="primary">Close</Button>
                         </DialogActions>
                     </Dialog>
-                    <Dialog open={openInspirationalImageDialog} onClose={handleClose} className={classes.dialog}>
-                        <DialogContent>
-                            <img src={designOpening} className={classes.dialogImage} />
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleClose} color="primary">Close</Button>
-                        </DialogActions>
-                    </Dialog>
                     <div className={classes.backButtonDiv}>
                         <div className={classes.backButton} onClick={onBackButtonClick}>
                             <Typography className={classes.backButtonIcon}>{`<`}</Typography>
@@ -321,7 +301,7 @@ export default function ContestDetails(props) {
                                 variant='fullWidth'
                                 TabIndicatorProps={{ style: { background:'black' }}}
                             >
-                                <Tab label={tabLable} />
+                                <Tab label='DESIGNS' />
                                 <Tab label='BRIEF' />
                             </Tabs>
                             <TabPanel value={activeTab} index={0} className={classes.tabPanel}>

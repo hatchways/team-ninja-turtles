@@ -106,20 +106,23 @@ def get_contest(contest_id):
         if contest_creater_user == current_user: # Owner is trying to access, return designs as well
             #Load submissions
             allSubmissions = db.session.query(Submission, User.username).filter_by(contest_id=contest_id).join(User, User.id == Submission.submiter_id).all()
+            setattr(contest, 'is_owner', True)
+        else:
+            allSubmissions = db.session.query(Submission, User.username).filter_by(contest_id=contest_id, submiter_id=current_user.id).join(User, User.id == Submission.submiter_id).all()
 
-            formatedSubmissions = []
+        formatedSubmissions = []
 
-            for pair in allSubmissions:
-                submission, username = pair
-                formatedSubmissions.append({
-                    "img": submission.image_link,
-                    "submission_id": submission.id,
-                    "creater": username
-                })
-            setattr(contest, 'designs', formatedSubmissions)
+        for pair in allSubmissions:
+            submission, username = pair
+            formatedSubmissions.append({
+                "img": submission.image_link,
+                "submission_id": submission.id,
+                "creater": username
+            })
             
         attached_inspirational_images = json.loads(get_contest_inspirational_images(contest_id).data)
     # Return contest contents
+        setattr(contest, 'designs', formatedSubmissions)
         setattr(contest, 'creater_name', contest_creater_user.username)
         setattr(contest, 'attached_inspirational_images', attached_inspirational_images)
         return json.dumps(contest.__dict__, default=str)
