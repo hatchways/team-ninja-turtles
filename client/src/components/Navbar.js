@@ -60,13 +60,35 @@ export default function Navbar() {
     return (
         <AppBar position='static' className={classes.appBar}>
             <Toolbar className={classes.toolBar}>
-                <Typography component={Link} to={'/'} variant='h6' className={classes.branchName}>
+                <Typography
+                    component={Link} to={'/'}
+                    variant='h6'
+                    className={classes.branchName}
+                >
                     Tattoo Art
                 </Typography>
                 <div className={classes.navItems}>
-                    <Button color='inherit' className={classes.navItem}>Discover</Button>
-                    <Button color='inherit' className={classes.navItem}>Messages</Button>
-                    <Button color='inherit' className={classes.navItem}>Notifications</Button>
+                    <Button
+                        component={Link} to={'/'} 
+                        color='inherit'
+                        className={classes.navItem}
+                    >
+                        Discover
+                    </Button>
+                    <Button
+                        component={Link} to={'/message'} 
+                        color='inherit'
+                        className={classes.navItem}
+                    >
+                        Messages
+                    </Button>
+                    {/* <Button
+                        component={Link} to={'/notifications'} 
+                        color='inherit'
+                        className={classes.navItem}
+                    >
+                        Notifications
+                    </Button> */}
                     <Button 
                         component={Link} to={'/create-contest'} 
                         color='inherit' 
@@ -76,7 +98,13 @@ export default function Navbar() {
                         Create Contest
                     </Button>
                     <img src={user.icon} alt='avatar' className={classes.avatar}/>
-                    <Button color='inherit' className={classes.accountLink}>Account</Button>
+                    <Button
+                        component={Link} to={'/profile'} 
+                        color='inherit'
+                        className={classes.accountLink}
+                    >
+                        Account
+                    </Button>
                 </div>
             </Toolbar>
         </AppBar>
