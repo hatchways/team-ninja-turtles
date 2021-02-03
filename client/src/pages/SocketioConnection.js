@@ -42,7 +42,6 @@ function Socketio() {
   }, [])
 
   const addMessage = useCallback(({name, message, time}) => {
-    console.log(messageLog)
     setMessageLog([...messageLog, {text:message, user:name, timestamp:time}])
   }, [messageLog])
   
@@ -50,7 +49,6 @@ function Socketio() {
     if (room.session >= 0) {
       socket.emit("join", room.session)
       getMsgLog(room.session, (data) => {
-        console.log(data)
         setMessageLog(data)
       }, (error) => {
         console.log(error.body)
@@ -109,7 +107,7 @@ function Socketio() {
                         {message.text}
                       </div>
                       <div className={`text-muted small ${fromMe ? 'text-right' : ''}`}>
-                        {message.fromMe ? 'You' : message.user}
+                        {fromMe ? 'You' : message.user}
                       </div>
                     </div>
                   )
