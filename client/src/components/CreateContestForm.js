@@ -140,7 +140,7 @@ export default function CreateContestForm() {
         getInspirationalImages(createGridListTiles, // Sets images equal to return from get request
             (error) => {
             // onError
-            if (error instanceof RequestError && error.response.status === 400) {
+            if (error instanceof RequestError && error.status === 400) {
                 console.log(error.response.json())
             } else {
                 console.log(error)

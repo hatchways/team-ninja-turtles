@@ -11,7 +11,6 @@ import json
 inspirational_images_handler = Blueprint("inspirational_images_handler", __name__)
 
 @inspirational_images_handler.route('/inspirational_images_migration')
-@require_auth
 def migrateImages():
     s3_resource = boto3.resource('s3')
     my_bucket = s3_resource.Bucket(S3_BUCKET)
