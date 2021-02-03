@@ -121,3 +121,18 @@ def get_user_profile():
 @require_auth
 def protected():
     return jsonify({"message": "hello"}), 200
+
+
+@user_handler.route('/api/search_user', methods=['GET'])
+def search_user():
+    contains = request.args.get('contains')
+
+    users = User.query.filter(User.username.ilike("%%%s%%" % contains)).all()
+
+    result = []
+    for user in users:
+        result.append({
+            "username": user.username,
+            "icon": user.icon
+        })
+    return jsonify(result), 201

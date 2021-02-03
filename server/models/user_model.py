@@ -13,4 +13,6 @@ class User(db.Model):
     stripe_id = db.Column(db.String())  # caller have to manually provide this.
     icon = db.Column(db.String())
     contests = db.relationship('Contest', backref="creator")
+    messages = db.relationship('Message', backref="user")
+
 
