@@ -1,4 +1,4 @@
-import { Button, TextField } from "@material-ui/core";
+import { Button, Paper, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
 import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -20,6 +20,12 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+    },
+    box: {
+        marginTop: "3%",
+        marginLeft: "37%",
+        marginRight: "37%",
+        padding: "3%"
     },
     textField: {
         marginTop: theme.spacing(5),
@@ -138,73 +144,75 @@ const Signup = () => {
 
     return (
         <form className={classes.root}>
-            <div className={classes.container}>
-                <h1>Sign Up</h1>
-            </div>
+            <Paper className={classes.box}>
+                <div className={classes.container}>
+                    <h1>Sign Up</h1>
+                </div>
 
-            <div className={classes.container}>
-                <TextField
-                    id="email" label="Email" 
-                    value={email}
-                    error={emailError}
-                    helperText={emailWarning}
-                    variant="outlined"
-                    onChange={onEmailChange}
-                    onBlur={event => blurred(event, email, setEmailError, setEmailWarning)}
-                    className={classes.textField}
-                />
-            </div>
+                <div className={classes.container}>
+                    <TextField
+                        id="email" label="Email" 
+                        value={email}
+                        error={emailError}
+                        helperText={emailWarning}
+                        variant="outlined"
+                        onChange={onEmailChange}
+                        onBlur={event => blurred(event, email, setEmailError, setEmailWarning)}
+                        className={classes.textField}
+                    />
+                </div>
 
-            <div className={classes.container}>
-                <TextField
-                    id="username" label="Username" 
-                    value={username}
-                    error={usernameError}
-                    helperText={usernameWarning}
-                    variant="outlined"
-                    onChange={onUsernameChange}
-                    onBlur={event => blurred(event, username, setUsernameError, setUsernameWarning)}
-                    className={classes.textField}
-                />
-            </div>
-            
-            <div className={classes.container}>
-                <TextField 
-                    id="password" 
-                    label="Password"
-                    value={password}
-                    type={"password"}
-                    error={passwordError}
-                    helperText={passwordWarning}
-                    variant="outlined"
-                    onChange={onPasswordChange}
-                    onBlur={event => blurred(event, password, setPasswordError, setPasswordWarning)}
-                    className={classes.textField}
-                /> 
-            </div>
+                <div className={classes.container}>
+                    <TextField
+                        id="username" label="Username" 
+                        value={username}
+                        error={usernameError}
+                        helperText={usernameWarning}
+                        variant="outlined"
+                        onChange={onUsernameChange}
+                        onBlur={event => blurred(event, username, setUsernameError, setUsernameWarning)}
+                        className={classes.textField}
+                    />
+                </div>
+                
+                <div className={classes.container}>
+                    <TextField 
+                        id="password" 
+                        label="Password"
+                        value={password}
+                        type={"password"}
+                        error={passwordError}
+                        helperText={passwordWarning}
+                        variant="outlined"
+                        onChange={onPasswordChange}
+                        onBlur={event => blurred(event, password, setPasswordError, setPasswordWarning)}
+                        className={classes.textField}
+                    /> 
+                </div>
 
-            <div className={classes.container}>
-                <TextField 
-                    id="confirmPW" 
-                    label="Confirm Password"
-                    value={confirmPW}
-                    type={"password"}
-                    error={confirmPWError}
-                    helperText={confirmPWWarning}
-                    variant="outlined"
-                    onChange={onConfirmPWChange}
-                    onBlur={event => blurred(event, confirmPW, setConfirmPWError, setConfirmPWWarning)}
-                    className={classes.textField}
-                /> 
-            </div>
+                <div className={classes.container}>
+                    <TextField 
+                        id="confirmPW" 
+                        label="Confirm Password"
+                        value={confirmPW}
+                        type={"password"}
+                        error={confirmPWError}
+                        helperText={confirmPWWarning}
+                        variant="outlined"
+                        onChange={onConfirmPWChange}
+                        onBlur={event => blurred(event, confirmPW, setConfirmPWError, setConfirmPWWarning)}
+                        className={classes.textField}
+                    /> 
+                </div>
 
-            <div className={classes.container}>
-                <Button onClick={submit} variant="outlined" className={classes.button}>Sign Up</Button>
-            </div>
+                <div className={classes.container}>
+                    <Button onClick={submit} variant="outlined" className={classes.button}>Sign Up</Button>
+                </div>
 
-            <div className={classes.container}>
-                <Button onClick={() => history.push("/login")} className={classes.button}>Already Has an Account? Log-in</Button>
-            </div>
+                <div className={classes.container}>
+                    <Button onClick={() => history.push("/login")} className={classes.button}>Already Has an Account? Log-in</Button>
+                </div>
+            </Paper>
         </form>
     );
 }

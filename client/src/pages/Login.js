@@ -1,4 +1,4 @@
-import { Button, TextField } from "@material-ui/core";
+import { Button, Paper, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
 import React, { useContext, useState } from "react";
 import RequestError, { login, getProfile } from "../apiCalls";
@@ -15,6 +15,12 @@ const warningMsg = {
 const useStyles = makeStyles(theme => ({
     root: {
         alignItems: "center",
+    },
+    box: {
+        marginTop: "3%",
+        marginLeft: "37%",
+        marginRight: "37%",
+        padding: "3%"
     },
     container: {
         display: "flex",
@@ -106,45 +112,47 @@ const Login = () => {
 
     return (
         <form className={classes.root}>
-            <div className={classes.container}>
-                <h1>Log In</h1>
-            </div>
+            <Paper className={classes.box}>
+                <div className={classes.container}>
+                    <h1>Log In</h1>
+                </div>
 
-            <div className={classes.container}>
-                <TextField
-                    id="username" label="Username" 
-                    value={username}
-                    error={usernameError}
-                    helperText={usernameWarning}
-                    variant="outlined"
-                    onChange={onUsernameChange}
-                    onBlur={event => blurred(event, username, setUsernameError, setUsernameWarning)}
-                    className={classes.textField}
-                />
-            </div>
-            
-            <div className={classes.container}>
-                <TextField 
-                    id="password" 
-                    label="Password"
-                    value={password}
-                    type={"password"}
-                    error={passwordError}
-                    helperText={passwordWarning}
-                    variant="outlined"
-                    onChange={onPasswordChange}
-                    onBlur={event => blurred(event, password, setPasswordError, setPasswordWarning)}
-                    className={classes.textField}
-                /> 
-            </div>
+                <div className={classes.container}>
+                    <TextField
+                        id="username" label="Username" 
+                        value={username}
+                        error={usernameError}
+                        helperText={usernameWarning}
+                        variant="outlined"
+                        onChange={onUsernameChange}
+                        onBlur={event => blurred(event, username, setUsernameError, setUsernameWarning)}
+                        className={classes.textField}
+                    />
+                </div>
+                
+                <div className={classes.container}>
+                    <TextField 
+                        id="password" 
+                        label="Password"
+                        value={password}
+                        type={"password"}
+                        error={passwordError}
+                        helperText={passwordWarning}
+                        variant="outlined"
+                        onChange={onPasswordChange}
+                        onBlur={event => blurred(event, password, setPasswordError, setPasswordWarning)}
+                        className={classes.textField}
+                    /> 
+                </div>
 
-            <div className={classes.container}>
-                <Button onClick={submit} variant="outlined" className={classes.button}>Login</Button>
-            </div>
+                <div className={classes.container}>
+                    <Button onClick={submit} variant="outlined" className={classes.button}>Login</Button>
+                </div>
 
-            <div className={classes.container}>
-                <Button onClick={() => history.push("/signin")} className={classes.button}>Not Registered? Sign-up</Button>
-            </div>
+                <div className={classes.container}>
+                    <Button onClick={() => history.push("/signin")} className={classes.button}>Not Registered? Sign-up</Button>
+                </div>
+            </Paper>
         </form>
     );
 }
