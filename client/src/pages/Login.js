@@ -150,7 +150,7 @@ const Login = () => {
                 </div>
 
                 <div className={classes.container}>
-                    <Button onClick={() => history.push("/signin")} className={classes.button}>Not Registered? Sign-up</Button>
+                    <Button onClick={() => history.push("/signup")} className={classes.button}>Not Registered? Sign-up</Button>
                 </div>
             </Paper>
         </form>
