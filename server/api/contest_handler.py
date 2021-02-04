@@ -12,7 +12,8 @@ contest_handler = Blueprint('contest_handler', __name__)
 
 @contest_handler.route('/contest', methods=['POST'])
 @require_auth
-def create_contest():
+@get_current_user
+def create_contest(current_user):
     # Create new contests
     if request.method == 'POST':
         request_json = request.get_json()
@@ -22,7 +23,7 @@ def create_contest():
         prize_contest = request_json.get("prize_contest")
         deadline_date = datetime.strptime(request_json.get("deadline_date"), "%Y-%m-%dT%H:%M:%S.%fZ")
         update_time = datetime.utcnow()
-        contest_creator = request_json.get('contest_creator')
+        contest_creator = current_user.id
         inspirational_images = request_json.get('inspirational_images')
 
         # Do any images exist?
@@ -197,8 +198,7 @@ def set_contest_winner():
     winning_submission_id = request_json.get("winning_submission_id")
     try:
         contest = Contest.query.get(contest_id)
-        winner = User.query.get(winning_submission_id)
-        if contest == None or winner == None:
+        if contest == None:
             raise Exception
     except Exception as e:
         return jsonify("Contest or winning user does not exist", str(e))

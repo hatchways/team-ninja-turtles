@@ -21,7 +21,7 @@ import {
     Radio,
 } from '@material-ui/core'
 
-import RequestError, { getContestDetails, setContestWinner } from '../apiCalls'
+import RequestError, { getContestDetails, setContestWinner, checkStripeIDExists, createPayment } from '../apiCalls'
 
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
@@ -120,6 +120,12 @@ const useStyles = makeStyles((theme) => ({
     dialogImage: {
         width: '100%',
         height: '100%'
+    },
+    contestOverText: {
+        color: 'red',
+        backgroundColor: '#1f1f1f',
+        fontSize: '1.5rem',
+        padding: '1rem'
     }
 }))
 
@@ -147,17 +153,44 @@ export default function ContestDetails(props) {
         setWinningSubmission(parseInt(e.target.value))
     }
 
-    const onWinnerSubmit = e => {
-        setContestWinner(contestId, winningSubmission, data => {
-            console.log('Winner Successfully Declared')
-        }, error => {
-            if (error instanceof RequestError && error.status === 400) {
-                console.log(error.body)
-            } else {
-                console.log("unexpected error")
+    const onWinnerSubmit = async(e) => {
+        var intentSecret = null
+        checkStripeIDExists( // check if payment is set up before allow user submit a winner 
+            (data) => {
+                intentSecret = data["intent_id"]
+                console.log(intentSecret)
+                if (intentSecret != null){
+                    let amount = contest.prize_contest
+                    let currency = 'usd'
+
+                    createPayment(amount, currency, data => {
+                        console.log(data.msg)
+
+                        setContestWinner(contestId, winningSubmission, data => {
+                            alert('Winner Successfully Declared')
+                            console.log('Winner Successfully Declared')
+                            getContestInfo(contestId)
+                        }, error => {
+                            if (error instanceof RequestError && error.status === 400) {
+                                console.log(error.body)
+                            } else {
+                                console.log("unexpected error")
+                            }
+                        })
+                        
+                    }, error => {   
+                        console.log("unexpected error")
+                    })
+
+                   
+                } else {
+                    alert("Please set up your payment before selecting a winner.")
+                }
+            },
+            (error) => {
+                alert("Please set up your payment before selecting a winner.")
             }
-        })
-        getContestInfo(contestId)
+        )
     }
     const onBackButtonClick = e => {
         history.push('/profile')
@@ -227,7 +260,9 @@ export default function ContestDetails(props) {
                 } else {
                     newGridListItems = <div>There is no images to display</div>
                 }
-                createSubmitDesignButton()
+                if (Date.parse(contest.deadline_date) < Date.now() && contest.winner == null) {
+                    createSubmitDesignButton()
+                }
             }
             setGridListItems(newGridListItems)
         }
@@ -293,6 +328,7 @@ export default function ContestDetails(props) {
                             </Grid>
                         </Grid>
                     </div>
+                    {contest.winner !== null ? <div className={classes.contestOverText}>This contest is over</div> : <div></div>}
                     <div className={classes.contestDesigns}>
                         <Paper>
                             <Tabs

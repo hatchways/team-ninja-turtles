@@ -128,8 +128,7 @@ export default function CreateContestForm() {
         const minutes = time.substr(3, 5)
         deadline.setHours(hours)
         deadline.setMinutes(minutes)
-        const contestCreator = 1
-        createContest(title, description, amount, deadline, contestCreator, checkedInspireationalImages, data => {
+        createContest(title, description, amount, deadline, checkedInspireationalImages, data => {
             alert('contest has been successfully created!')
             history.push(`/contest-details/${data.contest_id}`)
         }, error => {
