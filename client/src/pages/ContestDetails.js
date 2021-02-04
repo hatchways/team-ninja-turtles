@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
@@ -22,6 +22,7 @@ import {
 } from '@material-ui/core'
 
 import RequestError, { getContestDetails, setContestWinner } from '../apiCalls'
+import { UserContext } from '../App'
 
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
@@ -125,6 +126,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ContestDetails(props) {
     const classes = useStyles()
+    const {user, setUser} = useContext(UserContext)
     const [activeTab, setActiveTab] = useState(0)
     const [openDesignDialog, setOpenDesignDialog] = useState(false)
     const [contest, setContest] = useState(null)
@@ -289,7 +291,7 @@ export default function ContestDetails(props) {
                                     <div className={classes.prizeAmount}>${contest.prize_contest}</div>
                                 </div>
                                 <div className={classes.author}>
-                                    <img src={`${process.env.PUBLIC_URL}/images/avatar-${contest.contest_creater}.png`} onClick={onProfileClick} alt='designer avatar' className={classes.avatar} />
+                                    <img src={user.icon} onClick={onProfileClick} alt='designer avatar' className={classes.avatar} />
                                     <Typography onClick={onProfileClick} variant='h5'>{contest.creater_name}</Typography>
                                 </div>
                             </Grid>
