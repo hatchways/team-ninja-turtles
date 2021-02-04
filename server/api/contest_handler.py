@@ -53,7 +53,8 @@ def create_contest():
 def get_all_ongoing_contests():
     # Do any contests exist?
     try:
-        all_contests = db.session.query(User, Contest).outerjoin(Contest, Contest.contest_creater == User.id).all()
+        contains = request.args.get('contains')
+        all_contests = db.session.query(User, Contest).outerjoin(Contest, Contest.contest_creater == User.id).filter(Contest.title.ilike("%%%s%%" % contains)).all()
         if not bool(all_contests):
             raise Exception("no contest")
     except Exception as e:
