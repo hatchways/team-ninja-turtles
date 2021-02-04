@@ -53,10 +53,11 @@ def create_contest():
 
 @contest_handler.route('/contests', methods=['GET'])
 @require_auth
-def get_all_contests():
+def get_all_ongoing_contests():
     # Do any contests exist?
     try:
-        all_contests = db.session.query(User, Contest).outerjoin(Contest, Contest.contest_creater == User.id).all()
+        contains = request.args.get('contains')
+        all_contests = db.session.query(User, Contest).outerjoin(Contest, Contest.contest_creater == User.id).filter(Contest.title.ilike("%%%s%%" % contains)).all()
         if not bool(all_contests):
             raise Exception("no contest")
     except Exception:
@@ -66,7 +67,7 @@ def get_all_contests():
         lst = []
         for pair in all_contests:
             user, contest = pair
-            if (user is not None) and (contest is not None):
+            if (user is not None) and (contest is not None) and contest.deadline_date > datetime.utcnow():
                 # Load contest inspirational image
                 ins_image_link = db.session.query(InspirationalImage.image_link).join(InspirationalImageContestLink, InspirationalImageContestLink.image_id==InspirationalImage.id).filter_by(contest_id=contest.id).first()
                 lst.append({
