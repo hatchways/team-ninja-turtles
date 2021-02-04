@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
+import { useHistory } from 'react-router-dom'
+
 import {
     Grid,
     TextField,
@@ -87,6 +89,7 @@ export default function CreateContestForm() {
     const [amountHelperText, setAmountHelperText] = useState('')
     const [addImageLink, setImageLink] = useState('')
     const [checkedInspireationalImages, setChecked] = useState([])
+    const history = useHistory()
 
     const onAmountChange = e => {
         if (e.target.value < 0) {
@@ -98,7 +101,7 @@ export default function CreateContestForm() {
             setAmountHelperText('')
         }
     }
-    const handleChange = (event) => {
+    const handleCheckboxChange = (event) => {
         const newChecked = checkedInspireationalImages
         if (event.target.checked) {
             newChecked.push(event.target.name)
@@ -127,7 +130,8 @@ export default function CreateContestForm() {
         deadline.setMinutes(minutes)
         const contestCreator = 1
         createContest(title, description, amount, deadline, contestCreator, checkedInspireationalImages, data => {
-            console.log('contest has been successfully created!')
+            alert('contest has been successfully created!')
+            history.push(`/contest-details/${data.contest_id}`)
         }, error => {
             if (error instanceof RequestError && error.status === 400) {
                 console.log(error.body)
@@ -140,7 +144,7 @@ export default function CreateContestForm() {
         getInspirationalImages(createGridListTiles, // Sets images equal to return from get request
             (error) => {
             // onError
-            if (error instanceof RequestError && error.response.status === 400) {
+            if (error instanceof RequestError && error.status === 400) {
                 console.log(error.response.json())
             } else {
                 console.log(error)
@@ -169,7 +173,7 @@ export default function CreateContestForm() {
                                     className={classes.title}
                                     name={String(imageKey)}
                                     color="primary"
-                                    onChange={handleChange}
+                                    onChange={handleCheckboxChange}
                                 />
                             </IconButton>
                         }

@@ -1,6 +1,7 @@
 from flask import jsonify, Blueprint, request
 from api import db, s3
 from models import Contest, Submission, User
+from api.middleware import require_auth, get_current_user
 from config import S3_BUCKET, S3_REGION
 from datetime import date, datetime
 import jwt
@@ -9,15 +10,9 @@ submission_handler = Blueprint('submission_new_handler', __name__)
 
 
 @submission_handler.route('/contestImage/submission/<contest_id>', methods=['POST'])
-def create_submission(contest_id):
-    token = request.cookies.get("auth_token")
-
-    if token is None:
-        return jsonify({"error": "auth_token missing"}), 401
-
-    username = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])['user']
-    current_user = User.query.filter_by(username=username).first()
-
+@require_auth
+@get_current_user
+def create_submission(current_user, contest_id):
     # Replace all the ":" and " " with other charachters to have a consistent URL.
     # AWS would replace these charachters with others such as "+" or "%" and the link in the database would not match the actual link on AWS.
     file_name = (str(datetime.now()) + "_" + request.form["file_name"]).replace(":", "-").replace(" ", "_")

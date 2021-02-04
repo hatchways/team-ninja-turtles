@@ -113,4 +113,13 @@ export const getInspirationalImages = async (onSuccess, onError) => {
     get(`/inspirational_images`, {"Content-Type": "application/json"}, onSuccess, onError)
 }
 
+export const setContestWinner = async (contest_id, winning_submission_id, onSuccess, onError) => {
+    const data = {
+        'contest_id': contest_id,
+        'winning_submission_id': winning_submission_id
+    }
+    
+    makeRequest("/contest_winner", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
+}
+
 export default RequestError;
