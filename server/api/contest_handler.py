@@ -45,7 +45,7 @@ def create_contest():
                     break
         db.session.add(new_contest)
         db.session.commit()
-        return jsonify({'successMessage': "Sucessfully created contest"})
+        return jsonify({'successMessage': "Sucessfully created contest", 'contest_id': new_contest.id})
 
 
 @contest_handler.route('/contests', methods=['GET'])
