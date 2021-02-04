@@ -317,7 +317,7 @@ export default function ContestDetails(props) {
                                 </GridList>
                             </TabPanel>
                             <TabPanel value={activeTab} index={1}>
-                                Tab 2
+                                {contest.description}
                             </TabPanel>
                         </Paper>
                     </div>
