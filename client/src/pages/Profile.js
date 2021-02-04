@@ -63,8 +63,8 @@ export default function Profile() {
     const [profileUser, setProfileUser] = useState(null)
     const [activeTab, setActiveTab] = useState(0)
     const [contests, setContests] = useState([])    
-    const [inProgressContestCards, getInProgressContestCards] = useState([])
-    const [completedContestCards, getCompletedContestCards] = useState([])
+    const [inProgressContestCards, setInProgressContestCards] = useState([])
+    const [completedContestCards, setCompletedContestCards] = useState([])
     const [username, setUsername] = useState("")
     const [iconURL, setIconURL] = useState(process.env.PUBLIC_URL + 'images/avatar-1.png')
     const {id} = useParams()
@@ -75,19 +75,17 @@ export default function Profile() {
     }
 
     useEffect(() => { // Only runs once when first rendering
-        if (id === user.username) {
-            getOwnedContests(id, (data) => {
-                setContests(data) // Sets contests equal to return from get request
-            }, (error) => {
-                // onError
-                if (error instanceof RequestError && error.status === 400) {
-                    console.log(error.body)
-                } else {
-                    console.log("unexpected error")
-                }
-            })
-        }
-    }, [])
+        getOwnedContests(id, (data) => {
+            setContests(data) // Sets contests equal to return from get request
+        }, (error) => {
+            // onError
+            if (error instanceof RequestError && error.status === 400) {
+                console.log(error.body)
+            } else {
+                console.log("unexpected error")
+            }
+        })
+    }, [user, id])
 
     useEffect(() => {
         if (user.username === id) {
@@ -116,19 +114,19 @@ export default function Profile() {
             console.log(contests)
             const inProgressContestCards = []
             const completedContestCards = []
-            const contestsMap = new Map(Object.entries(contests))
-            for (var i = 0; i < contestsMap.size; i++) {
-                const contestName = 'contest_' + i
-                const contest = new Map(Object.entries(contestsMap.get(contestName)))
-                const deadlineDate = Date.parse(contest.get('deadline_date'))
+            for (var i = 0; i < contests.length; i++) {
+                const contest = contests[i]
+                console.log(contest)
+                const deadlineDate = Date.parse(contest.deadline)
                 if (deadlineDate > Date.now()) {
                     pushContestCard(inProgressContestCards, contest, i)
                 } else {
                     pushContestCard(completedContestCards, contest, i)
                 }
             }
-            getInProgressContestCards(inProgressContestCards)
-            getCompletedContestCards(completedContestCards)
+
+            setInProgressContestCards(inProgressContestCards)
+            setCompletedContestCards(completedContestCards)
         } catch (error) {
             if (error instanceof TypeError) {
                 // TODO: display "no ongoing contests"
@@ -158,11 +156,11 @@ export default function Profile() {
         cardList.push(
             <ContestCard 
                 key={i}
-                image='tattoo-2.png'
-                noSketches='24' 
-                title={contest.get('title')}
-                description={contest.get('description')}
-                prizeAmount={contest.get('prize_contest')}
+                image={contest.img[0]}
+                noSketches={contest.img.length} 
+                title={contest.title}
+                description={contest.description}
+                prizeAmount={contest.prize}
             />
         )
     }

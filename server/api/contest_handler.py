@@ -148,7 +148,6 @@ def get_contest(contest_id):
 
 
 @contest_handler.route('/contests/owned/<user_id>', methods=['GET'])
-@require_auth
 def get_owned_contests(user_id):
     # Do any contests exist for this user?
     try:
@@ -161,12 +160,22 @@ def get_owned_contests(user_id):
 
     # Return all contests owned by user
     else:
-        dictionary = {}
+        result = []
         counter = 0
         for contest in all_owned_contests:
-            dictionary["contest_{contest_number}".format(contest_number = counter)] = contest.__dict__
+            ins_image_link = db.session.query(InspirationalImage.image_link).\
+                join(InspirationalImageContestLink,  InspirationalImageContestLink.image_id == InspirationalImage.id).\
+                filter_by(contest_id=contest.id).first()
+
+            result.append({
+                "title": contest.title,
+                "description": contest.description,
+                "prize": contest.prize_contest,
+                "deadline": contest.deadline_date,
+                "img": ins_image_link
+            })
             counter += 1
-        return json.dumps(dictionary, default=str)
+        return jsonify(result), 200
 
 
 @contest_handler.route('/contests/submitted/to/<user_id>', methods=['GET'])

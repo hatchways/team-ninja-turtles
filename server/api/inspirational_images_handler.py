@@ -41,6 +41,7 @@ def addImages():
     db.session.commit()
     return jsonify({'successMessage': 'Images updated'})
 
+
 @inspirational_images_handler.route('/inspirational_images', methods=['GET'])
 @require_auth
 def getImages():
@@ -59,6 +60,7 @@ def getImages():
             dictionary[counter] = image.__dict__
             counter += 1
         return json.dumps(dictionary, default=str)
+
 
 @inspirational_images_handler.route('/inspirational_images/<contest_id>', methods=['GET'])
 @require_auth
