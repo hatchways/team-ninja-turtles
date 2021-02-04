@@ -1,6 +1,6 @@
 from flask import jsonify, Blueprint, request
 from api import socketio, db
-from api.middleware import require_auth
+from api.middleware import require_auth, get_current_user
 from flask_socketio import send, emit, join_room
 import jwt
 from models import User, RoomSession, Message
@@ -33,16 +33,12 @@ def on_join(data):
 
 @socketio_handler.route("/get_all_session", methods=["GET"])
 @require_auth
-def get_all_session():
-    token = request.cookies.get("auth_token")
-    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
-    username = data['user']
-    user = User.query.filter_by(username=username).first()
-
+@get_current_user
+def get_all_session(user):
     result = []
 
     for session in user.sessions:
-        target_user = session.users[1] if session.users[0].username == username else session.users[0]
+        target_user = session.users[1] if session.users[0].username == user.username else session.users[0]
         result.append({
             "session": session.id,
             "user": {
@@ -56,11 +52,9 @@ def get_all_session():
 
 @socketio_handler.route("/message_log/<session_id>", methods=["GET"])
 @require_auth
-def get_log(session_id):
+@get_current_user
+def get_log(user, session_id):
     session = RoomSession.query.filter_by(id=session_id).first()
-    token = request.cookies.get("auth_token")
-    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
-    user = User.query.filter_by(username=data['user']).first()
 
     if session is None:
         return jsonify({"error": "session not found"}), 400
@@ -83,15 +77,14 @@ def get_log(session_id):
 
 @socketio_handler.route("/create_room", methods=['POST'])
 @require_auth
-def create_room():
-    token = request.cookies.get("auth_token")
-    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
-    users = [data['user'], request.get_json().get('user')]
+@get_current_user
+def create_room(user):
+    users = [user.username, request.get_json().get('user')]
 
     session = RoomSession.query.filter(RoomSession.users.any(User.username == users[0])).\
         filter(RoomSession.users.any(User.username == users[1])).first()
 
-    user1 = User.query.filter_by(username=users[0]).first()
+    user1 = user
     user2 = User.query.filter_by(username=users[1]).first()
 
     if session is None:
