@@ -57,6 +57,14 @@ export default function Navbar() {
     const classes = useStyles()
     const {user, setUser} = useContext(UserContext);
 
+    const getAccountLink = () => {
+        if (user.username === "no-user") {
+            return "/login"
+        } else {
+            return `/profile/${user.username}`
+        }
+    }
+
     return (
         <AppBar position='static' className={classes.appBar}>
             <Toolbar className={classes.toolBar}>
@@ -99,7 +107,7 @@ export default function Navbar() {
                     </Button>
                     <img src={user.icon} alt='avatar' className={classes.avatar}/>
                     <Button
-                        component={Link} to={'/profile'} 
+                        component={Link} to={getAccountLink} 
                         color='inherit'
                         className={classes.accountLink}
                     >
