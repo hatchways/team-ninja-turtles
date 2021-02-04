@@ -105,13 +105,15 @@ export default function Navbar() {
                     >
                         Create Contest
                     </Button>
-                    <img src={user.icon} alt='avatar' className={classes.avatar}/>
+
+                    { user.username === "no-user" ? null : <img src={user.icon} alt='avatar' className={classes.avatar}/>}
+
                     <Button
                         component={Link} to={getAccountLink} 
                         color='inherit'
                         className={classes.accountLink}
                     >
-                        Account
+                        {user.username === "no-user" ? "Login": "Account"}
                     </Button>
                 </div>
             </Toolbar>
