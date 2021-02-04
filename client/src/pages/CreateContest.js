@@ -25,6 +25,12 @@ export default function CreateContest() {
     const classes = useStyles()
     const {user, setUser} = useContext(UserContext)
 
+    if (user.username === "no-user") {
+        return (
+          <Redirect to='/login'/>
+        )
+    }
+
     return (
         <Grid container justify='center' className={classes.pageContainer}>
             <Grid item xs={12} className={classes.pageTitle}>
