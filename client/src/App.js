@@ -46,7 +46,7 @@ function App() {
           <Switch>
             <Route path='/signup' component={Signup}></Route>
             <Route path='/login' component={Login}></Route>
-            <Route path='/profile' component={ProfilePage}></Route>
+            <Route path='/profile/:id' component={ProfilePage}></Route>
             <Route path='/contest-details/:id' component={ContestDetails}></Route>
             <Route path='/create-contest' component={CreateContestPage}></Route>
             <Route path='/submit-design/:id' component={SubmitDesignPage}></Route>

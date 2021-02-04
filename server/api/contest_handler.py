@@ -52,14 +52,14 @@ def create_contest():
 
 
 @contest_handler.route('/contests', methods=['GET'])
-@require_auth
 def get_all_contests():
     # Do any contests exist?
     try:
         all_contests = db.session.query(User, Contest).outerjoin(Contest, Contest.contest_creater == User.id).all()
         if not bool(all_contests):
             raise Exception("no contest")
-    except Exception:
+    except Exception as e:
+        print(e)
         return jsonify([]), 400
     # Return all contests
     else:
@@ -82,7 +82,6 @@ def get_all_contests():
 
 
 @contest_handler.route('/contest/<contest_id>', methods=['PUT', 'GET'])
-@require_auth
 def get_contest(contest_id):
     # Does contest exist?
     try:
@@ -151,7 +150,8 @@ def get_contest(contest_id):
 def get_owned_contests(user_id):
     # Do any contests exist for this user?
     try:
-        all_owned_contests = Contest.query.filter_by(contest_creater = user_id).all()
+        user = User.query.filter_by(username=user_id).first()
+        all_owned_contests = Contest.query.filter_by(contest_creater=user.id).all()
         if not bool(all_owned_contests):
             raise Exception
     except Exception:
@@ -187,6 +187,7 @@ def get_submitted_to_contests(user_id):
             dictionary["contest_{contest_number}".format(contest_number = counter)] = contest.__dict__
             counter += 1
         return json.dumps(dictionary, default=str)
+
 
 @contest_handler.route('/contest_winner', methods=['POST'])
 def set_contest_winner():
