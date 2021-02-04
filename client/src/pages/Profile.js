@@ -142,7 +142,7 @@ export default function Profile() {
             history.push({
                 pathname: "/message",
                 state: {
-                    room: data
+                    session: data
                 }
             })
         }, (error) => {

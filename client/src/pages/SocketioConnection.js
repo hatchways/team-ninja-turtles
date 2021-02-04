@@ -35,7 +35,7 @@ function Socketio() {
   const username = user.username
   const classes = useStyles()
   const location = useLocation()
-  const [room, setRoom] = useState(location.state.room ? location.state.room : {session: -1, user: {}})
+  const [room, setRoom] = useState(location.state && location.state.session ? location.state.session : {session: -1, user: {}})
 
   const setRef = useCallback(node => {
     if (node) {
@@ -83,57 +83,60 @@ function Socketio() {
         <div className="d-flex" style={{height: "90vh"}}>
           <MessageSideNav/> 
 
-          <div className="d-flex flex-column flex-grow-1">
-            <div className={`d-flex flex-row ${classes.chatTopBar}`}> 
-                <img alt="avatar" 
-                  src={room.user.icon ? room.user.icon : process.env.PUBLIC_URL + '/images/avatar-1.png'} 
-                  className={classes.avatar}/>
-                <Typography className={classes.chatTopBarName}>
-                  {room.user.username}
-                </Typography>
-            </div>
-
-            <div className="flex-grow-1 overflow-auto">
-              <div className="d-flex flex-column align-items-start justify-content-end px-3">
-                {messageLog.map((message, index) => {
-                  const lastMessage = messageLog.length - 1 === index
-                  const fromMe = message.user === user.username
-                  return (
-                    <div
-                      ref={lastMessage ? setRef : null}
-                      key={index}
-                      className={`my-1 d-flex flex-column ${fromMe ? 'align-self-end align-items-end' : 'align-items-start'}`}
-                    >
-                      <div
-                        className={`rounded px-2 py-1 ${fromMe ? 'bg-primary text-white' : 'border'}`}>
-                        {message.text}
-                      </div>
-                      <div className={`text-muted small ${fromMe ? 'text-right' : ''}`}>
-                        {fromMe ? 'You' : message.user}
-                      </div>
-                    </div>
-                  )
-                })}
+          {(
+            room.session === -1 ? null : 
+            <div className="d-flex flex-column flex-grow-1">
+              <div className={`d-flex flex-row ${classes.chatTopBar}`}> 
+                  <img alt="avatar" 
+                    src={room.user.icon ? room.user.icon : process.env.PUBLIC_URL + '/images/avatar-1.png'} 
+                    className={classes.avatar}/>
+                  <Typography className={classes.chatTopBarName}>
+                    {room.user.username}
+                  </Typography>
               </div>
+
+              <div className="flex-grow-1 overflow-auto">
+                <div className="d-flex flex-column align-items-start justify-content-end px-3">
+                  {messageLog.map((message, index) => {
+                    const lastMessage = messageLog.length - 1 === index
+                    const fromMe = message.user === user.username
+                    return (
+                      <div
+                        ref={lastMessage ? setRef : null}
+                        key={index}
+                        className={`my-1 d-flex flex-column ${fromMe ? 'align-self-end align-items-end' : 'align-items-start'}`}
+                      >
+                        <div
+                          className={`rounded px-2 py-1 ${fromMe ? 'bg-primary text-white' : 'border'}`}>
+                          {message.text}
+                        </div>
+                        <div className={`text-muted small ${fromMe ? 'text-right' : ''}`}>
+                          {fromMe ? 'You' : message.user}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+              
+              <Form onSubmit={onClick}>
+                <Form.Group className="m-2">
+                  <InputGroup>
+                    <Form.Control
+                      as="textarea"
+                      required
+                      value={message}
+                      onChange={e => setMessage(e.target.value)}
+                      style={{ height: '75px', resize: 'none' }}
+                    />
+                    <InputGroup.Append>
+                      <Button variant="secondary" type="submit">Send</Button>
+                    </InputGroup.Append>
+                  </InputGroup>
+                </Form.Group>
+              </Form>
             </div>
-            
-            <Form onSubmit={onClick}>
-              <Form.Group className="m-2">
-                <InputGroup>
-                  <Form.Control
-                    as="textarea"
-                    required
-                    value={message}
-                    onChange={e => setMessage(e.target.value)}
-                    style={{ height: '75px', resize: 'none' }}
-                  />
-                  <InputGroup.Append>
-                    <Button variant="secondary" type="submit">Send</Button>
-                  </InputGroup.Append>
-                </InputGroup>
-              </Form.Group>
-            </Form>
-          </div>
+          )}
 
         </div>
       </SessionsContext.Provider>
