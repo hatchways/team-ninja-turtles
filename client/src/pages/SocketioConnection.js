@@ -6,7 +6,7 @@ import { UserContext } from '../App';
 import { getMsgLog } from '../apiCalls';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { makeStyles, Typography } from '@material-ui/core';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 let socket = io.connect(null, {port:5000, rememberTransport: false});
 
@@ -35,6 +35,7 @@ function Socketio() {
   const username = user.username
   const classes = useStyles()
   const location = useLocation()
+  const history = useHistory()
   const [room, setRoom] = useState(location.state && location.state.session ? location.state.session : {session: -1, user: {}})
 
   const setRef = useCallback(node => {
@@ -77,6 +78,10 @@ function Socketio() {
     }
   };
 
+  const onProfileClick = e => {
+      history.push('/profile/'+room.user.username)
+  }
+
   return (
     <CurrentSessionContext.Provider value={{room, setRoom}}>
       <SessionsContext.Provider value={{sessions, setSessions}}>
@@ -89,8 +94,9 @@ function Socketio() {
               <div className={`d-flex flex-row ${classes.chatTopBar}`}> 
                   <img alt="avatar" 
                     src={room.user.icon ? room.user.icon : process.env.PUBLIC_URL + '/images/avatar-1.png'} 
-                    className={classes.avatar}/>
-                  <Typography className={classes.chatTopBarName}>
+                    className={classes.avatar}
+                    onClick={onProfileClick}/>
+                  <Typography className={classes.chatTopBarName} onClick={onProfileClick}>
                     {room.user.username}
                   </Typography>
               </div>
