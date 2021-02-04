@@ -93,8 +93,8 @@ export const getOwnedContests = async (userId, onSuccess, onError) => {
     get(`/contests/owned/${userId}`, {"Content-Type": "application/json"}, onSuccess, onError)
 }
 
-export const getAllContest = async (onSuccess, onError) => {
-    get("/contests", {}, onSuccess, onError)
+export const getAllContest = async (searchString, onSuccess, onError) => {
+    get(`/contests?contains=${searchString}`, {}, onSuccess, onError)
 }
 
 export const getContestDetails = async(contestId, onSuccess, onError) => {
