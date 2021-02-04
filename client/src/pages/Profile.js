@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Button, Typography, Tabs, Tab, Paper } from '@material-ui/core'
 import TabPanel from '../components/TabPanel'
 import ContestCard from '../components/ContestCard'
-import RequestError, { createRoom, getOwnedContests, getProfileOther } from '../apiCalls'
+import RequestError, { createRoom, getOwnedContests, getProfileOther, getSubmittedContest } from '../apiCalls'
 import { UserContext } from '../App'
 import { useHistory, useParams } from 'react-router-dom'
 
@@ -63,7 +63,8 @@ export default function Profile() {
     const {user, setUser} = useContext(UserContext)
     const [profileUser, setProfileUser] = useState(null)
     const [activeTab, setActiveTab] = useState(0)
-    const [contests, setContests] = useState([])    
+    const [contests, setContests] = useState([])   
+    const [submitted, setSubmitted] = useState([]) 
     const [inProgressContestCards, setInProgressContestCards] = useState([])
     const [completedContestCards, setCompletedContestCards] = useState([])
     const [username, setUsername] = useState("")
@@ -86,6 +87,15 @@ export default function Profile() {
                 console.log("unexpected error")
             }
         })
+
+        if (user.username !== "no-user" && user.username === id) {
+            getSubmittedContest((data) => {
+                setSubmitted(data)
+            }, (error) => {
+                console.log("unexpected error")
+            })
+        }
+        
     }, [user, id])
 
     useEffect(() => {
@@ -166,6 +176,7 @@ export default function Profile() {
             />
         )
     }
+    console.log(submitted)
 
     return (
         <div className={classes.pageContainer}>
@@ -195,6 +206,10 @@ export default function Profile() {
                 >
                     <Tab label='IN PROGRESS' />
                     <Tab label='COMPLETED' />
+                    {(  user.username !== "no-user" && user.username === id ?  
+                        <Tab label="SUBMITTED"></Tab>
+                        : null
+                    )}
                 </Tabs>
                 <TabPanel id = {"in_progress_tab"} value={activeTab} index={0}>
                     {inProgressContestCards}
@@ -202,6 +217,23 @@ export default function Profile() {
                 <TabPanel id = {"completed_tab"} value={activeTab} index={1}>
                     {completedContestCards}
                 </TabPanel>
+
+                {( user.username !== "no-user" && user.username === id ?  
+                    <TabPanel id = {"submitted"} value={activeTab} index={1}>
+                        {submitted.map((contest, index) => (
+                            <ContestCard 
+                                key={index}
+                                id = {contest.id}
+                                image={contest.img[0]}
+                                noSketches={contest.img.length} 
+                                title={contest.title}
+                                description={contest.description}
+                                prizeAmount={contest.prize}
+                            />
+                        ))}
+                    </TabPanel> 
+                    : null
+                )}
             </Paper>
         </div>
     )
