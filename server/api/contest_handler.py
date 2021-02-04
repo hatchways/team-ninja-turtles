@@ -187,6 +187,7 @@ def get_submitted_to_contests(user_id):
             dictionary["contest_{contest_number}".format(contest_number = counter)] = contest.__dict__
             counter += 1
         return json.dumps(dictionary, default=str)
+    
 
 @contest_handler.route('/contest_winner', methods=['POST'])
 def set_contest_winner():
