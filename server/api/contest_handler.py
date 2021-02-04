@@ -72,6 +72,7 @@ def get_all_ongoing_contests():
                 # Load contest inspirational image
                 ins_image_link = db.session.query(InspirationalImage.image_link).join(InspirationalImageContestLink, InspirationalImageContestLink.image_id==InspirationalImage.id).filter_by(contest_id=contest.id).first()
                 lst.append({
+                    "id" : contest.id,
                     "img": ins_image_link,
                     "name": contest.title,
                     "creator": user.username,
