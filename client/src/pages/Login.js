@@ -141,6 +141,10 @@ const Login = () => {
             <div className={classes.container}>
                 <Button onClick={submit} variant="outlined" className={classes.button}>Login</Button>
             </div>
+
+            <div className={classes.container}>
+                <Button onClick={() => history.push("/signin")} className={classes.button}>Not Registered? Sign-up</Button>
+            </div>
         </form>
     );
 }
