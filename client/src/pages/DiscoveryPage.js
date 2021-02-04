@@ -8,6 +8,7 @@ import {
 } from '@material-ui/core'
 import DiscoveryContent from  '../components/DiscoveryContent'
 import { getAllContest } from  '../apiCalls'
+import { useHistory } from "react-router-dom"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,6 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const DiscoveryPage = () => {
     const classes = useStyles() 
+    const history = useHistory();
     const [contests, setContests] = useState([]) 
     const [searchString, setSearchString] = useState("")
 
@@ -56,6 +58,10 @@ const DiscoveryPage = () => {
 
     const handleSearch = () => {
         fetchContests()
+    }
+
+    const onContestClick = e => {
+        history.push("/contest-details/"+contests[e.target.id].id)
     }
 
     useEffect(() => {
@@ -92,8 +98,12 @@ const DiscoveryPage = () => {
                 <Grid container justify= 'center' spacing={2}>
                     {contests.map((value, index) => (
                         <Grid key={index} item>
-                            <Paper className={classes.paper}>
+                            <Paper
+                                className={classes.paper}
+                                onClick={onContestClick}
+                            >
                                 <DiscoveryContent
+                                    id={index}
                                     img_src={value.img[0]}
                                     contest_name={value.name}
                                     creator_name={value.creator}
