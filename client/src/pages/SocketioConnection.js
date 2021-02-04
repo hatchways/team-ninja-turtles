@@ -29,7 +29,6 @@ const useStyles = makeStyles((theme) => ({
 function Socketio() {
   const [messageLog, setMessageLog] = useState([]);
   const [message, setMessage] = useState("");
-
   const {user, setUser} = useContext(UserContext)
   const [room, setRoom] = useState({session: -1, user: {}})
   const [sessions, setSessions] = useState([])
@@ -59,6 +58,7 @@ function Socketio() {
 
   useEffect(() => {
     socket.on("message", addMessage)
+
     return () => {
       socket.off("message")
     }
