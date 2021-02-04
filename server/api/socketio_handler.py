@@ -7,11 +7,13 @@ from models import User, RoomSession, Message
 import app
 
 
+
 socketio_handler = Blueprint('socketio_handler', __name__)
 
 
 @socketio.on("message")
 def handle_message(msg):
+
     user = User.query.filter_by(username=msg["username"]).first()
     session = RoomSession.query.filter_by(id=msg["roomID"]).first()
     message = Message(user=user, message=msg["message"], session=session)
