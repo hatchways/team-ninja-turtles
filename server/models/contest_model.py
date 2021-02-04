@@ -2,6 +2,7 @@ from api import db
 from sqlalchemy import ForeignKey
 from datetime import datetime
 
+
 class Contest(db.Model):
     __tablename__ = 'contest'
 

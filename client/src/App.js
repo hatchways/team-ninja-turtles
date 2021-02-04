@@ -23,7 +23,7 @@ export const UserContext = React.createContext();
 
 function App() {
   // this default value avoids crashing for navbar and accessing private pages when not login, should be changed in the future
-  const [user, setUser] = useState({username: "no-user", email: "", icon: process.env.PUBLIC_URL + 'images/avatar-1.png'})
+  const [user, setUser] = useState({username: "no-user", email: "", icon: process.env.PUBLIC_URL + '/images/avatar-1.png'})
 
   // load user context if the existing cookies hasnt expire
   useEffect(() => {
@@ -31,7 +31,7 @@ function App() {
         setUser({
           username: data.username,
           email: data.email,
-          icon: data.icon == null ? process.env.PUBLIC_URL + 'images/avatar-1.png' : data.icon
+          icon: data.icon == null ? process.env.PUBLIC_URL + '/images/avatar-1.png' : data.icon
         })
     }, (error) => {
         console.log("No valid user detected")
@@ -53,6 +53,7 @@ function App() {
             <Route path='/message' component={SocketPage}></Route>
             <Route path="/add-card" component={PaymentInfo}></Route>
             <Route path="/edit-profile" component={EditProfilePage} />
+            <Route path='/message/' component={SocketPage}></Route>
             <Route path='/' component={DiscoveryPage} />
           </Switch>
         </Router>
