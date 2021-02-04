@@ -54,7 +54,7 @@ const DiscoveryPage = () => {
         })
     }
 
-    const handleSearch = (event) => {
+    const handleSearch = () => {
         fetchContests()
     }
 
@@ -80,7 +80,13 @@ const DiscoveryPage = () => {
                         />
                     </Grid>
                     <Grid item xs={1}>
-                        <Button className={classes.addLinkButton} fullWidth onClick={handleSearch} >Search</Button>
+                        <Button
+                            className={classes.addLinkButton}
+                            fullWidth
+                            onClick={handleSearch}
+                        >
+                            Search
+                        </Button>
                     </Grid>
                 </Grid>
                 <Grid container justify= 'center' spacing={2}>
