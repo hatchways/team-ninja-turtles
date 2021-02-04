@@ -1,6 +1,7 @@
 from flask import jsonify, Blueprint, request
 from models import InspirationalImage, Contest, InspirationalImageContestLink
 from api import db, s3
+from api.middleware import require_auth
 from config import S3_BUCKET, S3_REGION
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker
@@ -29,6 +30,7 @@ def migrateImages():
     return jsonify({'successMessage': 'Images updated'})
 
 @inspirational_images_handler.route('/add_inspirational_images', methods=['POST'])
+@require_auth
 def addImages():
 
     request_json = request.get_json()
@@ -40,10 +42,11 @@ def addImages():
     return jsonify({'successMessage': 'Images updated'})
 
 @inspirational_images_handler.route('/inspirational_images', methods=['GET'])
+@require_auth
 def getImages():
     # Do any images exist?
     try:
-        all_images = InspirationalImage.query.order_by(InspirationalImage.created_time.desc()).all()
+        all_images = InspirationalImage.query.order_by(InspirationalImage.created_time.desc()).limit(20).all()
         if not bool(all_images):
             raise Exception
     except Exception:
@@ -58,6 +61,7 @@ def getImages():
         return json.dumps(dictionary, default=str)
 
 @inspirational_images_handler.route('/inspirational_images/<contest_id>', methods=['GET'])
+@require_auth
 def get_contest_inspirational_images(contest_id):
     try:
         all_data = db.session.query(Contest, InspirationalImage).filter(Contest.id == contest_id,

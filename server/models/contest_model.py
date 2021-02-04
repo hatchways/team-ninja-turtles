@@ -15,6 +15,7 @@ class Contest(db.Model):
     update_time = db.Column(db.DateTime, onupdate=datetime.utcnow()) # store updated time of row
     contest_creater = db.Column(db.Integer, ForeignKey('user.id'))
     inspirational_images = db.relationship('InspirationalImage', secondary = 'image_contest_link')
+    winner = db.Column(db.Integer, ForeignKey('submission.id'))
 
     def __init__(self, title, description, prize_contest, deadline_date, update_time, contest_creater):
         self.title = title

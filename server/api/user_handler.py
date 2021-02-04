@@ -1,7 +1,7 @@
 from flask import jsonify, Blueprint, request, send_file
 from api import db, bcrypt, s3
 from models import User
-from api.middleware import require_auth
+from api.middleware import require_auth, get_current_user
 import jwt
 from datetime import datetime, timedelta
 import app
@@ -81,12 +81,9 @@ def login():
 
 @user_handler.route('/api/edit_profile', methods=['POST'])
 @require_auth
-def edit_profile():
+@get_current_user
+def edit_profile(current_user):
     s3_key = request.form["file_name"]
-
-    token = request.cookies.get("auth_token")
-    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
-    current_user = User.query.filter_by(username=data['user']).first()
 
     try:
         if len(s3_key) > 0:
@@ -102,10 +99,8 @@ def edit_profile():
 
 @user_handler.route('/api/get_user', methods=['GET'])
 @require_auth
-def get_user_profile():
-    token = request.cookies.get("auth_token")
-    data = jwt.decode(token, app.app.config['JWT_SECRET'], algorithms=['HS256'])
-    current_user = User.query.filter_by(username=data['user']).first()
+@get_current_user
+def get_user_profile(current_user):
     icon = None if current_user.icon is None else \
         "http://%s.s3.%s.amazonaws.com/%s" % (S3_BUCKET, S3_REGION, current_user.icon)
 
