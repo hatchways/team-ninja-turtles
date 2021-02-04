@@ -46,7 +46,7 @@ def addImages():
 def getImages():
     # Do any images exist?
     try:
-        all_images = InspirationalImage.query.order_by(InspirationalImage.created_time.desc()).all()
+        all_images = InspirationalImage.query.order_by(InspirationalImage.created_time.desc()).limit(20).all()
         if not bool(all_images):
             raise Exception
     except Exception:

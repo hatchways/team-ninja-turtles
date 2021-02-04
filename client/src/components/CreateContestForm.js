@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
+import { useHistory } from 'react-router-dom'
+
 import {
     Grid,
     TextField,
@@ -87,6 +89,7 @@ export default function CreateContestForm() {
     const [amountHelperText, setAmountHelperText] = useState('')
     const [addImageLink, setImageLink] = useState('')
     const [checkedInspireationalImages, setChecked] = useState([])
+    const history = useHistory()
 
     const onAmountChange = e => {
         if (e.target.value < 0) {
@@ -127,7 +130,8 @@ export default function CreateContestForm() {
         deadline.setMinutes(minutes)
         const contestCreator = 1
         createContest(title, description, amount, deadline, contestCreator, checkedInspireationalImages, data => {
-            console.log('contest has been successfully created!')
+            alert('contest has been successfully created!')
+            history.push(`/contest-details/${data.contest_id}`)
         }, error => {
             if (error instanceof RequestError && error.status === 400) {
                 console.log(error.body)
