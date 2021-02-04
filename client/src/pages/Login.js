@@ -20,7 +20,9 @@ const useStyles = makeStyles(theme => ({
         marginTop: "3%",
         marginLeft: "37%",
         marginRight: "37%",
-        padding: "3%"
+        padding: "3%",
+        width: "400px",
+        height: "450px"
     },
     container: {
         display: "flex",
