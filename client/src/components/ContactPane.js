@@ -12,10 +12,8 @@ export default function ContactPane(props) {
         getAllSessions((data) => {
             setSessions(data)
 
-            if (room.session < 0) {
-                if (data.length > 0) {
+            if (room.session < 0 && data.length > 0) {
                     setRoom(data[0])
-                }
             }
         }, (error) => {
             console.log(error)

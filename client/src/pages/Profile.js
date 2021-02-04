@@ -76,7 +76,7 @@ export default function Profile() {
 
     useEffect(() => { // Only runs once when first rendering
         if (id === user.username) {
-            setContests(getOwnedContests(id, (data) => {
+            getOwnedContests(id, (data) => {
                 setContests(data) // Sets contests equal to return from get request
             }, (error) => {
                 // onError
@@ -85,7 +85,7 @@ export default function Profile() {
                 } else {
                     console.log("unexpected error")
                 }
-            }))
+            })
         }
     }, [])
 
