@@ -1,6 +1,7 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { Typography } from '@material-ui/core'
+import { useHistory } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     card: {
@@ -48,13 +49,18 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-export default function ContestCard({ image, noSketches, title, description, prizeAmount }) {
+export default function ContestCard({id, image, noSketches, title, description, prizeAmount }) {
     const classes = useStyles()
+    const history = useHistory()
+
+    const onClick = () => {
+        history.push(`/contest-details/${id}`)
+    }
 
     return (
         <div className={classes.card}>
             <div className={classes.imageWrapper}>
-                <img src={image} alt='Tattoo contest' className={classes.image}/>
+                <img src={image} alt='Tattoo contest' className={classes.image} onClick={onClick}/>
                 <div>
                     <div className={classes.textBlock}>
                         <Typography>{noSketches} Sketches</Typography>

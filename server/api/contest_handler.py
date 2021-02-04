@@ -169,6 +169,7 @@ def get_owned_contests(user_id):
                 filter_by(contest_id=contest.id).first()
 
             result.append({
+                "id": contest.id,
                 "title": contest.title,
                 "description": contest.description,
                 "prize": contest.prize_contest,

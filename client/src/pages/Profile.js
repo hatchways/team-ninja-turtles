@@ -47,13 +47,14 @@ const useStyles = makeStyles((theme) => ({
     editButton: {
         '& .MuiButton-label': {
             fontWeight: 'bold'
-        }
+        },
+        marginBottom:'2rem'
     }, 
     messageButton: {
         '& .MuiButton-label': {
             fontWeight: 'bold'
         }, 
-        marginLeft: '10px'
+        marginBottom:'2rem'
     }
 }))
 
@@ -156,6 +157,7 @@ export default function Profile() {
         cardList.push(
             <ContestCard 
                 key={i}
+                id = {contest.id}
                 image={contest.img[0]}
                 noSketches={contest.img.length} 
                 title={contest.title}
