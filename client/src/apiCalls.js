@@ -113,6 +113,25 @@ export const getInspirationalImages = async (onSuccess, onError) => {
     get(`/inspirational_images`, {"Content-Type": "application/json"}, onSuccess, onError)
 }
 
+export const searchUserInfo = async (searchString, onSuccess, onError) => {
+    get(`/api/search_user?contains=${searchString}`, {}, onSuccess, onError)
+}
+
+export const createRoom = async(targetUser, onSuccess, onError) => {
+    const data = {
+        "user": targetUser
+    }
+    makeRequest("/create_room", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
+}
+
+export const getAllSessions = async(onSuccess, onError) => {
+    get("/get_all_session", {}, onSuccess, onError)
+}
+
+export const getMsgLog = async(session, onSucces, onError) => {
+    get(`/message_log/${session}`, {}, onSucces, onError )
+}
+
 export const setContestWinner = async (contest_id, winning_submission_id, onSuccess, onError) => {
     const data = {
         'contest_id': contest_id,

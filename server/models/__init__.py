@@ -3,3 +3,4 @@ from models.inspirational_image_contest_link import InspirationalImageContestLin
 from models.inspirational_image_model import InspirationalImage
 from models.submission_model import Submission
 from models.user_model import User
+from models.messenger_models import RoomSession, Message
