@@ -22,9 +22,10 @@ def create_contest():
         prize_contest = request_json.get("prize_contest")
         deadline_date = datetime.strptime(request_json.get("deadline_date"), "%Y-%m-%dT%H:%M:%S.%fZ")
         update_time = datetime.utcnow()
-        contest_creator = request_json.get('contest_creator')
+        contest_creator_username = request_json.get('contest_creator')
         inspirational_images = request_json.get('inspirational_images')
 
+        contest_creator = User.query.filter_by(username=contest_creator_username).first().id
         # Do any images exist?
         try:
             all_inspirational_images = InspirationalImage.query.all()
@@ -189,7 +190,6 @@ def get_submitted_to_contests(user_id):
             counter += 1
         return json.dumps(dictionary, default=str)
     
-
 
 @contest_handler.route('/contest_winner', methods=['POST'])
 def set_contest_winner():
