@@ -176,7 +176,6 @@ export default function Profile() {
             />
         )
     }
-    console.log(submitted)
 
     return (
         <div className={classes.pageContainer}>
@@ -185,14 +184,14 @@ export default function Profile() {
                 <Typography className={classes.userName}>{username}</Typography>
             </div>
             <div className={classes.buttonDiv}>                
-                {(user.username !== "no-user" && user.username !== id ? 
-                    <Button className={classes.messageButton} variant='outlined' onClick={sendMessage}>
-                        Send Message
-                    </Button> 
-                    : 
+                {(user.username === id ? 
                     <Button className={classes.editButton} variant='outlined' onClick={editProfile}>
                         Edit Profile
                     </Button>
+                    : (user.username === "no-user" ? null : 
+                    <Button className={classes.messageButton} variant='outlined' onClick={sendMessage}>
+                        Send Message
+                    </Button> )
                 )}   
             </div>
 
