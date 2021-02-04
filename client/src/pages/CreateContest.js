@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Grid, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
 import CreateContestForm from '../components/CreateContestForm'
+import { UserContext } from '../App'
+import { Redirect } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
@@ -21,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CreateContest() {
     const classes = useStyles()
+    const {user, setUser} = useContext(UserContext)
 
     return (
         <Grid container justify='center' className={classes.pageContainer}>

@@ -6,7 +6,7 @@ import { UserContext } from '../App';
 import { getMsgLog } from '../apiCalls';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { makeStyles, Typography } from '@material-ui/core';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Redirect, useHistory, useLocation } from 'react-router-dom';
 
 let socket = io.connect(null, {port:5000, rememberTransport: false});
 
@@ -80,6 +80,13 @@ function Socketio() {
 
   const onProfileClick = e => {
       history.push('/profile/'+room.user.username)
+  }
+
+
+  if (user.username === "no-user") {
+    return (
+      <Redirect to='/login'/>
+    )
   }
 
   return (
