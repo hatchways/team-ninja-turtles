@@ -141,4 +141,8 @@ export const setContestWinner = async (contest_id, winning_submission_id, onSucc
     makeRequest("/contest_winner", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
 }
 
+export const getProfileOther = async (username, onSucces, onError) => {
+    get(`/api/get_profile/${username}`, {}, onSucces, onError)
+}
+
 export default RequestError;

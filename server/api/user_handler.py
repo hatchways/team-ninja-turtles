@@ -120,6 +120,20 @@ def get_user_profile(current_user):
     })
 
 
+@user_handler.route('/api/get_profile/<username>', methods=['GET'])
+def get_profile(username):
+    user = User.query.filter_by(username=username).first()
+    icon = None if user.icon is None else \
+        "http://%s.s3.%s.amazonaws.com/%s" % (S3_BUCKET, S3_REGION, user.icon)
+
+    # requires to call get_custom_icon if custom_icon is true
+    return jsonify({
+        'username': user.username,
+        'email': user.email,
+        'icon': icon
+    })
+
+
 @user_handler.route('/api/test_protected', methods=['POST', 'GET'])
 @require_auth
 def protected():

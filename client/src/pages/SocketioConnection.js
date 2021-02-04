@@ -6,6 +6,7 @@ import { UserContext } from '../App';
 import { getMsgLog } from '../apiCalls';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { makeStyles, Typography } from '@material-ui/core';
+import { useLocation } from 'react-router-dom';
 
 let socket = io.connect(null, {port:5000, rememberTransport: false});
 
@@ -30,10 +31,11 @@ function Socketio() {
   const [messageLog, setMessageLog] = useState([]);
   const [message, setMessage] = useState("");
   const {user, setUser} = useContext(UserContext)
-  const [room, setRoom] = useState({session: -1, user: {}})
   const [sessions, setSessions] = useState([])
   const username = user.username
   const classes = useStyles()
+  const location = useLocation()
+  const [room, setRoom] = useState(location.state.room ? location.state.room : {session: -1, user: {}})
 
   const setRef = useCallback(node => {
     if (node) {

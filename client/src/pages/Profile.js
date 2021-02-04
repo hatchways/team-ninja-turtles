@@ -3,8 +3,9 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Button, Typography, Tabs, Tab, Paper } from '@material-ui/core'
 import TabPanel from '../components/TabPanel'
 import ContestCard from '../components/ContestCard'
-import RequestError, { getOwnedContests, getProfile } from '../apiCalls'
+import RequestError, { createRoom, getOwnedContests, getProfileOther } from '../apiCalls'
 import { UserContext } from '../App'
+import { useHistory, useParams } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
@@ -47,42 +48,68 @@ const useStyles = makeStyles((theme) => ({
         '& .MuiButton-label': {
             fontWeight: 'bold'
         }
+    }, 
+    messageButton: {
+        '& .MuiButton-label': {
+            fontWeight: 'bold'
+        }, 
+        marginLeft: '10px'
     }
 }))
-
-const userId = 1
 
 export default function Profile() {
     const classes = useStyles()
     const {user, setUser} = useContext(UserContext)
+    const [profileUser, setProfileUser] = useState(null)
     const [activeTab, setActiveTab] = useState(0)
     const [contests, setContests] = useState([])    
     const [inProgressContestCards, getInProgressContestCards] = useState([])
     const [completedContestCards, getCompletedContestCards] = useState([])
     const [username, setUsername] = useState("")
     const [iconURL, setIconURL] = useState(process.env.PUBLIC_URL + 'images/avatar-1.png')
+    const {id} = useParams()
+    const history = useHistory()
 
     const handleTabChange = (event, newActiveTab) => {
         setActiveTab(newActiveTab)
     }
 
     useEffect(() => { // Only runs once when first rendering
-        setContests(getOwnedContests(userId, (data) => {
-            setContests(data) // Sets contests equal to return from get request
-        }, (error) => {
-            // onError
-            if (error instanceof RequestError && error.status === 400) {
-                console.log(error.body)
-            } else {
-                console.log("unexpected error")
-            }
-        }))
+        if (id === user.username) {
+            getOwnedContests(id, (data) => {
+                setContests(data) // Sets contests equal to return from get request
+            }, (error) => {
+                // onError
+                if (error instanceof RequestError && error.status === 400) {
+                    console.log(error.body)
+                } else {
+                    console.log("unexpected error")
+                }
+            })
+        }
     }, [])
 
+    useEffect(() => {
+        if (user.username === id) {
+            setProfileUser(user)
+        } else {
+            getProfileOther(id, (data) => {
+                setProfileUser({
+                    username: data.username, 
+                    icon: data.icon ? data.icon : process.env.PUBLIC_URL + '/images/avatar-1.png'
+                })
+            }, (error) => {
+                console.log("unexpected error")
+            })
+        }
+    }, [user, id])
+
     useEffect(() => { 
-        setUsername(user.username)
-        setIconURL(user.icon)
-    }, [user])
+        if (profileUser && profileUser.username) {
+            setUsername(profileUser.username)
+            setIconURL(profileUser.icon)
+        }
+    }, [profileUser])
 
     useEffect(() => { // Once get request returns a response, set contest cards
         try {
@@ -110,6 +137,23 @@ export default function Profile() {
         }
     }, [contests])
 
+    const sendMessage = () => {
+        createRoom(id, (data) => {
+            history.push({
+                pathname: "/message",
+                state: {
+                    room: data
+                }
+            })
+        }, (error) => {
+            console.log("unexpected error")
+        })
+    }
+
+    const editProfile = () => {
+        history.push("/edit-profile")
+    }
+
     const pushContestCard = (cardList, contest, i) => {
         cardList.push(
             <ContestCard 
@@ -129,11 +173,18 @@ export default function Profile() {
                 <img src={iconURL} alt='avatar' className={classes.avatar}/>
                 <Typography className={classes.userName}>{username}</Typography>
             </div>
-            <div className={classes.buttonDiv}>
-                <Button className={classes.editButton} variant='outlined'>
-                    Edit Profile
-                </Button>
+            <div className={classes.buttonDiv}>                
+                {(user.username !== "no-user" && user.username !== id ? 
+                    <Button className={classes.messageButton} variant='outlined' onClick={sendMessage}>
+                        Send Message
+                    </Button> 
+                    : 
+                    <Button className={classes.editButton} variant='outlined' onClick={editProfile}>
+                        Edit Profile
+                    </Button>
+                )}   
             </div>
+
             <Paper className={classes.contestSection}>
                 <Tabs
                     id="tabs"
