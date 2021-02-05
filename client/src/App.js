@@ -35,6 +35,8 @@ function App() {
         })
     }, (error) => {
         console.log("No valid user detected")
+        // opt-out current user if it the token is  expired
+        setUser({username: "no-user", email: "", icon: process.env.PUBLIC_URL + '/images/avatar-1.png'})
     })
 }, [])
 
