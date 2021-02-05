@@ -227,6 +227,10 @@ export default function ContestDetails(props) {
 
     useEffect(() => {
         if (contest) {
+            // Hide submit button when contest is over 
+            if (contest.winner !== null) {
+                setSubmitButton(null)
+            }
             var newGridListItems = null
             if (contest.hasOwnProperty('is_owner')) { // If contest does not have property 'designs', that means it is not the contest owner accessing the page
                 if (contest.designs.length > 0) { // Render this if it is the contest owner and there have been designs submitted
