@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 import TabPanel from '../components/TabPanel'
+import CheckoutForm from '../components/CheckoutForm'
+// import CreditCardForm from '../components/CreditCardForm'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
 import { 
     Button, 
     Typography, 
@@ -21,8 +25,9 @@ import {
     Radio,
 } from '@material-ui/core'
 
-import RequestError, { getContestDetails, setContestWinner, checkStripeIDExists, createPayment } from '../apiCalls'
+import RequestError, { getContestDetails, checkStripeIDExists, createPayment } from '../apiCalls'
 
+const stripePromise = loadStripe("pk_test_51IH8tAGt0nFBLozrVPDB6mwr6yEw9QOAVWhTQK0hErAcLv7F278Dz2f3P637jEaboOp7lJbAVnZNbQTxQUoqD91z00VxrG6s3T")
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
         height: 'calc(100vh - 100px)',
@@ -126,6 +131,11 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#1f1f1f',
         fontSize: '1.5rem',
         padding: '1rem'
+    },
+    paymentDialog: {
+        '& .MuiDialog-paper': {
+            minWidth: '600px'
+        }
     }
 }))
 
@@ -133,11 +143,13 @@ export default function ContestDetails(props) {
     const classes = useStyles()
     const [activeTab, setActiveTab] = useState(0)
     const [openDesignDialog, setOpenDesignDialog] = useState(false)
+    const [openPaymentDialog, setOpenPaymentDialog] = useState(false)
     const [contest, setContest] = useState(null)
     const [designOpening, setDesignOpening] = useState({})
     const [gridListItems, setGridListItems] = useState(null)
     const [submitButton, setSubmitButton] = useState(null)
     const [winningSubmission, setWinningSubmission] = useState(null)
+    const [clientSecret, setClientSecret] = useState("")
     const contestId = props.match.params.id
     const history = useHistory()
 
@@ -147,6 +159,10 @@ export default function ContestDetails(props) {
 
     const handleClose = () => {
         setOpenDesignDialog(false);
+    }
+
+    const handlePaymentDialogClose = () => {
+        setOpenPaymentDialog(false)
     }
 
     const handleWinnerChange = e => {
@@ -165,24 +181,12 @@ export default function ContestDetails(props) {
 
                     createPayment(amount, currency, data => {
                         console.log(data.msg)
-
-                        setContestWinner(contestId, winningSubmission, data => {
-                            alert('Winner Successfully Declared')
-                            console.log('Winner Successfully Declared')
-                            getContestInfo(contestId)
-                        }, error => {
-                            if (error instanceof RequestError && error.status === 400) {
-                                console.log(error.body)
-                            } else {
-                                console.log("unexpected error")
-                            }
-                        })
-                        
+                        console.log(data.client_secret)
+                        setClientSecret(data.client_secret)
+                        setOpenPaymentDialog(true)
                     }, error => {   
                         console.log("unexpected error")
                     })
-
-                   
                 } else {
                     alert("Please set up your payment before selecting a winner.")
                 }
@@ -221,6 +225,11 @@ export default function ContestDetails(props) {
         getContestInfo(contestId)
         // eslint-disable-next-line
     }, [])
+
+    useEffect(() => {
+        //when payment dialog close, should fetch new data 
+        getContestInfo(contestId)
+    }, [openPaymentDialog])
 
     useEffect(() => {
         if (contest) {
@@ -290,6 +299,7 @@ export default function ContestDetails(props) {
 
     return (
         contest !== null ? (
+        <Elements stripe={stripePromise}>
             <div className={classes.pageContainer}>
                 <div className={classes.containerWrapper}>
                     <Dialog open={openDesignDialog} onClose={handleClose} className={classes.dialog}>
@@ -302,6 +312,19 @@ export default function ContestDetails(props) {
                         <DialogActions>
                             <Button onClick={handleClose} color="primary">Close</Button>
                         </DialogActions>
+                    </Dialog>
+                    <Dialog open={openPaymentDialog} onClose={handlePaymentDialogClose} className={classes.paymentDialog}>
+                        <DialogTitle>
+                            Checkout Form 
+                        </DialogTitle>
+                        <DialogContent>
+                            <CheckoutForm 
+                                clientSecret={clientSecret} 
+                                contestId={contestId} 
+                                winningSubmission={winningSubmission}
+                                setOpenPaymentDialog={setOpenPaymentDialog}
+                            />
+                        </DialogContent>
                     </Dialog>
                     <div className={classes.backButtonDiv}>
                         <div className={classes.backButton} onClick={onBackButtonClick}>
@@ -352,6 +375,7 @@ export default function ContestDetails(props) {
                     </div>
                 </div>
             </div>
+        </Elements>
         ) : (
         <div className={classes.pageContainer}>
             <div className={classes.backButtonDiv}>
