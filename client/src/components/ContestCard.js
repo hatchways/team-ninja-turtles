@@ -1,6 +1,7 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { Typography } from '@material-ui/core'
+import { useHistory } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     card: {
@@ -15,7 +16,8 @@ const useStyles = makeStyles((theme) => ({
     },
     image: {
         width: '100%',
-        height: '100%'
+        height: '100%',
+        objectFit: 'cover'
     },
     textBlock: {
         position: 'absolute',
@@ -38,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '1rem',
     },
     prizeAmount: {
-        width: '4rem',
+        width: '8rem',
         textAlign: 'center',
         padding: '0.5rem',
         color: '#fff',
@@ -47,19 +49,25 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-export default function ContestCard({ image, noSketches, title, description, prizeAmount }) {
+export default function ContestCard({id, image, noSketches, title, description, prizeAmount }) {
     const classes = useStyles()
+    const history = useHistory()
+
+    const onClick = () => {
+        history.push(`/contest-details/${id}`)
+    }
 
     return (
         <div className={classes.card}>
             <div className={classes.imageWrapper}>
-                <img src={`${process.env.PUBLIC_URL}images/${image}`} alt='Tattoo contest' className={classes.image}/>
+                <img src={image} alt='Tattoo contest' className={classes.image} onClick={onClick}/>
                 <div>
                     <div className={classes.textBlock}>
                         <Typography>{noSketches} Sketches</Typography>
                     </div>
                 </div>
             </div>
+
             <div className={classes.info}>
                 <Typography className={classes.title}>{title}</Typography>
                 <Typography className={classes.description}>{description}</Typography>

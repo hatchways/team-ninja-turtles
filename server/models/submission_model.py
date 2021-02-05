@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey
 from datetime import datetime
 
+
 class Submission(db.Model):
     __tablename__ = 'submission'
 

@@ -145,4 +145,8 @@ export const getProfileOther = async (username, onSucces, onError) => {
     get(`/api/get_profile/${username}`, {}, onSucces, onError)
 }
 
+export const getSubmittedContest = async (onSucces, onError) => {
+    get(`/contests/submitted/`, {}, onSucces, onError)
+}
+
 export default RequestError;
