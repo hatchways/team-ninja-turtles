@@ -37,6 +37,9 @@ const useStyles = makeStyles(theme => ({
   },
   button: {
     marginTop: theme.spacing(5)
+  }, 
+  input: {
+      width: "300px"
   }
 }));
 
@@ -112,6 +115,7 @@ function CreditCardForm() {
                 <CardNumberElement
                     onChange={onChangeNumber}
                     options={CARD_ELEMENT_OPTIONS}
+                    className={classes.input}
                 />
               </label>
           </div>
@@ -122,6 +126,7 @@ function CreditCardForm() {
                   <CardExpiryElement
                       onChange={onChangeExpiry}
                       options={CARD_ELEMENT_OPTIONS}
+                      className={classes.input}
                     />
               </label>
           </div>
@@ -132,6 +137,7 @@ function CreditCardForm() {
                   <CardCvcElement
                       onChange={onChangeCVC}
                       options={CARD_ELEMENT_OPTIONS}
+                      className={classes.input}
                     />
               </label>
           </div>

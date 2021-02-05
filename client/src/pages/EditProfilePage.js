@@ -3,6 +3,7 @@ import { Button, InputLabel, OutlinedInput} from '@material-ui/core'
 import { makeStyles } from "@material-ui/core/styles"
 import { getProfile, editProfile } from "../apiCalls"
 import { UserContext } from '../App'
+import { useHistory } from 'react-router-dom'
 
 
 const useStyles = makeStyles(theme => ({
@@ -36,8 +37,14 @@ const useStyles = makeStyles(theme => ({
     
     upload: {
         position: "relative",
+        marginBottom: "5px",
         top: "5%",
         left: "25%",
+    },
+    
+    addCard: {
+        top: "7%",
+        left: "18%"
     },
     
     submit: {
@@ -87,6 +94,7 @@ const EditProfilePage = () => {
     const [iconURL, setIconURL] = useState(user.icon)
     const [imageFile, setImageFile] = useState(null)
     const hiddenFileInput = useRef(null);
+    const history = useHistory();
 
     useEffect(() => {
         setUsername(user.username)
@@ -147,7 +155,7 @@ const EditProfilePage = () => {
                         
                         <input type="file" ref={hiddenFileInput} style={{display:'none'}} onChange={handleFileChange} accept="image/*"/> 
                         <Button className={classes.upload} variant="outlined" onClick={uploadFile} >Upload</Button>
-                        
+                        <Button className={classes.addCard} variant="outlined" onClick={() => history.push("/add-card")} >Add Card</Button>
                     </div>
                     
                     <div className={classes.floatDiv}>

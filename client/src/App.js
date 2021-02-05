@@ -39,26 +39,28 @@ function App() {
 }, [])
 
   return (
-    <UserContext.Provider value={{user, setUser}}>
-      <MuiThemeProvider theme={theme}>
-        <Router>
-          <NavBar />
-          <Switch>
-            <Route path='/signup' component={Signup}></Route>
-            <Route path='/login' component={Login}></Route>
-            <Route path='/profile/:id' component={ProfilePage}></Route>
-            <Route path='/contest-details/:id' component={ContestDetails}></Route>
-            <Route path='/create-contest' component={CreateContestPage}></Route>
-            <Route path='/submit-design/:id' component={SubmitDesignPage}></Route>
-            <Route path='/message' component={SocketPage}></Route>
-            <Route path="/add-card" component={PaymentInfo}></Route>
-            <Route path="/edit-profile" component={EditProfilePage} />
-            <Route path='/message/' component={SocketPage}></Route>
-            <Route path='/' component={DiscoveryPage} />
-          </Switch>
-        </Router>
-      </MuiThemeProvider>
-    </UserContext.Provider>
+    <MuiThemeProvider theme={theme}>
+      <UserContext.Provider value={{user, setUser}}>
+        <MuiThemeProvider theme={theme}>
+          <Router>
+            <NavBar />
+            <Switch>
+              <Route path='/signup' component={Signup}></Route>
+              <Route path='/login' component={Login}></Route>
+              <Route path='/profile/:id' component={ProfilePage}></Route>
+              <Route path='/contest-details/:id' component={ContestDetails}></Route>
+              <Route path='/create-contest' component={CreateContestPage}></Route>
+              <Route path='/submit-design/:id' component={SubmitDesignPage}></Route>
+              <Route path='/message' component={SocketPage}></Route>
+              <Route path="/add-card" component={PaymentInfo}></Route>
+              <Route path="/edit-profile" component={EditProfilePage} />
+              <Route path='/message/' component={SocketPage}></Route>
+              <Route path='/' component={DiscoveryPage} />
+            </Switch>
+          </Router>
+        </MuiThemeProvider>
+      </UserContext.Provider>
+    </MuiThemeProvider>
   )
 }
 
