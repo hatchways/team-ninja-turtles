@@ -53,24 +53,26 @@ def create_contest(current_user):
 
 
 @contest_handler.route('/contests', methods=['GET'])
-@require_auth
-def get_all_contests():
+def get_all_ongoing_contests():
     # Do any contests exist?
     try:
-        all_contests = db.session.query(User, Contest).outerjoin(Contest, Contest.contest_creater == User.id).all()
+        contains = request.args.get('contains')
+        all_contests = db.session.query(User, Contest).outerjoin(Contest, Contest.contest_creater == User.id).filter(Contest.title.ilike("%%%s%%" % contains)).all()
         if not bool(all_contests):
             raise Exception("no contest")
-    except Exception:
+    except Exception as e:
+        print(e)
         return jsonify([]), 400
     # Return all contests
     else:
         lst = []
         for pair in all_contests:
             user, contest = pair
-            if (user is not None) and (contest is not None):
+            if (user is not None) and (contest is not None) and contest.deadline_date > datetime.utcnow():
                 # Load contest inspirational image
                 ins_image_link = db.session.query(InspirationalImage.image_link).join(InspirationalImageContestLink, InspirationalImageContestLink.image_id==InspirationalImage.id).filter_by(contest_id=contest.id).first()
                 lst.append({
+                    "id" : contest.id,
                     "img": ins_image_link,
                     "name": contest.title,
                     "creator": user.username,
@@ -83,14 +85,13 @@ def get_all_contests():
 
 
 @contest_handler.route('/contest/<contest_id>', methods=['PUT', 'GET'])
-@require_auth
 def get_contest(contest_id):
     # Does contest exist?
     try:
         contest = Contest.query.get(contest_id)
-        if contest == None:
+        if contest is None:
             raise Exception
-    except Exception:
+    except Exception as e:
         return jsonify("Contest does not exist")
 
     try:
@@ -102,35 +103,41 @@ def get_contest(contest_id):
         current_user = None
 
     if request.method == 'GET':
-        #Load user info
+        # Load user info
         try:
-            contest_creater_user = User.query.filter_by(id=contest.contest_creater).first()
-            if contest_creater_user == None: 
+            contest_creator_user = User.query.filter_by(id=contest.contest_creater).first()
+            if contest_creator_user is None:
                 raise Exception
         except Exception as e:
             return jsonify("Contest owner not found")
 
-        if contest_creater_user == current_user: # Owner is trying to access, return designs as well
-            #Load submissions
-            allSubmissions = db.session.query(Submission, User.username).filter_by(contest_id=contest_id).join(User, User.id == Submission.submiter_id).all()
+        if current_user is None:
+            all_submissions = []
+        elif contest_creator_user == current_user: # Owner is trying to access, return designs as well
+            # Load submissions
+            all_submissions = db.session.query(Submission, User.username).\
+                filter_by(contest_id=contest_id).join(User, User.id == Submission.submiter_id).all()
             setattr(contest, 'is_owner', True)
         else:
-            allSubmissions = db.session.query(Submission, User.username).filter_by(contest_id=contest_id, submiter_id=current_user.id).join(User, User.id == Submission.submiter_id).all()
+            all_submissions = db.session.query(Submission, User.username).\
+                filter_by(contest_id=contest_id, submiter_id=current_user.id).\
+                join(User, User.id == Submission.submiter_id).all()
 
-        formatedSubmissions = []
+        formatted_submissions = []
 
-        for pair in allSubmissions:
+        for pair in all_submissions:
             submission, username = pair
-            formatedSubmissions.append({
+            formatted_submissions.append({
                 "img": submission.image_link,
                 "submission_id": submission.id,
                 "creater": username
             })
-            
-        attached_inspirational_images = json.loads(get_contest_inspirational_images(contest_id).data)
+
+        attached_inspirational_images = get_contest_inspirational_images(contest_id)[0]
+
     # Return contest contents
-        setattr(contest, 'designs', formatedSubmissions)
-        setattr(contest, 'creater_name', contest_creater_user.username)
+        setattr(contest, 'designs', formatted_submissions)
+        setattr(contest, 'creater_name', contest_creator_user.username)
         setattr(contest, 'attached_inspirational_images', attached_inspirational_images)
         return json.dumps(contest.__dict__, default=str)
 
@@ -148,11 +155,11 @@ def get_contest(contest_id):
 
 
 @contest_handler.route('/contests/owned/<user_id>', methods=['GET'])
-@require_auth
 def get_owned_contests(user_id):
     # Do any contests exist for this user?
     try:
-        all_owned_contests = Contest.query.filter_by(contest_creater = user_id).all()
+        user = User.query.filter_by(username=user_id).first()
+        all_owned_contests = Contest.query.filter_by(contest_creater=user.id).all()
         if not bool(all_owned_contests):
             raise Exception
     except Exception:
@@ -160,34 +167,59 @@ def get_owned_contests(user_id):
 
     # Return all contests owned by user
     else:
-        dictionary = {}
+        result = []
         counter = 0
         for contest in all_owned_contests:
-            dictionary["contest_{contest_number}".format(contest_number = counter)] = contest.__dict__
+            ins_image_link = db.session.query(InspirationalImage.image_link).\
+                join(InspirationalImageContestLink,  InspirationalImageContestLink.image_id == InspirationalImage.id).\
+                filter_by(contest_id=contest.id).first()
+
+            result.append({
+                "id": contest.id,
+                "title": contest.title,
+                "description": contest.description,
+                "prize": contest.prize_contest,
+                "deadline": contest.deadline_date,
+                "img": ins_image_link
+            })
             counter += 1
-        return json.dumps(dictionary, default=str)
+        return jsonify(result), 200
 
 
-@contest_handler.route('/contests/submitted/to/<user_id>', methods=['GET'])
+@contest_handler.route('/contests/submitted/', methods=['GET'])
 @require_auth
-def get_submitted_to_contests(user_id):
+@get_current_user
+def get_submitted_to_contests(user):
     # Do any submissions exist for this user?
     try:
-        all_user_submissions = Submission.query.all()
+        all_user_submissions = Submission.query.filter_by(submiter_id=user.id).all()
         if not bool(all_user_submissions):
             raise Exception
-    except Exception:
-        return jsonify("No submissions listed")
+    except Exception as e:
+        return jsonify([]), 200
     
     # Return all contests owned by user
     else:
         dictionary = {}
-        counter = 0
         for submission in all_user_submissions:
             contest = Contest.query.filter_by(id=submission.contest_id).first()
-            dictionary["contest_{contest_number}".format(contest_number = counter)] = contest.__dict__
-            counter += 1
-        return json.dumps(dictionary, default=str)
+            if contest.id not in contest:
+                ins_image_link = db.session.query(InspirationalImage.image_link). \
+                    join(InspirationalImageContestLink,
+                         InspirationalImageContestLink.image_id == InspirationalImage.id). \
+                    filter_by(contest_id=contest.id).first()
+
+                dictionary[contest.id] = {
+                    "id": contest.id,
+                    "title": contest.title,
+                    "description": contest.description,
+                    "prize": contest.prize_contest,
+                    "deadline": contest.deadline_date,
+                    "img": ins_image_link
+                }
+
+        return jsonify([contest for contest in dictionary]), 201
+    
 
 @contest_handler.route('/contest_winner', methods=['POST'])
 def set_contest_winner():
@@ -198,7 +230,7 @@ def set_contest_winner():
     winning_submission_id = request_json.get("winning_submission_id")
     try:
         contest = Contest.query.get(contest_id)
-        if contest == None:
+        if contest is None:
             raise Exception
     except Exception as e:
         return jsonify("Contest or winning user does not exist", str(e))

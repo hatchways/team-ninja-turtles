@@ -1,8 +1,9 @@
-import { Button, TextField } from "@material-ui/core";
+import { Button, Paper, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
 import React, { useContext, useState } from "react";
 import RequestError, { login, getProfile } from "../apiCalls";
-import {UserContext} from "../App"
+import { UserContext } from "../App"
+import { useHistory } from "react-router-dom"
 
 const warningMsg = {
     emptyFieldError: "Required",
@@ -14,6 +15,14 @@ const warningMsg = {
 const useStyles = makeStyles(theme => ({
     root: {
         alignItems: "center",
+    },
+    box: {
+        marginTop: "3%",
+        marginLeft: "37%",
+        marginRight: "37%",
+        padding: "3%",
+        width: "420px",
+        height: "500px"
     },
     container: {
         display: "flex",
@@ -32,6 +41,7 @@ const useStyles = makeStyles(theme => ({
 const Login = () => {
     const classes = useStyles();
     const {user, setUser} = useContext(UserContext);
+    const history = useHistory();
     const [username, setUsername] =  useState("");
     const [password, setPassword ] = useState("");
     const [usernameWarning, setUsernameWarning] = useState("");
@@ -77,15 +87,24 @@ const Login = () => {
                         icon: (data.icon == null) ? process.env.PUBLIC_URL + 'images/avatar-1.png' : data.icon,
                         email: data.email
                     })
-                    console.log(data)
+                    history.push("/")
                 }, (error) => {
-                    console.log(error)
+                    console.log("Unexpected Error")
                 })
             },  (error) => {
                 // onError
                 console.log(error)
                 if (error instanceof RequestError && error.status === 400) {
-                    console.log(error.body)
+                    const errMsg = error.body
+                    if (errMsg.password_error) {
+                        setPasswordError(true)
+                        setPasswordWarning(errMsg.password_error)
+                    }
+
+                    if (errMsg.user_error) {
+                        setUsernameError(true)
+                        setUsernameWarning(errMsg.user_error)
+                    }
                 } else {
                     console.log("unexpected error")
                 }
@@ -95,41 +114,47 @@ const Login = () => {
 
     return (
         <form className={classes.root}>
-            <div className={classes.container}>
-                <h1>Log In</h1>
-            </div>
+            <Paper className={classes.box}>
+                <div className={classes.container}>
+                    <h1>Log In</h1>
+                </div>
 
-            <div className={classes.container}>
-                <TextField
-                    id="username" label="Username" 
-                    value={username}
-                    error={usernameError}
-                    helperText={usernameWarning}
-                    variant="outlined"
-                    onChange={onUsernameChange}
-                    onBlur={event => blurred(event, username, setUsernameError, setUsernameWarning)}
-                    className={classes.textField}
-                />
-            </div>
-            
-            <div className={classes.container}>
-                <TextField 
-                    id="password" 
-                    label="Password"
-                    value={password}
-                    type={"password"}
-                    error={passwordError}
-                    helperText={passwordWarning}
-                    variant="outlined"
-                    onChange={onPasswordChange}
-                    onBlur={event => blurred(event, password, setPasswordError, setPasswordWarning)}
-                    className={classes.textField}
-                /> 
-            </div>
+                <div className={classes.container}>
+                    <TextField
+                        id="username" label="Username" 
+                        value={username}
+                        error={usernameError}
+                        helperText={usernameWarning}
+                        variant="outlined"
+                        onChange={onUsernameChange}
+                        onBlur={event => blurred(event, username, setUsernameError, setUsernameWarning)}
+                        className={classes.textField}
+                    />
+                </div>
+                
+                <div className={classes.container}>
+                    <TextField 
+                        id="password" 
+                        label="Password"
+                        value={password}
+                        type={"password"}
+                        error={passwordError}
+                        helperText={passwordWarning}
+                        variant="outlined"
+                        onChange={onPasswordChange}
+                        onBlur={event => blurred(event, password, setPasswordError, setPasswordWarning)}
+                        className={classes.textField}
+                    /> 
+                </div>
 
-            <div className={classes.container}>
-                <Button onClick={submit} variant="outlined" className={classes.button}>Login</Button>
-            </div>
+                <div className={classes.container}>
+                    <Button onClick={submit} variant="outlined" className={classes.button}>Login</Button>
+                </div>
+
+                <div className={classes.container}>
+                    <Button onClick={() => history.push("/signup")} className={classes.button}>Not Registered? Sign-up</Button>
+                </div>
+            </Paper>
         </form>
     );
 }

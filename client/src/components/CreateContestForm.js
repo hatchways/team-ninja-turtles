@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { useHistory } from 'react-router-dom'
 
@@ -19,6 +19,7 @@ import {
 } from '@material-ui/core'
 
 import RequestError, { createContest, getInspirationalImages, createInspirationalImage } from '../apiCalls'
+import { UserContext } from '../App'
 
 const useStyles = makeStyles((theme) => ({
     formContainer: {
@@ -78,6 +79,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CreateContestForm() {
     const classes = useStyles()
+    const {user, setUser} = useContext(UserContext)
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [amount, setAmount] = useState(0)

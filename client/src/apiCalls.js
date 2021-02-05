@@ -105,8 +105,8 @@ export const getOwnedContests = async (userId, onSuccess, onError) => {
     get(`/contests/owned/${userId}`, {"Content-Type": "application/json"}, onSuccess, onError)
 }
 
-export const getAllContest = async (onSuccess, onError) => {
-    get("/contests", {}, onSuccess, onError)
+export const getAllContest = async (searchString, onSuccess, onError) => {
+    get(`/contests?contains=${searchString}`, {}, onSuccess, onError)
 }
 
 export const getContestDetails = async(contestId, onSuccess, onError) => {
@@ -151,6 +151,14 @@ export const setContestWinner = async (contest_id, winning_submission_id, onSucc
     }
     
     makeRequest("/contest_winner", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
+}
+
+export const getProfileOther = async (username, onSucces, onError) => {
+    get(`/api/get_profile/${username}`, {}, onSucces, onError)
+}
+
+export const getSubmittedContest = async (onSucces, onError) => {
+    get(`/contests/submitted/`, {}, onSucces, onError)
 }
 
 export default RequestError;

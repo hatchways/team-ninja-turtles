@@ -1,6 +1,7 @@
-import { Button, TextField } from "@material-ui/core";
+import { Button, Paper, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles"
 import React, { useContext, useState } from "react";
+import { useHistory } from "react-router-dom";
 import RequestError, {getProfile, register} from "../apiCalls"
 import { UserContext } from "../App";
 
@@ -20,6 +21,14 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center",
         justifyContent: "center",
     },
+    box: {
+        marginTop: "3%",
+        marginLeft: "37%",
+        marginRight: "37%",
+        padding: "3%",
+        width: "420px",
+        height: "680px"
+    },
     textField: {
         marginTop: theme.spacing(5),
         width: 300
@@ -31,6 +40,7 @@ const useStyles = makeStyles(theme => ({
 
 const Signup = () => {
     const classes = useStyles();
+    const history = useHistory();
     const {user, setUser} = useContext(UserContext);
     const [username, setUsername] =  useState("");
     const [email, setEmail] = useState("")
@@ -104,14 +114,29 @@ const Signup = () => {
                         icon: process.env.PUBLIC_URL + 'images/avatar-1.png',
                         email: data.email
                     })
-                    console.log(data)
+                    history.push("/")
                 }, (error) => {
                     console.log(error)
                 })
             }, (error) => {
                 // onError
                 if (error instanceof RequestError && error.status === 400) {
-                    console.log(error.body)
+                    const errMsg = error.body
+                    console.log(errMsg)
+                    if (errMsg.password_error) {
+                        setPasswordError(true)
+                        setPasswordWarning(errMsg.password_error)
+                    }
+
+                    if (errMsg.user_error) {
+                        setUsernameError(true)
+                        setUsernameWarning(errMsg.user_error)
+                    }
+
+                    if (errMsg.email_error) {
+                        setEmailError(true)
+                        setEmailWarning(errMsg.email_error)
+                    }
                 } else {
                     console.log("unexpected error")
                 }
@@ -121,69 +146,75 @@ const Signup = () => {
 
     return (
         <form className={classes.root}>
-            <div className={classes.container}>
-                <h1>Sign Up</h1>
-            </div>
+            <Paper className={classes.box}>
+                <div className={classes.container}>
+                    <h1>Sign Up</h1>
+                </div>
 
-            <div className={classes.container}>
-                <TextField
-                    id="email" label="Email" 
-                    value={email}
-                    error={emailError}
-                    helperText={emailWarning}
-                    variant="outlined"
-                    onChange={onEmailChange}
-                    onBlur={event => blurred(event, email, setEmailError, setEmailWarning)}
-                    className={classes.textField}
-                />
-            </div>
+                <div className={classes.container}>
+                    <TextField
+                        id="email" label="Email" 
+                        value={email}
+                        error={emailError}
+                        helperText={emailWarning}
+                        variant="outlined"
+                        onChange={onEmailChange}
+                        onBlur={event => blurred(event, email, setEmailError, setEmailWarning)}
+                        className={classes.textField}
+                    />
+                </div>
 
-            <div className={classes.container}>
-                <TextField
-                    id="username" label="Username" 
-                    value={username}
-                    error={usernameError}
-                    helperText={usernameWarning}
-                    variant="outlined"
-                    onChange={onUsernameChange}
-                    onBlur={event => blurred(event, username, setUsernameError, setUsernameWarning)}
-                    className={classes.textField}
-                />
-            </div>
-            
-            <div className={classes.container}>
-                <TextField 
-                    id="password" 
-                    label="Password"
-                    value={password}
-                    type={"password"}
-                    error={passwordError}
-                    helperText={passwordWarning}
-                    variant="outlined"
-                    onChange={onPasswordChange}
-                    onBlur={event => blurred(event, password, setPasswordError, setPasswordWarning)}
-                    className={classes.textField}
-                /> 
-            </div>
+                <div className={classes.container}>
+                    <TextField
+                        id="username" label="Username" 
+                        value={username}
+                        error={usernameError}
+                        helperText={usernameWarning}
+                        variant="outlined"
+                        onChange={onUsernameChange}
+                        onBlur={event => blurred(event, username, setUsernameError, setUsernameWarning)}
+                        className={classes.textField}
+                    />
+                </div>
+                
+                <div className={classes.container}>
+                    <TextField 
+                        id="password" 
+                        label="Password"
+                        value={password}
+                        type={"password"}
+                        error={passwordError}
+                        helperText={passwordWarning}
+                        variant="outlined"
+                        onChange={onPasswordChange}
+                        onBlur={event => blurred(event, password, setPasswordError, setPasswordWarning)}
+                        className={classes.textField}
+                    /> 
+                </div>
 
-            <div className={classes.container}>
-                <TextField 
-                    id="confirmPW" 
-                    label="Confirm Password"
-                    value={confirmPW}
-                    type={"password"}
-                    error={confirmPWError}
-                    helperText={confirmPWWarning}
-                    variant="outlined"
-                    onChange={onConfirmPWChange}
-                    onBlur={event => blurred(event, confirmPW, setConfirmPWError, setConfirmPWWarning)}
-                    className={classes.textField}
-                /> 
-            </div>
+                <div className={classes.container}>
+                    <TextField 
+                        id="confirmPW" 
+                        label="Confirm Password"
+                        value={confirmPW}
+                        type={"password"}
+                        error={confirmPWError}
+                        helperText={confirmPWWarning}
+                        variant="outlined"
+                        onChange={onConfirmPWChange}
+                        onBlur={event => blurred(event, confirmPW, setConfirmPWError, setConfirmPWWarning)}
+                        className={classes.textField}
+                    /> 
+                </div>
 
-            <div className={classes.container}>
-                <Button onClick={submit} variant="outlined" className={classes.button}>Sign Up</Button>
-            </div>
+                <div className={classes.container}>
+                    <Button onClick={submit} variant="outlined" className={classes.button}>Sign Up</Button>
+                </div>
+
+                <div className={classes.container}>
+                    <Button onClick={() => history.push("/login")} className={classes.button}>Already Has an Account? Log-in</Button>
+                </div>
+            </Paper>
         </form>
     );
 }

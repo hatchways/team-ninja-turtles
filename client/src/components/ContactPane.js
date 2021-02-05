@@ -4,15 +4,16 @@ import ContactCard from './ContactCard'
 import {getAllSessions} from "../apiCalls"
 import { CurrentSessionContext, SessionsContext } from '../pages/SocketioConnection';
 
-export default function ContactPane() {
+export default function ContactPane(props) {
     const {sessions, setSessions} = useContext(SessionsContext);
     const {room, setRoom} = useContext(CurrentSessionContext)
 
     useEffect(() => {
         getAllSessions((data) => {
             setSessions(data)
-            if (data.length > 0) {
-                setRoom(data[0])
+
+            if (room.session < 0 && data.length > 0) {
+                    setRoom(data[0])
             }
         }, (error) => {
             console.log(error)
