@@ -41,6 +41,7 @@ def addImages():
     db.session.commit()
     return jsonify({'successMessage': 'Images updated'})
 
+
 @inspirational_images_handler.route('/inspirational_images', methods=['GET'])
 @require_auth
 def getImages():
@@ -60,20 +61,28 @@ def getImages():
             counter += 1
         return json.dumps(dictionary, default=str)
 
-@inspirational_images_handler.route('/inspirational_images/<contest_id>', methods=['GET'])
-@require_auth
+
 def get_contest_inspirational_images(contest_id):
     try:
         all_data = db.session.query(Contest, InspirationalImage).filter(Contest.id == contest_id,
-            InspirationalImageContestLink.contest_id == Contest.id, 
-            InspirationalImageContestLink.image_id == InspirationalImage.id).order_by(InspirationalImageContestLink.contest_id).all()
+            InspirationalImageContestLink.contest_id == Contest.id,
+            InspirationalImageContestLink.image_id == InspirationalImage.id).\
+            order_by(InspirationalImageContestLink.contest_id).all()
         if not bool(all_data):
             raise Exception
     except Exception as e:
-        return jsonify(str(e))
+        return str(e), 404
 
     else:
         images = []
         for data in all_data:
             images.append(data.InspirationalImage.image_link)
-        return jsonify(images)
+
+        return images, 201
+
+
+@inspirational_images_handler.route('/inspirational_images/<contest_id>', methods=['GET'])
+@require_auth
+def get_contest_image(contest_id):
+    image, status = get_contest_inspirational_images(contest_id)
+    return jsonify(image), status
