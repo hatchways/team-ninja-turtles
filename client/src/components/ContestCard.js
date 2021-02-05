@@ -30,14 +30,20 @@ const useStyles = makeStyles((theme) => ({
         backgroundImage: 'linear-gradient(to top,rgba(0,0,0,.7) 10%,rgba(0,0,0,0))'
     },
     info: {
-        padding: '2rem 4rem'
+        leftMargin: "300px",
+        padding: '2rem 4rem',
+        width: "1100px",
+        height: "200px"
     },
     title: {
         fontSize: '1.4rem',
         fontWeight: 'bold'
     },
     description: {
+        height: "70%",
         fontSize: '1rem',
+        overflow: "hidden",
+        textOverflow: "ellipsis"
     },
     prizeAmount: {
         width: '8rem',

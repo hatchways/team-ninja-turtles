@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
         maringBottom: '0.5rem'
     },
     prizeAmount: {
-        width: '4rem',
+        width: '8rem',
         textAlign: 'center',
         padding: '0.5rem',
         marginLeft: '0.5rem',
@@ -70,9 +70,9 @@ const useStyles = makeStyles((theme) => ({
         marginTop: '0.5rem',
         display: 'flex',
         flexDirection: 'row',
-        '& .MuiTypography-h5': {
+        '& span': {
             alignSelf: 'center',
-            marginLeft: '1rem'
+            marginLeft: '1rem',
         }
     },
     avatar: {
@@ -159,6 +159,7 @@ export default function ContestDetails(props) {
         setWinningSubmission(parseInt(e.target.value))
     }
 
+
     const onWinnerSubmit = e => {
         setContestWinner(contestId, winningSubmission, data => {
             console.log('Winner Successfully Declared')
@@ -241,7 +242,8 @@ export default function ContestDetails(props) {
                                 }/>
                             </GridListTile>
                     ))
-                    if (Date.parse(contest.deadline_date) < Date.now() && contest.winner == null) {
+
+                    if (contest.winner === null) {
                         createSubmitWinnerButton()
                     }
                 } else {
@@ -324,7 +326,7 @@ export default function ContestDetails(props) {
                                 </div>
                                 <div className={classes.author}>
                                     <img src={user.icon} onClick={onProfileClick} alt='designer avatar' className={classes.avatar} />
-                                    <Typography onClick={onProfileClick} variant='h5'>{contest.creater_name}</Typography>
+                                    <Typography onClick={onProfileClick} variant='h7'>{contest.creater_name}</Typography>
                                 </div>
                             </Grid>
                             <Grid item xs={5} className={classes.submitButtonDiv}>
