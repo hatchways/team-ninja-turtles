@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Grid, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -25,11 +25,13 @@ export default function CreateContest() {
     const classes = useStyles()
     const {user, setUser} = useContext(UserContext)
 
-    if (user.username === "no-user") {
-        return (
-          <Redirect to='/login'/>
-        )
-    }
+    useEffect(() => {
+        if (user.username === "no-user") {
+            return (
+            <Redirect to='/login'/>
+            )
+        }
+    }, [user])
 
     return (
         <Grid container justify='center' className={classes.pageContainer}>

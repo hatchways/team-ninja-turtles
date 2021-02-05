@@ -82,12 +82,13 @@ function Socketio() {
       history.push('/profile/'+room.user.username)
   }
 
-
-  if (user.username === "no-user") {
-    return (
-      <Redirect to='/login'/>
-    )
-  }
+  useEffect( () => {
+    if (user.username === "no-user") {
+      return (
+        <Redirect to='/login'/>
+      )
+    }
+  }, [user])
 
   return (
     <CurrentSessionContext.Provider value={{room, setRoom}}>

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Redirect, useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 import { Paper, Typography, Button, Box } from '@material-ui/core'
@@ -117,11 +117,13 @@ export default function SubmitDesign(props) {
         })
     }
 
-    if (user.username === "no-user") {
-        return (
-          <Redirect to='/login'/>
-        )
-    }
+    useEffect(() => {
+        if (user.username === "no-user") {
+            return (
+              <Redirect to='/login'/>
+            )
+        }
+    }, [user])
 
 
     return (
