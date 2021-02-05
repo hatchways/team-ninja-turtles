@@ -4,7 +4,6 @@ import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 import TabPanel from '../components/TabPanel'
 import CheckoutForm from '../components/CheckoutForm'
-// import CreditCardForm from '../components/CreditCardForm'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import { 
@@ -170,18 +169,14 @@ export default function ContestDetails(props) {
     }
 
     const onWinnerSubmit = async(e) => {
-        var intentSecret = null
         checkStripeIDExists( // check if payment is set up before allow user submit a winner 
             (data) => {
-                intentSecret = data["intent_id"]
-                console.log(intentSecret)
+                let intentSecret = data["intent_id"]
                 if (intentSecret != null){
-                    let amount = contest.prize_contest
-                    let currency = 'usd'
+                    const amount = contest.prize_contest
+                    const currency = 'usd'
 
                     createPayment(amount, currency, data => {
-                        console.log(data.msg)
-                        console.log(data.client_secret)
                         setClientSecret(data.client_secret)
                         setOpenPaymentDialog(true)
                     }, error => {   
@@ -210,7 +205,6 @@ export default function ContestDetails(props) {
 
     const getContestInfo = contestId => {
         getContestDetails(contestId, (data) => {
-            console.log(data)
             data.title ? setContest(data) : setContest(null)
         },  (error) => {
             if (error instanceof RequestError && error.status === 400) {
@@ -229,7 +223,7 @@ export default function ContestDetails(props) {
     useEffect(() => {
         //when payment dialog close, should fetch new data 
         getContestInfo(contestId)
-    }, [openPaymentDialog])
+    }, [openPaymentDialog, contestId])
 
     useEffect(() => {
         if (contest) {
