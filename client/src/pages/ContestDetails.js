@@ -53,7 +53,10 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center'
     },
     description: {
-        marginBottom: '0.5rem'
+        marginBottom: '1.5rem'
+    },
+    descriptionInsp: {
+        maringBottom: '0.5rem'
     },
     prizeAmount: {
         width: '4rem',
@@ -341,10 +344,10 @@ export default function ContestDetails(props) {
                                 <Tab label='DESIGNS' />
                             </Tabs>
                             <TabPanel value={activeTab} index={0}>
-                                <Typography variant='h6' className={classes.description}>
+                                <Typography variant='h5' className={classes.description}>
                                     {contest.description}
                                 </Typography>
-                                <Typography variant='h5' className={classes.description}>
+                                <Typography variant='h6' className={classes.description}>
                                     {"Inspirational Images:"}
                                 </Typography>
                                 <GridList cellHeight={280} className={classes.gridList} cols={4} spacing={30}>
