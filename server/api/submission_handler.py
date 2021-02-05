@@ -23,7 +23,7 @@ def create_submission(current_user, contest_id):
     image = 'https://'+S3_BUCKET+".s3."+S3_REGION+'.amazonaws.com/'+folder_path
 
     try:
-        s3.upload_fileobj(request.files['file'], S3_BUCKET, folder_path)
+        s3.upload_fileobj(request.files['file'], S3_BUCKET, folder_path, ExtraArgs={'ACL': 'public-read'})
     except Exception as e:
         return jsonify({'error': str(e)})
 
