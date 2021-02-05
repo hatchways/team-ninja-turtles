@@ -52,6 +52,9 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'row',
         alignItems: 'center'
     },
+    description: {
+        marginBottom: '0.5rem'
+    },
     prizeAmount: {
         width: '4rem',
         textAlign: 'center',
@@ -129,9 +132,12 @@ export default function ContestDetails(props) {
     const {user, setUser} = useContext(UserContext)
     const [activeTab, setActiveTab] = useState(0)
     const [openDesignDialog, setOpenDesignDialog] = useState(false)
+    const [openInspirationalDialog, setOpenInspirationalDialog] = useState(false)
     const [contest, setContest] = useState(null)
     const [designOpening, setDesignOpening] = useState({})
-    const [gridListItems, setGridListItems] = useState(null)
+    const [inspirationalOpening, setInspirationalOpening] = useState({})
+    const [designGridListItems, setDesignGridListItems] = useState(null)
+    const [inspirationalGridListItems, setInspirationalGridListItems] = useState(null)
     const [submitButton, setSubmitButton] = useState(null)
     const [winningSubmission, setWinningSubmission] = useState(null)
     const contestId = props.match.params.id
@@ -143,6 +149,7 @@ export default function ContestDetails(props) {
 
     const handleClose = () => {
         setOpenDesignDialog(false);
+        setOpenInspirationalDialog(false);
     }
 
     const handleWinnerChange = e => {
@@ -178,6 +185,14 @@ export default function ContestDetails(props) {
         }
     }
 
+    const onInspirationalClick = e => {
+        const index = e.target.id
+        if (index) {
+            setInspirationalOpening(contest.attached_inspirational_images[index])
+            setOpenInspirationalDialog(true)
+        }
+    }
+
     const getContestInfo = contestId => {
         getContestDetails(contestId, (data) => {
             console.log(data)
@@ -199,6 +214,12 @@ export default function ContestDetails(props) {
     useEffect(() => {
         if (contest) {
             var newGridListItems = null
+            const newInspirationalGridListItems = contest.attached_inspirational_images.map((design, index) => (
+                <GridListTile key={index}>
+                    <img src={design} alt={design} id={index} onClick={onInspirationalClick} className={classes.designImage} />
+                </GridListTile>
+            ))
+            setInspirationalGridListItems(newInspirationalGridListItems)
             if (contest.hasOwnProperty('is_owner')) { // If contest does not have property 'designs', that means it is not the contest owner accessing the page
                 if (contest.designs.length > 0) { // Render this if it is the contest owner and there have been designs submitted
                     newGridListItems = contest.designs.map((design, index) => (
@@ -221,7 +242,7 @@ export default function ContestDetails(props) {
                         createSubmitWinnerButton()
                     }
                 } else {
-                    newGridListItems = <div>There is no images to display</div>
+                    newGridListItems = <div>There is no submitted designs</div>
                 }
             } else { // Render this if it is not the contest owner
                 if (contest.attached_inspirational_images.length > 0) {
@@ -232,11 +253,11 @@ export default function ContestDetails(props) {
                         </GridListTile>
                     ))
                 } else {
-                    newGridListItems = <div>There is no images to display</div>
+                    newGridListItems = <div>There is no submitted designs</div>
                 }
                 createSubmitDesignButton()
             }
-            setGridListItems(newGridListItems)
+            setDesignGridListItems(newGridListItems)
         }
     }, [contest, winningSubmission])
 
@@ -275,6 +296,14 @@ export default function ContestDetails(props) {
                             <Button onClick={handleClose} color="primary">Close</Button>
                         </DialogActions>
                     </Dialog>
+                    <Dialog open={openInspirationalDialog} onClose={handleClose} className={classes.dialog}>
+                        <DialogContent>
+                            <img src={inspirationalOpening} className={classes.dialogImage} />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose} color="primary">Close</Button>
+                        </DialogActions>
+                    </Dialog>
                     <div className={classes.backButtonDiv}>
                         <div className={classes.backButton} onClick={onBackButtonClick}>
                             <Typography className={classes.backButtonIcon}>{`<`}</Typography>
@@ -308,16 +337,24 @@ export default function ContestDetails(props) {
                                 variant='fullWidth'
                                 TabIndicatorProps={{ style: { background:'black' }}}
                             >
-                                <Tab label='DESIGNS' />
                                 <Tab label='BRIEF' />
+                                <Tab label='DESIGNS' />
                             </Tabs>
-                            <TabPanel value={activeTab} index={0} className={classes.tabPanel}>
+                            <TabPanel value={activeTab} index={0}>
+                                <Typography variant='h6' className={classes.description}>
+                                    {contest.description}
+                                </Typography>
+                                <Typography variant='h5' className={classes.description}>
+                                    {"Inspirational Images:"}
+                                </Typography>
                                 <GridList cellHeight={280} className={classes.gridList} cols={4} spacing={30}>
-                                    {gridListItems}
+                                    {inspirationalGridListItems}
                                 </GridList>
                             </TabPanel>
-                            <TabPanel value={activeTab} index={1}>
-                                {contest.description}
+                            <TabPanel value={activeTab} index={1} className={classes.tabPanel}>
+                                <GridList cellHeight={280} className={classes.gridList} cols={4} spacing={30}>
+                                    {designGridListItems}
+                                </GridList>
                             </TabPanel>
                         </Paper>
                     </div>
