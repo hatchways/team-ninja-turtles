@@ -63,13 +63,12 @@ export const register = async (username, password, email, onSuccess, onError) =>
     makeRequest("/api/register", "POST", {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
 }
 
-export const createContest = async (title, description, prize_contest, deadline_date, contest_creator, inspirational_images, onSuccess, onError) => {
+export const createContest = async (title, description, prize_contest, deadline_date, inspirational_images, onSuccess, onError) => {
     const data = {
         'title': title,
         'description': description,
         'prize_contest': prize_contest,
         'deadline_date': deadline_date,
-        'contest_creator': contest_creator,
         'inspirational_images': inspirational_images
     }
 
@@ -87,6 +86,19 @@ export const createInspirationalImage = async (link, onSuccess, onError) => {
 export const getStripeID = async (onSuccess, onError) => {
     get("/api/get_stripe_intent", {}, onSuccess, onError)
     return true
+}
+
+export const checkStripeIDExists = async (onSuccess, onError) => {
+    get("/api/get_stripe_id", {}, onSuccess, onError)
+}
+
+export const createPayment = async (amount, currency, onSuccess, onError) => {
+    const data = {
+        amount: amount,
+        currency: currency
+    }
+
+    makeRequest('/api/create_payment', 'POST',  {"Content-Type": "application/json"}, JSON.stringify(data), onSuccess, onError)
 }
 
 export const getOwnedContests = async (userId, onSuccess, onError) => {

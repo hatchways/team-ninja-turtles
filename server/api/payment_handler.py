@@ -9,11 +9,6 @@ from api.middleware import require_auth, get_current_user
 payment_handler = Blueprint("payment_handler", __name__)
 
 
-# Mock data
-def get_price_val(data):
-    return 1000, 'usd'
-
-
 @payment_handler.route("/api/get_stripe_intent", methods=["GET"])
 @require_auth
 @get_current_user
@@ -33,13 +28,27 @@ def get_stripe_intent(user):
 @payment_handler.route("/api/create_payment", methods=["POST"])
 def create_payment():
     try:
-        data = request.get_json()
-        price, currency = get_price_val(data)
+        request_json = request.get_json()
+        amount = request_json.get("amount")
+        currency = request_json.get("currency")
         intent = stripe.PaymentIntent.create(
-            amount=price,
+            amount=amount,
             currency=currency
         )
-        return jsonify({"client_secret": intent["client_secret"]}), 201
+        return jsonify({"client_secret": intent["client_secret"], "msg": "Payment has been successfully processed"}), 201
     except Exception as e:
         return jsonify(error=str(e)), 403
 
+
+@payment_handler.route("/api/get_stripe_id", methods=["GET"])
+@require_auth
+@get_current_user
+def get_stripe_id(user):
+    stripe.api_key = app.app.config['STRIPE_SK']
+
+    if user.stripe_id is None:
+       return jsonify({"error": "stripe id not found"}), 404
+
+    intent = stripe.SetupIntent.create(customer=user.stripe_id)
+
+    return jsonify({"intent_id": intent.client_secret}), 200

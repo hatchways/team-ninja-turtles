@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 import TabPanel from '../components/TabPanel'
+import CheckoutForm from '../components/CheckoutForm'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
 import { 
     Button, 
     Typography, 
@@ -21,9 +24,10 @@ import {
     Radio,
 } from '@material-ui/core'
 
-import RequestError, { getContestDetails, setContestWinner } from '../apiCalls'
+import RequestError, { getContestDetails, checkStripeIDExists, createPayment } from '../apiCalls'
 import { UserContext } from '../App'
 
+const stripePromise = loadStripe("pk_test_51IH8tAGt0nFBLozrVPDB6mwr6yEw9QOAVWhTQK0hErAcLv7F278Dz2f3P637jEaboOp7lJbAVnZNbQTxQUoqD91z00VxrG6s3T")
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
         height: 'calc(100vh - 100px)',
@@ -127,6 +131,17 @@ const useStyles = makeStyles((theme) => ({
     dialogImage: {
         width: '100%',
         height: '100%'
+    },
+    contestOverText: {
+        color: 'red',
+        backgroundColor: '#1f1f1f',
+        fontSize: '1.5rem',
+        padding: '1rem'
+    },
+    paymentDialog: {
+        '& .MuiDialog-paper': {
+            minWidth: '600px'
+        }
     }
 }))
 
@@ -135,6 +150,7 @@ export default function ContestDetails(props) {
     const {user, setUser} = useContext(UserContext)
     const [activeTab, setActiveTab] = useState(0)
     const [openDesignDialog, setOpenDesignDialog] = useState(false)
+    const [openPaymentDialog, setOpenPaymentDialog] = useState(false)
     const [openInspirationalDialog, setOpenInspirationalDialog] = useState(false)
     const [contest, setContest] = useState(null)
     const [designOpening, setDesignOpening] = useState({})
@@ -143,6 +159,7 @@ export default function ContestDetails(props) {
     const [inspirationalGridListItems, setInspirationalGridListItems] = useState(null)
     const [submitButton, setSubmitButton] = useState(null)
     const [winningSubmission, setWinningSubmission] = useState(null)
+    const [clientSecret, setClientSecret] = useState("")
     const contestId = props.match.params.id
     const history = useHistory()
 
@@ -155,21 +172,36 @@ export default function ContestDetails(props) {
         setOpenInspirationalDialog(false);
     }
 
+    const handlePaymentDialogClose = () => {
+        setOpenPaymentDialog(false)
+    }
+
     const handleWinnerChange = e => {
         setWinningSubmission(parseInt(e.target.value))
     }
 
-    const onWinnerSubmit = e => {
-        setContestWinner(contestId, winningSubmission, data => {
-            console.log('Winner Successfully Declared')
-        }, error => {
-            if (error instanceof RequestError && error.status === 400) {
-                console.log(error.body)
-            } else {
-                console.log("unexpected error")
+    const onWinnerSubmit = async(e) => {
+        checkStripeIDExists( // check if payment is set up before allow user submit a winner 
+            (data) => {
+                let intentSecret = data["intent_id"]
+                if (intentSecret != null){
+                    const amount = contest.prize_contest
+                    const currency = 'usd'
+
+                    createPayment(amount, currency, data => {
+                        setClientSecret(data.client_secret)
+                        setOpenPaymentDialog(true)
+                    }, error => {   
+                        console.log("unexpected error")
+                    })
+                } else {
+                    alert("Please set up your payment before selecting a winner.")
+                }
+            },
+            (error) => {
+                alert("Please set up your payment before selecting a winner.")
             }
-        })
-        getContestInfo(contestId)
+        )
     }
 
     const onBackButtonClick = e => {
@@ -198,7 +230,6 @@ export default function ContestDetails(props) {
 
     const getContestInfo = contestId => {
         getContestDetails(contestId, (data) => {
-            console.log(data)
             data.title ? setContest(data) : setContest(null)
         },  (error) => {
             if (error instanceof RequestError && error.status === 400) {
@@ -215,7 +246,16 @@ export default function ContestDetails(props) {
     }, [])
 
     useEffect(() => {
+        //when payment dialog close, should fetch new data 
+        getContestInfo(contestId)
+    }, [openPaymentDialog, contestId])
+
+    useEffect(() => {
         if (contest) {
+            // Hide submit button when contest is over 
+            if (contest.winner !== null) {
+                setSubmitButton(null)
+            }
             var newGridListItems = null
             const newInspirationalGridListItems = contest.attached_inspirational_images.map((design, index) => (
                 <GridListTile key={index}>
@@ -258,7 +298,9 @@ export default function ContestDetails(props) {
                 } else {
                     newGridListItems = <div>There is no submitted designs</div>
                 }
-                createSubmitDesignButton()
+                if (Date.parse(contest.deadline_date) < Date.now() && contest.winner == null) {
+                    createSubmitDesignButton()
+                }
             }
             setDesignGridListItems(newGridListItems)
         }
@@ -286,6 +328,7 @@ export default function ContestDetails(props) {
 
     return (
         contest !== null ? (
+        <Elements stripe={stripePromise}>
             <div className={classes.pageContainer}>
                 <div className={classes.containerWrapper}>
                     <Dialog open={openDesignDialog} onClose={handleClose} className={classes.dialog}>
@@ -299,13 +342,27 @@ export default function ContestDetails(props) {
                             <Button onClick={handleClose} color="primary">Close</Button>
                         </DialogActions>
                     </Dialog>
+                    <Dialog open={openPaymentDialog} onClose={handlePaymentDialogClose} className={classes.paymentDialog}>
+                        <DialogTitle>
+                            Checkout Form 
+                        </DialogTitle>
+                        <DialogContent>
+                            <CheckoutForm 
+                                clientSecret={clientSecret} 
+                                contestId={contestId} 
+                                winningSubmission={winningSubmission}
+                                setOpenPaymentDialog={setOpenPaymentDialog}
+                            />
+                        </DialogContent>
+                    </Dialog>
+
                     <Dialog open={openInspirationalDialog} onClose={handleClose} className={classes.dialog}>
                         <DialogContent>
-                            <img src={inspirationalOpening} className={classes.dialogImage} />
+                            <img src={inspirationalOpening} className={classes.dialogImage} alt="" />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose} color="primary">Close</Button>
-                        </DialogActions>
+                    </DialogActions>
                     </Dialog>
                     <div className={classes.backButtonDiv}>
                         <div className={classes.backButton} onClick={onBackButtonClick}>
@@ -332,6 +389,7 @@ export default function ContestDetails(props) {
                             </Grid>
                         </Grid>
                     </div>
+                    {contest.winner !== null ? <div className={classes.contestOverText}>This contest is over</div> : <div></div>}
                     <div className={classes.contestDesigns}>
                         <Paper>
                             <Tabs
@@ -363,6 +421,7 @@ export default function ContestDetails(props) {
                     </div>
                 </div>
             </div>
+        </Elements>
         ) : (
         <div className={classes.pageContainer}>
             <div className={classes.backButtonDiv}>
