@@ -23,7 +23,7 @@ export const UserContext = React.createContext();
 
 function App() {
   // this default value avoids crashing for navbar and accessing private pages when not login, should be changed in the future
-  const [user, setUser] = useState({username: "no-user", email: "", icon: process.env.PUBLIC_URL + '/images/avatar-1.png'})
+  const [user, setUser] = useState({username: "", email: "", icon: process.env.PUBLIC_URL + '/images/avatar-1.png'})
 
   // load user context if the existing cookies hasnt expire
   useEffect(() => {
@@ -35,6 +35,8 @@ function App() {
         })
     }, (error) => {
         console.log("No valid user detected")
+        // opt-out current user if it the token is  expired
+        setUser({username: "no-user", email: "", icon: process.env.PUBLIC_URL + '/images/avatar-1.png'})
     })
 }, [])
 

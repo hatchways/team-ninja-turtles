@@ -1,8 +1,9 @@
-import React from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useContext, useEffect } from 'react'
+import { Redirect, useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 import { Paper, Typography, Button, Box } from '@material-ui/core'
 import { useDropzone } from 'react-dropzone'
+import { UserContext } from '../App'
 
 const useStyles = makeStyles((theme) => ({
     pageContainer: {
@@ -63,6 +64,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SubmitDesign(props) {
     const history = useHistory()
     const classes = useStyles()
+    const {user, setUser} = useContext(UserContext);
     const {
         acceptedFiles,
         fileRejections,
@@ -114,6 +116,15 @@ export default function SubmitDesign(props) {
                 console.error('Error:', error);
         })
     }
+
+    useEffect(() => {
+        if (user.username === "no-user") {
+            return (
+              <Redirect to='/login'/>
+            )
+        }
+    }, [user])
+
 
     return (
         <div className={classes.pageContainer}>
